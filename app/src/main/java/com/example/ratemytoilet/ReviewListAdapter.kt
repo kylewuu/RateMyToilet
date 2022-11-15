@@ -26,11 +26,13 @@ class MyListAdapter
         val subtitleText = rowView.findViewById<View>(R.id.subtitle) as TextView
         val ratingsText = rowView.findViewById<View>(R.id.tv_rating) as TextView
         val distanceText = rowView.findViewById<View>(R.id.tv_distance) as TextView
+
         ratingsText.text = ratings[position]
         titleText.text = maintitle[position]
         imageView.setImageResource(imgid[position])
         subtitleText.text = subtitle[position]
         distanceText.text = distance[position]
+
         return rowView
     }
 }

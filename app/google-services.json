@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "418757379689",
+    "project_id": "ratemytoilet-da4c8",
+    "storage_bucket": "ratemytoilet-da4c8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:418757379689:android:11131d755b99faf17204f8",
+        "android_client_info": {
+          "package_name": "com.example.RateMyToilet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "418757379689-qe72m78s5hpf3fsrscb42cdam5423m9n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWUZ-eynud7UR3jPTHLPcE8F-DA7PLKM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "418757379689-qe72m78s5hpf3fsrscb42cdam5423m9n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:418757379689:android:8a310cfdf025cd1e7204f8",
+        "android_client_info": {
+          "package_name": "com.example.ratemytoilet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "418757379689-qe72m78s5hpf3fsrscb42cdam5423m9n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWUZ-eynud7UR3jPTHLPcE8F-DA7PLKM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "418757379689-qe72m78s5hpf3fsrscb42cdam5423m9n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

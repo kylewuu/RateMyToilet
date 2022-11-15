@@ -1,7 +1,5 @@
 package com.example.ratemytoilet
 
-import android.R.attr.subtitle
-import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -50,10 +48,7 @@ class ListActivity : AppCompatActivity() {
         var list = findViewById<View>(R.id.lv_reviews) as ListView
         list.setAdapter(adapter)
 
-
-
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main1, menu) // Menu Resource, Menu
@@ -64,7 +59,7 @@ class ListActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.getItemId()) {
             R.id.action_maintain -> {
-                val filterDialog = FilterDialogment()
+                val filterDialog = FilterDialogFragment()
                 filterDialog.show(supportFragmentManager, "Filter")
                 // TODO: Return filter settings and filter reviews
                 true
