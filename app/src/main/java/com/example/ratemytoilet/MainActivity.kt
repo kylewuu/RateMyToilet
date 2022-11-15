@@ -10,10 +10,12 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.ratemytoilet.database.Locations
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -38,6 +40,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
 
+    private var count = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -54,7 +58,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
         val filterButton = findViewById<Button>(R.id.filterButton)
         filterButton.setOnClickListener {
-            val filterDialog = FilterDialogment()
+            val filterDialog = FilterDialogFragment()
             filterDialog.show(supportFragmentManager, "Filter")
         }
 
@@ -157,5 +161,13 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             return true
         }
         return false
+    }
+
+    /**
+     * Adds a new location to the firestore. Currently does not add any real data.
+     */
+    fun addNewLocation(view: View) {
+        count++
+        Locations(count)
     }
 }
