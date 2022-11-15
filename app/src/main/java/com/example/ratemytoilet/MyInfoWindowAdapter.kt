@@ -66,4 +66,5 @@ class MyInfoWindowAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
         setWindowText(marker, view)
         return view
     }
+
 }
