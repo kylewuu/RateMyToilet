@@ -9,7 +9,7 @@ import android.widget.Spinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.DialogFragment
 
-class FilterDialogment : DialogFragment() {
+class FilterDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val layoutInflater = requireActivity().layoutInflater
