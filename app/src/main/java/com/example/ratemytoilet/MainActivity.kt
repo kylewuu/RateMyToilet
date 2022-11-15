@@ -1,6 +1,7 @@
 package com.example.ratemytoilet
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Criteria
@@ -8,21 +9,23 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.ui.IconGenerator
 
-class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener {
+
+class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener, OnInfoWindowClickListener {
     private var myLocationMarker : Marker ?= null
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMainBinding
@@ -54,6 +57,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         filterButton.setOnClickListener {
             val filterDialog = FilterDialogment()
             filterDialog.show(supportFragmentManager, "Filter")
+
         }
 
     }
@@ -76,6 +80,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         markerOptions = MarkerOptions()
         mMap.setOnMarkerClickListener(this)
         mMap.setInfoWindowAdapter(MyInfoWindowAdapter(this))
+        mMap.setOnInfoWindowClickListener(this)
         checkPermission()
     }
 
@@ -146,8 +151,14 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     override fun onMarkerClick(marker: Marker): Boolean {
         if (marker.equals(myMarker)) {
             marker.showInfoWindow()
-            return true
+            return false
         }
-        return false
+        return true
     }
+
+    override fun onInfoWindowClick(marker: Marker) {
+        val viewIntent = Intent(this, DisplayActivity::class.java)
+        startActivity(viewIntent)
+    }
+
 }
