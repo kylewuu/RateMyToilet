@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="washroomNameText" type="id" />
+    <item name="reviewNumberText" type="id" />
+    <item name="dateText" type="id" />
+    <item name="overallRate" type="id" />
+    <item name="textView6" type="id" />
+    <item name="genderText" type="id" />
+    <item name="textView8" type="id" />
+    <item name="paperCheckText" type="id" />
+    <item name="textView10" type="id" />
+    <item name="soapCheckText" type="id" />
+    <item name="commentListView" type="id" />
+    <item name="editButton" type="id" />
+</resources>
