@@ -17,6 +17,28 @@
         android:theme="@style/Theme.RateMyToilet"
         tools:targetApi="31">
         <activity
+            android:name=".launch.ConfirmEmailActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".launch.RegisterEmailActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".launch.LaunchActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".ListActivity"
             android:exported="false">
             <meta-data
@@ -37,7 +59,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayActivity"/>
+        <activity android:name=".DisplayActivity" />
     </application>
 
 </manifest>
