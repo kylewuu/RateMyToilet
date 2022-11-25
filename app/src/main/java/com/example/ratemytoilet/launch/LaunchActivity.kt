@@ -29,8 +29,8 @@ class LaunchActivity : AppCompatActivity() {
         moveTaskToBack(true)
     }
 
-    fun onSignUpClicked(view: View) {
-        val intent = Intent(this, RegisterEmailActivity::class.java)
+    fun onSignInClicked(view: View) {
+        val intent = Intent(this, PhoneActivity::class.java)
         startActivity(intent)
     }
 }
