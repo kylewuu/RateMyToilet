@@ -4,25 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".launch.LaunchActivity"
     android:padding="16dp"
-    android:orientation="vertical">
+    tools:context=".launch.PhoneActivity">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/sign_up_button"
+        <EditText
+            android:id="@+id/phone_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onSignInClicked"
-            android:text="@string/sign_in" />
+            android:layout_marginVertical="8dp"
+            android:inputType="phone"
+            android:hint="@string/phone" />
 
     </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:onClick="onVerifyPhoneClick"
+        android:text="@string/next"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
