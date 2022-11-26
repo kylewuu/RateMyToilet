@@ -1,11 +1,13 @@
 package com.example.ratemytoilet
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DisplayActivity : AppCompatActivity() {
     private lateinit var userCommentList: ArrayList<UserComment>
@@ -15,11 +17,17 @@ class DisplayActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         commentList = findViewById<ListView>(R.id.commentListView)
         userCommentList = ArrayList()
         listAdapter = UserCommentListAdapter(applicationContext, userCommentList)
         commentList.adapter = listAdapter
         setData()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     fun setData() {
@@ -29,7 +37,7 @@ class DisplayActivity : AppCompatActivity() {
         val paperText = findViewById<TextView>(R.id.paperCheckText)
         val soapText = findViewById<TextView>(R.id.soapCheckText)
 
-        val editButton = findViewById<ImageButton>(R.id.editButton)
+        val addButton = findViewById<FloatingActionButton>(R.id.addButton)
         val washroomName = findViewById<TextView>(R.id.washroomNameText)
         val rateNumber = findViewById<TextView>(R.id.reviewNumberText)
 
@@ -53,6 +61,17 @@ class DisplayActivity : AppCompatActivity() {
         soapText.setText("Yes")
         dataText.setText("Nov.7, 2022")
         rate.setRating(4.7f)
+
+        addButton.setOnClickListener {
+            val admin = true
+            if (!admin) {
+                val intent = Intent(this, NormalUserAddReviewActivity::class.java)
+                startActivity(intent)
+            } else {
+                val filterDialogFragment = AdminFragment()
+                filterDialogFragment.show(supportFragmentManager, "Admin")
+            }
+        }
 
     }
 }

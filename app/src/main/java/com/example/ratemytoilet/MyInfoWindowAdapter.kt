@@ -1,6 +1,7 @@
 package com.example.ratemytoilet
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
@@ -31,19 +32,19 @@ class MyInfoWindowAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
             if (soapResult == "true") {
                 soapCheck.setImageResource(R.drawable.checkmark)
             } else {
-                soapCheck.setImageResource(R.drawable.uncheckmark)
+                soapCheck.setImageResource(R.drawable.uncheck)
             }
 
             if (paperResult == "true") {
                 paperCheck.setImageResource(R.drawable.checkmark)
             } else {
-                paperCheck.setImageResource(R.drawable.uncheckmark)
+                paperCheck.setImageResource(R.drawable.uncheck)
             }
 
             if (accessResult == "true") {
                 accessCheck.setImageResource(R.drawable.checkmark)
             } else {
-                accessCheck.setImageResource(R.drawable.uncheckmark)
+                accessCheck.setImageResource(R.drawable.uncheck)
             }
         }
 

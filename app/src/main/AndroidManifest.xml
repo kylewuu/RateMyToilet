@@ -37,7 +37,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayActivity"/>
+        <activity android:name=".DisplayActivity"
+            android:label="Review Washroom"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".NormalUserAddReviewActivity"
+            android:label="Review Washroom"
+            android:parentActivityName=".DisplayActivity"/>
     </application>
 
 </manifest>

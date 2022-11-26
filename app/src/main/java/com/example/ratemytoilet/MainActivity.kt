@@ -11,6 +11,7 @@ import android.location.LocationManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import androidx.core.app.ActivityCompat
@@ -24,9 +25,11 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.firebase.firestore.auth.User
+import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
 
-class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener, OnInfoWindowClickListener {
+class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
     private var myLocationMarker : Marker ?= null
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMainBinding
@@ -39,6 +42,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var  markerOptions: MarkerOptions
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
+    private lateinit var myClusterManager: ClusterManager<MyItem>
 
     private var count = 0
 
@@ -58,8 +62,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
         val filterButton = findViewById<Button>(R.id.filterButton)
         filterButton.setOnClickListener {
-            val filterDialog = FilterDialogFragment()
-            filterDialog.show(supportFragmentManager, "Filter")
+            val filterDialogFragment = FilterDialogFragment()
+            filterDialogFragment.show(supportFragmentManager, "Filter")
         }
 
         val listButton = findViewById<Button>(R.id.listButton)
@@ -86,9 +90,17 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         polylineOptions.color(Color.BLACK)
         polylines = ArrayList()
         markerOptions = MarkerOptions()
-        mMap.setOnMarkerClickListener(this)
-        mMap.setInfoWindowAdapter(MyInfoWindowAdapter(this))
-        mMap.setOnInfoWindowClickListener(this)
+        myClusterManager = ClusterManager<MyItem>(applicationContext , mMap)
+        myClusterManager.renderer = MarkerClusterRenderer(this, mMap, myClusterManager)
+        myClusterManager.markerCollection.setInfoWindowAdapter(MyInfoWindowAdapter(this))
+        mMap.setOnMarkerClickListener(myClusterManager)
+        mMap.setOnCameraIdleListener(myClusterManager)
+        mMap.setInfoWindowAdapter(myClusterManager.markerManager)
+        myClusterManager.setOnClusterItemInfoWindowClickListener {
+            val viewIntent = Intent(this, DisplayActivity::class.java)
+            startActivity(viewIntent)
+        }
+        mMap.setOnInfoWindowClickListener(myClusterManager)
         checkPermission()
     }
 
@@ -149,19 +161,30 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     fun getToiletLocation() {
         val latLng = LatLng(49.278762746674886, -122.9172651303747)
+        val latlng2 = LatLng(49.27883401764781, -122.9172336167242)
+        val latlng3 = LatLng(49.279164723163824, -122.91720144989004)
+        val latlng4 = LatLng(49.279182669314714, -122.9171085521842)
+        val latlng5 = LatLng(49.27950003509996, -122.91687906260248)
         val bubble = IconGenerator(this)
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        val toiletMarkOptions = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.7"))).anchor(bubble.getAnchorU(), bubble.getAnchorV()).title("true, false, true").snippet("AQ, 2008;4.7")
-        myMarker = mMap.addMarker(toiletMarkOptions)!!
-        //myMarker.showInfoWindow()
-    }
+        val arr = ArrayList<MyItem>()
+        val item = MyItem(latLng, "true,false,true", "AQ, 2008;4.7", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.7")))
+        val item2 = MyItem(latlng2, "true,true,true", "AQ, 2007;4.5", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.5")))
+        val item3 = MyItem(latlng3, "false,true,false", "AQ, 2006;4.3", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.3")))
+        val item4 = MyItem(latlng4, "false,false,false", "AQ, 2005;3.1", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("3.1")))
+        val item5 = MyItem(latlng5, "false,false,false", "AQ, 2004;3.1", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("3.1")))
+        arr.add(item)
+        arr.add(item2)
+        arr.add(item3)
+        arr.add(item4)
+        arr.add(item5)
 
-    override fun onMarkerClick(marker: Marker): Boolean {
-        if (marker.equals(myMarker)) {
-            marker.showInfoWindow()
-            return false
-        }
-        return true
+
+        myClusterManager.addItems(arr)
+        myClusterManager.cluster()
+        //val toiletMarkOptions = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.warning)).anchor(bubble.getAnchorU(), bubble.getAnchorV()).title("true, false, true").snippet("AQ, 2008;4.7")
+        //myMarker = mMap.addMarker(toiletMarkOptions)!!
+        //myMarker.showInfoWindow()
     }
 
     /**
@@ -171,10 +194,4 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         count++
         Locations(count)
     }
-
-    override fun onInfoWindowClick(marker: Marker) {
-        val viewIntent = Intent(this, DisplayActivity::class.java)
-        startActivity(viewIntent)
-    }
-
 }
