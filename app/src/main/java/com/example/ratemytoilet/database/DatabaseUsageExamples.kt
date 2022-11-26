@@ -29,9 +29,12 @@ class DatabaseUsageExamples {
          * Needs to be called in a coroutine.
          */
         fun getAllLocations() {
+            var locationViewModel = LocationViewModel()
             CoroutineScope(Dispatchers.IO).launch {
-                var allLocations = LocationRepository.getAllLocations()
-                println("debugk: ${allLocations}")
+                var allLocations = locationViewModel.getAllLocations()
+                for (location in allLocations) {
+                    println("debugk: $location")
+                }
             }
         }
 
@@ -41,6 +44,8 @@ class DatabaseUsageExamples {
          * is added
          */
         fun addNewLocation() {
+            var locationViewModel = LocationViewModel()
+
             var newLocation = Location()
             newLocation.roomNumber = 789
             newLocation.gender = 1
@@ -48,10 +53,7 @@ class DatabaseUsageExamples {
             newLocation.lng = 123.123
             newLocation.date = Calendar.getInstance().timeInMillis
             newLocation.name = "Second washroom"
-            LocationRepository.addLocation(newLocation)
-
-            // Use the view model addLocation if you have access to the viewmodel instance.
-            // LocationViewModel.addLocation(newLocation)
+            locationViewModel.addLocation(newLocation)
         }
 
         /**
@@ -60,10 +62,14 @@ class DatabaseUsageExamples {
          * from Location.
          */
         fun getReviewsForLocation() {
+            var reviewViewModel = ReviewViewModel()
+
             CoroutineScope(Dispatchers.IO).launch{
                 var locationId = "KrsezdPuMUVlMxezoYxc"
-                var reviews = ReviewRepository.getReviewsForLocation(locationId)
-                println("debugk: ${reviews[0]}") // gets the first one because there is a test review for it
+                var reviews = reviewViewModel.getReviewsForLocation(locationId)
+                for (review in reviews) {
+                    println("debugk: $review")
+                }
             }
         }
 
@@ -83,7 +89,8 @@ class DatabaseUsageExamples {
             newReview.accessibility = 0
             newReview.comment = "New comment"
 
-            ReviewRepository.addReviewForLocation(newReview)
+            var reviewViewModel = ReviewViewModel()
+            reviewViewModel.addReviewForLocation(newReview)
         }
     }
 

@@ -10,4 +10,8 @@ class LocationViewModel : ViewModel() {
     fun addLocation(location: Location) {
         LocationRepository.addLocation(location)
     }
+
+    suspend fun getAllLocations(): List<Location> {
+        return LocationRepository.getAllLocations()
+    }
 }

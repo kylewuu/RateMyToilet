@@ -185,6 +185,6 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     }
 
     fun testFunction(view: View) {
-        DatabaseUsageExamples.getReviewsForLocation()
+        DatabaseUsageExamples.getAllLocations()
     }
 }
