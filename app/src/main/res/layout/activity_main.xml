@@ -65,7 +65,7 @@
             android:text="Add"
             android:textColor="#9754CB"
             android:backgroundTint="#FAF8F8"
-            android:onClick="addNewLocation" />
+            android:onClick="testFunction" />
 
     </LinearLayout>
 

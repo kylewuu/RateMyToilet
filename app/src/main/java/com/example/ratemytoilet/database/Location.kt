@@ -1,7 +1,6 @@
 package com.example.ratemytoilet.database
 
 import com.google.firebase.firestore.DocumentSnapshot
-import org.checkerframework.checker.units.qual.K
 
 /**
  * https://medium.com/firebase-developers/android-mvvm-firestore-37c3a8d65404
@@ -30,7 +29,7 @@ data class Location (
         }
     }
 
-    fun toMap(): HashMap<String, Any> {
+    fun toLocationMap(): HashMap<String, Any> {
         return hashMapOf(
             "roomNumber" to this.roomNumber,
             "gender" to this.gender,

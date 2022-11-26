@@ -1,10 +1,15 @@
 package com.example.ratemytoilet.database
 
 import com.example.ratemytoilet.database.Location.Companion.toLocation
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -21,32 +26,29 @@ class LocationRepository {
         fun getLocationById() {
             CoroutineScope(IO).launch {
                 var location = collection.document("KrsezdPuMUVlMxezoYxc").get().await().toLocation()
-
-                println("debugk: ${location.name}")
             }
         }
 
-        fun getAllLocations() {
-            CoroutineScope(IO).launch {
-                var allLocations: List<Location> = collection.get().await().documents.map({it.toLocation()})
+        suspend fun getAllLocations(): List<Location>  {
+            return collection.get().await().documents.map { it.toLocation() }
+        }
 
-                println("debugk: ${allLocations.size}")
+        fun getAllLocationsFlow(): Flow<List<Location>> {
+            return callbackFlow {
+                var listener = collection.addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
+                    if (firebaseFirestoreException == null && querySnapshot != null) {
+                        var ret = querySnapshot.documents.mapNotNull { it.toLocation() };
+                        trySend(ret)
+                    }
+                }
+                awaitClose {
+                    listener.remove()
+                }
             }
         }
 
-        /** TODO move this comment to the viewmodel
-        example usage:
-        var newLocation = com.example.ratemytoilet.database.Location()
-        newLocation.roomNumber = 1234
-        newLocation.gender = 1
-        newLocation.lat = 123.456
-        newLocation.lng = 123.123
-        newLocation.date = Calendar.getInstance().timeInMillis
-        newLocation.name = "Second washroom"
-        addLocation(newLocation)
-         */
         fun addLocation(newLocation: Location) {
-            collection.add(newLocation.toMap())
+            collection.add(newLocation.toLocationMap())
         }
     }
 }
