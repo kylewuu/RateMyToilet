@@ -9,12 +9,13 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.ratemytoilet.database.DatabaseUsageExamples
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,6 +28,8 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.ui.IconGenerator
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener, OnInfoWindowClickListener {
     private var myLocationMarker : Marker ?= null
@@ -41,8 +44,6 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var  markerOptions: MarkerOptions
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
-
-    private var count = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +71,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             this.startActivity(listActivityIntent)
         }
 
+        DatabaseUsageExamples.initializeLocationViewModel(this)
     }
 
     override fun onStart() {
@@ -179,17 +181,12 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         return true
     }
 
-    /**
-     * Adds a new location to the firestore. Currently does not add any real data.
-     */
-    fun addNewLocation(view: View) {
-        count++
-        //Locations(count)
-    }
-
     override fun onInfoWindowClick(marker: Marker) {
         val viewIntent = Intent(this, DisplayActivity::class.java)
         startActivity(viewIntent)
     }
 
+    fun testFunction(view: View) {
+        DatabaseUsageExamples.addReview()
+    }
 }
