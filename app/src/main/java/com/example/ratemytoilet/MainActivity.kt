@@ -28,6 +28,8 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.ui.IconGenerator
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener, OnInfoWindowClickListener {
     private var myLocationMarker : Marker ?= null
@@ -185,6 +187,6 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     }
 
     fun testFunction(view: View) {
-        DatabaseUsageExamples.getAllLocations()
+        DatabaseUsageExamples.addReview()
     }
 }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+
 /**
  * refs:
  * https://medium.com/firebase-developers/android-mvvm-firestore-37c3a8d65404
