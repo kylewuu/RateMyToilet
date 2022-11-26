@@ -1,4 +1,24 @@
 <resources>
     <string name="app_name">RateMyToilet</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="sign_in">Sign In</string>
+    <string name="login">Log In</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="next">Next</string>
+    <string name="confirmation_code">Confirmation Code</string>
+    <string name="desc_confirmation_code">A confirmation link has been emailed to %s. Please visit your email and click this link.</string>
+    <string name="confirm">Confirm</string>
+    <string name="error">Error</string>
+    <string name="verification_failed">Verification failed. Please try again.</string>
+    <string name="prefs_key_phone">prefs_key_phone</string>
+    <string name="title_password_mismatch">Password mismatch</string>
+    <string name="desc_password_mismatch">Please ensure passwords match.</string>
+    <string name="prefs_filename">rmp_prefs</string>
+    <string name="phone">Phone Number</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="submit">Submit</string>
+    <string name="invalid_phone">Please enter a valid phone number.</string>
+    <string name="invalid_auth_code">Verification failed. Please ensure the veriifcation code is correct and try again.</string>
 </resources>

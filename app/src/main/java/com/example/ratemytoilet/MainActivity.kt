@@ -15,9 +15,12 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import androidx.core.app.ActivityCompat
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import androidx.core.content.ContextCompat
-import com.example.ratemytoilet.database.Locations
+import com.example.ratemytoilet.database.DatabaseUsageExamples
 import com.example.ratemytoilet.databinding.ActivityMainBinding
+import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
@@ -28,6 +31,8 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.firestore.auth.User
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
     private var myLocationMarker : Marker ?= null
@@ -72,6 +77,20 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
             this.startActivity(listActivityIntent)
         }
 
+        DatabaseUsageExamples.initializeLocationViewModel(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = Firebase.auth.currentUser
+        if (currentUser == null) {
+            loadLaunchScreen()
+        }
+    }
+
+    private fun loadLaunchScreen() {
+        val intent = Intent(this, LaunchActivity::class.java)
+        startActivity(intent)
     }
 
     /**
