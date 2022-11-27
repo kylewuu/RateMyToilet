@@ -1,9 +1,6 @@
 package com.example.ratemytoilet
 
 import android.Manifest
-import android.app.Activity
-import android.app.PendingIntent.getActivity
-
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -20,8 +17,6 @@ import android.widget.RatingBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import com.example.ratemytoilet.database.DatabaseUsageExamples
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.example.ratemytoilet.launch.LaunchActivity
@@ -35,7 +30,6 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.ui.IconGenerator
-import java.util.*
 
 
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener, OnInfoWindowClickListener {
@@ -214,7 +208,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
         val viewIntent = Intent(this, AddNewLocationFragment::class.java)
         startActivity(viewIntent)
-        //DatabaseUsageExamples.addReview()
+//        DatabaseUsageExamples.addNewLocation()
 
         // Create fragment
         /*
