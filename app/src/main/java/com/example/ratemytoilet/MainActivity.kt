@@ -1,6 +1,7 @@
 package com.example.ratemytoilet
 
 import android.Manifest
+
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -15,6 +16,8 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.example.ratemytoilet.database.DatabaseUsageExamples
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.example.ratemytoilet.launch.LaunchActivity
@@ -29,7 +32,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.ui.IconGenerator
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener, OnInfoWindowClickListener {
     private var myLocationMarker : Marker ?= null
@@ -45,6 +48,10 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
 
+    // Buttons
+    private lateinit var filterButton: Button
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -59,7 +66,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val filterButton = findViewById<Button>(R.id.filterButton)
+        filterButton = findViewById<Button>(R.id.filterButton)
         filterButton.setOnClickListener {
             val filterDialog = FilterDialogFragment()
             filterDialog.show(supportFragmentManager, "Filter")
@@ -78,7 +85,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         super.onStart()
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
-            loadLaunchScreen()
+            //loadLaunchScreen()
         }
     }
 
@@ -186,7 +193,28 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         startActivity(viewIntent)
     }
 
-    fun testFunction(view: View) {
-        DatabaseUsageExamples.addReview()
+
+    fun onAddNewLocationClick(view: View) {
+        //DatabaseUsageExamples.addReview()
+
+        // Create fragment
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        transaction.replace(R.id.frameLayout, AddNewLocationFragment(), "Test")
+        transaction.commit()
+
+        // Remove filter button visibility
+        filterButton.visibility = View.GONE
+
+        // Re-add action bar, and change the title.
+        if (supportActionBar != null) {
+            supportActionBar?.show()
+            supportActionBar?.title = "Add New Washroom"
+        }
+
+
+
+
+
     }
 }
