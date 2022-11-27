@@ -2,10 +2,12 @@ package com.example.ratemytoilet
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat.setBackgroundTintList
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.Review
@@ -18,56 +20,74 @@ import java.util.*
 
 class AddNewLocationFragment : AppCompatActivity() {
 
+    // Views
     private lateinit var ratingBar: RatingBar
     private lateinit var roomNumber: EditText
     private lateinit var washroomName: EditText
-    private var gender: Int? = 3
+    private lateinit var paperTowelButtonYes: Button
+    private lateinit var paperTowelButtonNo: Button
+    private lateinit var soapButtonYes: Button
+    private lateinit var soapButtonNo: Button
+
+    // Vars to save
+    private var gender: Int? = 0
     private var addLocationLatLng : LatLng? = null
+    private var paperTowelValue: Int = 0
+    private var soapValue: Int = 0
 
-
+    // Array of genders
     val genderArray = arrayOf("Male", "Female", "Universal")
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_add_new_location)
 
+        // Set views
+        paperTowelButtonYes = findViewById<Button>(R.id.bt_paperTowelsYes)
+        paperTowelButtonNo = findViewById<Button>(R.id.bt_paperTowelsNo)
+        soapButtonYes = findViewById<Button>(R.id.bt_soapYes)
+        soapButtonNo = findViewById<Button>(R.id.bt_soapNo)
 
+        // Setup spinner for Gender
         val genderSelected = findViewById<TextView>(R.id.tv_genderSelected)
         val spinner = findViewById<Spinner>(R.id.sp_gender)
         spinner?.adapter = ArrayAdapter(this, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, genderArray ) as SpinnerAdapter
-        //spinner.prompt = "Select Gender"
+
+
+        // Update textView with selected gender
         spinner?.onItemSelectedListener = object:AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 gender = p2
                 genderSelected.text = genderArray[p2]
-                /*
-                if (inputTypeResult != null) {
-                    inputTypeResult.text = inputTypeArray[p2]   // Set the textView text with the chosen element
-
-                }
-
-                 */
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
-                //Do nothing, compiler complains if not implemented
+                //Do nothing
             }
 
         }
     }
 
 
+
+    // Start the AddLocationMapActivity. User chooses new washroom's location
     fun onAddLocationClick(view: View){
         val viewIntent = Intent(this, AddLocationMapActivity::class.java)
         startActivityForResult(viewIntent, 0)
     }
 
+
+
+    // Retrieve lat and lng coordinates from the user selected location, from AddLocationMapActivity
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 0) {
             if (resultCode == Activity.RESULT_OK) {
                 val message = data!!.getParcelableExtra<LatLng>("LATLNG_KEY")
                 if (message != null) {
                     addLocationLatLng = message
-                    println("debug" + addLocationLatLng)
+                    //println("debug" + addLocationLatLng)
                 }
             }
         } else {
@@ -75,39 +95,32 @@ class AddNewLocationFragment : AppCompatActivity() {
         }
     }
 
+
+
+    // On finish button clicked
     fun onAddNewWashroomClick(view: View){
+
+        // Get views
         ratingBar = findViewById(R.id.rb_ratingBar)
         roomNumber = findViewById(R.id.et_roomNumber)
         washroomName = findViewById(R.id.et_washroomName)
 
 
+        // Get values in views
         val roomNum = roomNumber.text.toString()
         val roomName = washroomName.text.toString()
         val rating = ratingBar.rating.toDouble().toInt()
-        println("Rating" + rating)
+        //println("Rating" + rating)
 
 
-
+        // Room Number, Room Name, and Location cannot be empty
         if(roomNum != "" && roomName != ""  && addLocationLatLng != null)
         {
-            /*
-            var locationViewModel = LocationViewModel()
-
-            var newLocation = Location()
-            newLocation.roomNumber = roomNum.toInt()
-            newLocation.gender = gender!!
-            newLocation.lat = addLocationLatLng!!.latitude
-            newLocation.lng = addLocationLatLng!!.longitude
-            newLocation.date = Calendar.getInstance().timeInMillis
-            newLocation.name = roomName
-            //locationViewModel.addLocation(newLocation)
-
-             */
-
             CoroutineScope(Dispatchers.IO).launch {
                 var locationViewModel = LocationViewModel()
                 var newLocation = Location()
 
+                // Add new location to database
                 newLocation.roomNumber = roomNum.toInt()
                 newLocation.gender = gender!!
                 newLocation.lat = addLocationLatLng!!.latitude
@@ -115,18 +128,15 @@ class AddNewLocationFragment : AppCompatActivity() {
                 newLocation.date = Calendar.getInstance().timeInMillis
                 newLocation.name = roomName
                 locationViewModel.addLocation(newLocation).collect {
-                    /**
-                     * "it" here is the documentId of the newly added location. It is the same
-                     * as the locatoinId found in ReviewDb. This can be used to attach a new
-                     * review or to fetch the new location as soon as it is added.
-                     */
+
+                    // Add new review to newly created location
                     var newReview = Review()
                     newReview.locationId = it
                     newReview.leftByAdmin = false
                     newReview.cleanliness = rating
                     newReview.dateAdded = Calendar.getInstance().timeInMillis
-                    newReview.sufficientPaperTowels = 0
-                    newReview.sufficientSoap = 0
+                    newReview.sufficientPaperTowels = paperTowelValue
+                    newReview.sufficientSoap = soapValue
                     newReview.accessibility = 0
                     newReview.comment = ""
 
@@ -136,57 +146,79 @@ class AddNewLocationFragment : AppCompatActivity() {
                 }
             }
 
-
-            //TODO: Add Review. Don't know how to get last added location.
-            /*
-            CoroutineScope(Dispatchers.IO).launch {
-                var allLocations = locationViewModel.getAllLocations()
-
-
-                var lastAddedLocationID = allLocations[allLocations.size-1]
-                println("Location:"+lastAddedLocationID.toString())
-                var newReview = Review()
-                newReview.locationId = lastAddedLocationID.toString()
-                newReview.leftByAdmin = false
-                newReview.cleanliness = 5
-                newReview.dateAdded = Calendar.getInstance().timeInMillis
-                newReview.sufficientPaperTowels = 1
-                newReview.sufficientSoap = 2
-                newReview.accessibility = 0
-                newReview.comment = ""
-
-                var reviewViewModel = ReviewViewModel()
-                //reviewViewModel.addReviewForLocation(newReview)
-
-            }
-
-             */
             finish()
+
         }
         else if(addLocationLatLng == null){
-            // Show toast indicating a parameter is missing
+            // Show toast indicating location parameter is missing
             val toast = Toast.makeText(applicationContext, "Missing Location", Toast.LENGTH_SHORT)
             toast.show()
         }
         else if(roomNum == ""){
-            // Show toast indicating a parameter is missing
+            // Show toast indicating room number parameter is missing
             val toast = Toast.makeText(applicationContext, "Missing Room Number", Toast.LENGTH_SHORT)
             toast.show()
         }
         else if(roomName == ""){
-            // Show toast indicating a parameter is missing
+            // Show toast indicating room name parameter is missing
             val toast = Toast.makeText(applicationContext, "Missing Washroom Name", Toast.LENGTH_SHORT)
             toast.show()
         }
+    }
 
 
 
+    fun onPaperTowelYesClick(view:View){
+        paperTowelValue = 2
+
+        paperTowelButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
+        paperTowelButtonYes.setTextColor(Color.WHITE)
 
 
-
-
+        paperTowelButtonNo.setBackgroundColor(Color.WHITE)
+        paperTowelButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
 
     }
+
+
+
+    fun onPaperTowelNoClick(view:View){
+        paperTowelValue = 1
+
+        paperTowelButtonYes.setBackgroundColor(Color.WHITE)
+        paperTowelButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
+
+        paperTowelButtonNo.setBackgroundColor(Color.parseColor("#9754CB"))
+        paperTowelButtonNo.setTextColor(Color.WHITE)
+
+    }
+
+
+
+    fun onSoapYesClick(view:View){
+        soapValue = 2
+
+        soapButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
+        soapButtonYes.setTextColor(Color.WHITE)
+
+
+        soapButtonNo.setBackgroundColor(Color.WHITE)
+        soapButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
+    }
+
+
+
+    fun onSoapNoClick(view:View){
+        soapValue = 1
+
+        soapButtonYes.setBackgroundColor(Color.WHITE)
+        soapButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
+
+        soapButtonNo.setBackgroundColor(Color.parseColor("#9754CB"))
+        soapButtonNo.setTextColor(Color.WHITE)
+    }
+
+
 
 
 

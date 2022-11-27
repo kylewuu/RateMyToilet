@@ -63,7 +63,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ListActivity"
+            android:name=".WashroomListActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

@@ -82,8 +82,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
         val listButton = findViewById<Button>(R.id.listButton)
         listButton.setOnClickListener {
-            val listActivityIntent = Intent(this, ListActivity::class.java)
-            this.startActivity(listActivityIntent)
+            val washroomListActivityIntent = Intent(this, WashroomListActivity::class.java)
+            this.startActivity(washroomListActivityIntent)
         }
 
         DatabaseUsageExamples.initializeLocationViewModel(this)
@@ -204,43 +204,11 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     }
 
 
+    // Start AddNewLocationFragment in order to add a new washroom location
     fun onAddNewLocationClick(view: View) {
-
         val viewIntent = Intent(this, AddNewLocationFragment::class.java)
         startActivity(viewIntent)
-//        DatabaseUsageExamples.addNewLocation()
-
-        // Create fragment
-        /*
-        var addNewLocationFragment = AddNewLocationFragment()
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-        transaction.replace(R.id.frameLayout, addNewLocationFragment, "Test")
-        transaction.commit()
-
-         */
-
-        // Remove filter button visibility
-        //filterButton.visibility = View.GONE
-
-        // Re-add action bar, and change the title.
-        /*
-        if (supportActionBar != null) {
-            supportActionBar?.show()
-            supportActionBar?.title = "Add New Washroom"
-        }
-
-         */
-
-
     }
 
 
-
-    fun onAddNewWashroomClick(view: View){
-        println("HERE")
-        //ratingBar = findViewById(R.id.ratingBar)
-
-
-    }
 }

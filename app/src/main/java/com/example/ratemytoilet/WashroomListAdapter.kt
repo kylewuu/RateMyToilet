@@ -7,11 +7,10 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.example.ratemytoilet.database.Location
-import com.google.android.gms.maps.model.LatLng
-import java.text.DecimalFormat
 
 // Based off class demo
-class MyListAdapter(private val context: Context, private var commentList: List<Location>) : BaseAdapter() {
+class WashroomListAdapter(private val context: Context, private var commentList: List<Location>) : BaseAdapter() {
+
 
     // Returns the values associated with a key in the database
     override fun getItem(position: Int): (Array<String>) {
@@ -27,9 +26,11 @@ class MyListAdapter(private val context: Context, private var commentList: List<
         return position.toLong()
     }
 
+
     override fun getCount(): Int {
         return commentList.size
     }
+
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view: View = View.inflate(context, R.layout.layout_adapter, null)
@@ -40,9 +41,9 @@ class MyListAdapter(private val context: Context, private var commentList: List<
         header.text = commentList.get(position).id
         distanceAndDuration.text = commentList.get(position).name
 
-
         return view
     }
+
 
     fun replace(newCommentList: List<Location>) {
         commentList = newCommentList
