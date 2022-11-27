@@ -3,22 +3,12 @@ package com.example.ratemytoilet
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
-import com.example.ratemytoilet.database.Review
-import com.example.ratemytoilet.database.ReviewViewModel
-import com.example.ratemytoilet.databinding.ActivityAddLocationMapBinding
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
 
 class AddNewLocationFragment : AppCompatActivity() {
@@ -104,7 +94,7 @@ class AddNewLocationFragment : AppCompatActivity() {
             newLocation.lng = addLocationLatLng!!.longitude
             newLocation.date = Calendar.getInstance().timeInMillis
             newLocation.name = roomName.toString()
-            locationViewModel.addLocation(newLocation)
+//            locationViewModel.addLocation(newLocation)
 
 
             //TODO: Add Review. Don't know how to get last added location.
