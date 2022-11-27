@@ -8,7 +8,12 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
+import com.example.ratemytoilet.database.Review
+import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class AddNewLocationFragment : AppCompatActivity() {
@@ -78,23 +83,58 @@ class AddNewLocationFragment : AppCompatActivity() {
 
         val roomNum = roomNumber.text.toString()
         val roomName = washroomName.text.toString()
-        val rating = ratingBar.rating.toDouble()
+        val rating = ratingBar.rating.toDouble().toInt()
         println("Rating" + rating)
 
 
-        //
+
         if(roomNum != "" && roomName != ""  && addLocationLatLng != null)
         {
+            /*
             var locationViewModel = LocationViewModel()
 
             var newLocation = Location()
-            newLocation.roomNumber = roomNum.toString().toInt()
+            newLocation.roomNumber = roomNum.toInt()
             newLocation.gender = gender!!
             newLocation.lat = addLocationLatLng!!.latitude
             newLocation.lng = addLocationLatLng!!.longitude
             newLocation.date = Calendar.getInstance().timeInMillis
-            newLocation.name = roomName.toString()
-//            locationViewModel.addLocation(newLocation)
+            newLocation.name = roomName
+            //locationViewModel.addLocation(newLocation)
+
+             */
+
+            CoroutineScope(Dispatchers.IO).launch {
+                var locationViewModel = LocationViewModel()
+                var newLocation = Location()
+
+                newLocation.roomNumber = roomNum.toInt()
+                newLocation.gender = gender!!
+                newLocation.lat = addLocationLatLng!!.latitude
+                newLocation.lng = addLocationLatLng!!.longitude
+                newLocation.date = Calendar.getInstance().timeInMillis
+                newLocation.name = roomName
+                locationViewModel.addLocation(newLocation).collect {
+                    /**
+                     * "it" here is the documentId of the newly added location. It is the same
+                     * as the locatoinId found in ReviewDb. This can be used to attach a new
+                     * review or to fetch the new location as soon as it is added.
+                     */
+                    var newReview = Review()
+                    newReview.locationId = it
+                    newReview.leftByAdmin = false
+                    newReview.cleanliness = rating
+                    newReview.dateAdded = Calendar.getInstance().timeInMillis
+                    newReview.sufficientPaperTowels = 0
+                    newReview.sufficientSoap = 0
+                    newReview.accessibility = 0
+                    newReview.comment = ""
+
+                    var reviewViewModel = ReviewViewModel()
+                    reviewViewModel.addReviewForLocation(newReview)
+
+                }
+            }
 
 
             //TODO: Add Review. Don't know how to get last added location.
