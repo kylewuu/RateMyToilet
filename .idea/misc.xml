@@ -10,10 +10,24 @@
         <entry key="..\:/englishDesktop/School/CMPT362/RateMyToilet/app/src/main/res/layout/activity_register_email.xml" value="0.1833839918946302" />
         <entry key="..\:/englishDesktop/School/CMPT362/RateMyToilet/app/src/main/res/layout/custom_inforwindow.xml" value="0.33559782608695654" />
         <entry key="..\:/englishDesktop/School/CMPT362/RateMyToilet/app/src/main/res/layout/fragment_dialog.xml" value="0.33559782608695654" />
+        <entry key="app/src/debug/res/drawable-anydpi/ic_filter.xml" value="0.1" />
+        <entry key="app/src/debug/res/drawable-xxhdpi/button_shape.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/background_color.xml" value="0.16" />
+        <entry key="app/src/main/res/drawable/background_layout.xml" value="0.16" />
+        <entry key="app/src/main/res/drawable/rounded_edittext.xml" value="0.138" />
+        <entry key="app/src/main/res/layout/activity_add_location_map.xml" value="0.2708333333333333" />
+        <entry key="app/src/main/res/layout/activity_launch.xml" value="0.2708333333333333" />
+        <entry key="app/src/main/res/layout/activity_list.xml" value="0.2708333333333333" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2708333333333333" />
+        <entry key="app/src/main/res/layout/custom_inforwindow.xml" value="0.2708333333333333" />
+        <entry key="app/src/main/res/layout/fragment_add_new_location.xml" value="0.2505584716796875" />
+        <entry key="app/src/main/res/layout/fragment_dialog.xml" value="0.22056159420289856" />
+        <entry key="app/src/main/res/layout/layout_adapter.xml" value="0.2708333333333333" />
+        <entry key="app/src/main/res/layout/review_list.xml" value="0.13385416666666666" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

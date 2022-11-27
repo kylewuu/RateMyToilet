@@ -1,11 +1,18 @@
 package com.example.ratemytoilet
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import com.example.ratemytoilet.database.Location
+import com.example.ratemytoilet.database.LocationViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /*
@@ -17,38 +24,47 @@ https://www.javatpoint.com/android-custom-listview
  */
 
 class ListActivity : AppCompatActivity() {
+
+    private lateinit var myListView: ListView
+    private lateinit var arrayList: ArrayList<Location>
+    private lateinit var arrayAdapter: MyListAdapter
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
         // Remove app name from toolbar
-        supportActionBar?.setDisplayShowTitleEnabled(false);
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // TODO: Get reviews from firebase. Currently reviews in list are hardcoded.
-        val washroomNames = arrayOf(
-            "AQ Washroom", "AQ Washroom"
-        )
+        // List of locations
+        myListView = findViewById<ListView>(R.id.lv_locations)
 
-        val washroomAmenities = arrayOf(
-            "Male / Hand Dryer / Paper Towels",
-            "Female / Hand Dryer / Paper Towels"
-        )
+        // Arraylist for displaying entries
+        arrayList = ArrayList<Location>()
+        arrayAdapter = MyListAdapter(this, arrayList)
+        myListView.adapter = arrayAdapter
 
-        val ratings = arrayOf(
-            "4.7", "0"
-        )
 
-        val distance = arrayOf(
-            "50m","200m"
-        )
+        var locationViewModel = LocationViewModel()
+        // Reload the array with database values
+        locationViewModel.locations.observe(this, Observer { it ->
+            arrayAdapter.replace(it)
+            arrayAdapter.notifyDataSetChanged()
+        })
 
-        val images = arrayOf(R.drawable.ellipse3, R.drawable.ellipse3)
 
-        val adapter = MyListAdapter(this, washroomNames, washroomAmenities, images, ratings, distance)
-        var list = findViewById<View>(R.id.lv_reviews) as ListView
-        list.setAdapter(adapter)
-
+        // TODO: When a location is clicked, show its reviews
+        myListView.isClickable = true
+        myListView.onItemClickListener = object : AdapterView.OnItemClickListener {
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+               //println("Position in listView clicked: " + p2)
+            }
+        }
     }
+
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main1, menu) // Menu Resource, Menu

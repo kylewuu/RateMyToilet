@@ -7,8 +7,8 @@
 
 
     <ListView
-        android:id="@+id/lv_reviews"
+        android:id="@+id/lv_locations"
         android:layout_width="match_parent"
-        android:layout_height="624dp" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>
