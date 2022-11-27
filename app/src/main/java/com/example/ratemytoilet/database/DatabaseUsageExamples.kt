@@ -56,6 +56,11 @@ class DatabaseUsageExamples {
                 newLocation.date = Calendar.getInstance().timeInMillis
                 newLocation.name = "Second washroom"
                 locationViewModel.addLocation(newLocation).collect {
+                    /**
+                     * "it" here is the documentId of the newly added location. It is the same
+                     * as the locatoinId found in ReviewDb. This can be used to attach a new
+                     * review or to fetch the new location as soon as it is added.
+                     */
                     println("debugk: documentId $it")
                 }
             }
