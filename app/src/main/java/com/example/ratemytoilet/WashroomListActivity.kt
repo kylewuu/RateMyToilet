@@ -1,6 +1,5 @@
 package com.example.ratemytoilet
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,9 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 /*
@@ -23,30 +19,33 @@ https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-
 https://www.javatpoint.com/android-custom-listview
  */
 
-class ListActivity : AppCompatActivity() {
+class WashroomListActivity : AppCompatActivity() {
 
     private lateinit var myListView: ListView
     private lateinit var arrayList: ArrayList<Location>
-    private lateinit var arrayAdapter: MyListAdapter
+    private lateinit var arrayAdapter: WashroomListAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
+
         // Remove app name from toolbar
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
 
         // List of locations
         myListView = findViewById<ListView>(R.id.lv_locations)
 
+
         // Arraylist for displaying entries
         arrayList = ArrayList<Location>()
-        arrayAdapter = MyListAdapter(this, arrayList)
+        arrayAdapter = WashroomListAdapter(this, arrayList)
         myListView.adapter = arrayAdapter
-
-
         var locationViewModel = LocationViewModel()
+
+
         // Reload the array with database values
         locationViewModel.locations.observe(this, Observer { it ->
             arrayAdapter.replace(it)
@@ -65,11 +64,11 @@ class ListActivity : AppCompatActivity() {
 
 
 
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main1, menu) // Menu Resource, Menu
         return true
     }
+
 
     // Show filter fragment if filter button is clicked
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
