@@ -57,6 +57,7 @@ class DisplayActivity : AppCompatActivity() {
         val addButton = findViewById<FloatingActionButton>(R.id.addButton)
         val washroomName = findViewById<TextView>(R.id.washroomNameText)
         val rateNumber = findViewById<TextView>(R.id.reviewNumberText)
+        val mostRecentComment = findViewById<TextView>(R.id.mostRecentComment)
 
         washroomName.setText(washroom)
         genderText.setText(gender)
@@ -74,6 +75,9 @@ class DisplayActivity : AppCompatActivity() {
                 var rating = 0.0
                 CoroutineScope(Main).launch {
                     rateNumber.setText("(" + allReviews.size + ")")
+
+                    // Display most recent comment
+                    mostRecentComment.text = allReviews[0].comment
                 }
                 if (allReviews[0].sufficientPaperTowels == 0) {
                     CoroutineScope(Main).launch {
