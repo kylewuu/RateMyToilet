@@ -61,6 +61,7 @@ class WashroomListAdapter(private val context: Context, private var locationList
         var soapValue = ""
 
 
+
         // Retrieve reviews for a location
         CoroutineScope(Dispatchers.IO).launch{
 
@@ -68,6 +69,7 @@ class WashroomListAdapter(private val context: Context, private var locationList
             val genderInt = locationList[position].gender
 
             var reviews = reviewViewModel.getReviewsForLocation(locationId)
+
             var arrayOfReviews = mutableListOf<Review>()
 
 
@@ -78,7 +80,9 @@ class WashroomListAdapter(private val context: Context, private var locationList
             }
 
 
+
             // Make sure there exists a review, otherwise divide by 0 error while calculating average cleanliness
+
             if(reviews.isNotEmpty()){
 
 
@@ -98,14 +102,17 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     if(latestReview.sufficientPaperTowels == 0){
                         paperTowelsValue = " / No Paper Towels"
                         paperTowelIsUnknown = true
+
                         break
                     }
                     else if(latestReview.sufficientPaperTowels == 1){
                         paperTowelsValue = " / Paper Towels"
                         paperTowelIsUnknown = true
+
                         break
                     }
                 }
+
 
                 // If no review contained sufficientPaperTowels set to either 0 or 1 (No or Yes), then set to Unknown status
                 if(!paperTowelIsUnknown){
@@ -128,6 +135,7 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     }
                 }
 
+
                 // If no review contained sufficientSoap set to either 0 or 1 (No or Yes), then set to Unknown status
                 if(!soapIsUnknown){
                     soapValue = " / Unknown"
@@ -146,12 +154,14 @@ class WashroomListAdapter(private val context: Context, private var locationList
             GlobalScope.launch(Dispatchers.Main) {
 
                 // TODO: If rating is 0.0 (double), then set to Int (0). Is needed?
+
                 if(averageCleanlinessRating == 0.0){
                     ratingsText.text = averageCleanlinessRating.toInt().toString()
                 }
                 else{
                     ratingsText.text = averageCleanlinessRating.toString()
                 }
+
 
 
 
@@ -168,6 +178,7 @@ class WashroomListAdapter(private val context: Context, private var locationList
             }
 
         }
+
 
 
         // TODO: Get user location, and find distance relative to washroom location
