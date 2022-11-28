@@ -86,12 +86,14 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
         val listButton = findViewById<Button>(R.id.listButton)
         listButton.setOnClickListener {
-            val listActivityIntent = Intent(this, ListActivity::class.java)
-            this.startActivity(listActivityIntent)
+            val washroomListActivityIntent = Intent(this, WashroomListActivity::class.java)
+            this.startActivity(washroomListActivityIntent)
         }
 
         DatabaseUsageExamples.initializeLocationViewModel(this)
+
     }
+
 
     override fun onStart() {
         super.onStart()
@@ -422,69 +424,11 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     }
 
 
-
-
-        //Log.d("TAi", arr.size.toString())
-       /* val latLng = LatLng(49.278762746674886, -122.9172651303747)
-        val latlng2 = LatLng(49.27883401764781, -122.9172336167242)
-        val latlng3 = LatLng(49.279164723163824, -122.91720144989004)
-        val latlng4 = LatLng(49.279182669314714, -122.9171085521842)
-        val latlng5 = LatLng(49.27950003509996, -122.91687906260248)
-
-
-        val item = MyItem(latLng, "true,false,true", "AQ, 2008;4.7", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.7")))
-        val item2 = MyItem(latlng2, "true,true,true", "AQ, 2007;4.5", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.5")))
-        val item3 = MyItem(latlng3, "false,true,false", "AQ, 2006;4.3", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.3")))
-        val item4 = MyItem(latlng4, "false,false,false", "AQ, 2005;3.1", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("3.1")))
-        val item5 = MyItem(latlng5, "false,false,false", "AQ, 2004;3.1", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("3.1")))
-        arr.add(item)
-        arr.add(item2)
-        arr.add(item3)
-        arr.add(item4)
-        arr.add(item5)*/
-
-
-
-        //val toiletMarkOptions = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.warning)).anchor(bubble.getAnchorU(), bubble.getAnchorV()).title("true, false, true").snippet("AQ, 2008;4.7")
-        //myMarker = mMap.addMarker(toiletMarkOptions)!!
-        //myMarker.showInfoWindow()
-
+    // Start AddNewLocationFragment in order to add a new washroom location
     fun onAddNewLocationClick(view: View) {
-
         val viewIntent = Intent(this, AddNewLocationFragment::class.java)
         startActivity(viewIntent)
-//        DatabaseUsageExamples.addNewLocation()
-
-        // Create fragment
-        /*
-        var addNewLocationFragment = AddNewLocationFragment()
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-        transaction.replace(R.id.frameLayout, addNewLocationFragment, "Test")
-        transaction.commit()
-
-         */
-
-        // Remove filter button visibility
-        //filterButton.visibility = View.GONE
-
-        // Re-add action bar, and change the title.
-        /*
-        if (supportActionBar != null) {
-            supportActionBar?.show()
-            supportActionBar?.title = "Add New Washroom"
-        }
-
-         */
-
-
     }
 
-    fun onAddNewWashroomClick(view: View){
-        println("HERE")
-        //ratingBar = findViewById(R.id.ratingBar)
 
-
-    }
 }
-
