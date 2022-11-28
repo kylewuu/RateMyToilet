@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -45,6 +46,11 @@ class DisplayActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onResume() {
+        super.onResume()
+//        setData()
+    }
+
     fun setData() {
         val dataText = findViewById<TextView>(R.id.dateText)
         val rate = findViewById<RatingBar>(R.id.overallRate)
@@ -66,9 +72,9 @@ class DisplayActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             val reviewViewModel = ReviewViewModel()
-            val allReviews = reviewViewModel.getReviewsForLocation(washroomId)
-            allReviews.sortedByDescending { it.dateAdded }
-            if (allReviews.size != 0) {
+            var allReviews = reviewViewModel.getReviewsForLocation(washroomId)
+            allReviews = allReviews.sortedByDescending { it.dateAdded }
+            if (allReviews.size != 0 && allReviews.size != userCommentList.size) {
                 var rating = 0.0
                 CoroutineScope(Main).launch {
                     rateNumber.setText("(" + allReviews.size + ")")
@@ -93,26 +99,33 @@ class DisplayActivity : AppCompatActivity() {
                         paperText.setText("Unknown")
                     }
                 }
+                userCommentList.clear()
                 for (review in allReviews) {
                     rating += review.cleanliness
                     val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
                     date = dateTimeFormat.format(review.dateAdded)
-                    val user = UserComment(review.id,date, rating.toFloat(), review.comment)
-                    userCommentList.add(user)
-                    listAdapter.update(userCommentList)
-                    CoroutineScope(Main).launch {
+                    val user = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment)
+                    withContext(Main) {
+                        launch {
+                            userCommentList.add(user)
+                        }
+                    }
+                }
+                withContext(Main) {
+                    launch {
+                        listAdapter.update(userCommentList)
                         listAdapter.notifyDataSetChanged()
                     }
                 }
                 rating /= allReviews.size
-                CoroutineScope(Main).launch {
+                withContext(Main) {
                     rate.setRating(rating.toFloat())
                 }
             }
         }
 
         addButton.setOnClickListener {
-            val admin = true
+            val admin = false
             if (!admin) {
                 val intent = Intent(this, NormalUserAddReviewActivity::class.java)
                 intent.putExtra("location", washroomId)
