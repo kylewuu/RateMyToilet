@@ -266,10 +266,13 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
-            val fragment = getSupportFragmentManager().findFragmentByTag("Load") as DialogFragment
-            fragment.dismiss()
-            myClusterManager.addItems(locationList)
-            myClusterManager.cluster()
+            var loadFragment = getSupportFragmentManager().findFragmentByTag("Load")
+            if (loadFragment != null) {
+                val fragment = loadFragment as DialogFragment
+                fragment.dismiss()
+                myClusterManager.addItems(locationList)
+                myClusterManager.cluster()
+            }
         }
     }
 
