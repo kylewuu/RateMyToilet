@@ -17,7 +17,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RatingBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
 import com.google.firebase.ktx.Firebase
@@ -40,10 +39,12 @@ import com.google.firebase.firestore.auth.User
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
 import kotlinx.coroutines.*
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener, OnInfoWindowClickListener {
+class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, FilterDialogFragment.FilterListener {
     private var myLocationMarker : Marker ?= null
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMainBinding
@@ -53,26 +54,15 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     private var mapCentered = false
     private var washroomId : String ?= null
+    private var washroomName : String ?= null
+    private var gender : String ?= null
+    private var date : String ?= null
     private lateinit var  markerOptions: MarkerOptions
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<MyItem>
 
     private var count = 0
-
-    // Buttons
-    private lateinit var filterButton: Button
-
-
-    // Vars to save for adding new location
-    private lateinit var addLocationLatLng: LatLng
-
-    // Views for adding new location
-    private lateinit var addNewLocationFragment: AddNewLocationFragment
-    private lateinit var ratingBar: RatingBar
-    private lateinit var roomNumber: EditText
-    private lateinit var washroomName: EditText
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +127,16 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         myClusterManager.markerCollection.setInfoWindowAdapter(MyInfoWindowAdapter(this))
         myClusterManager.setOnClusterItemClickListener {
             washroomId = it.getId()
+            washroomName = it.snippet?.split(",")?.get(0)
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
+            date = dateTimeFormat.format(it.getDate())
+            if (it.getGender() == 0) {
+                gender = "Male"
+            } else if (it.getGender() == 1) {
+                gender = "Female"
+            } else {
+                gender = "Universal"
+            }
             return@setOnClusterItemClickListener false
         }
         mMap.setOnMarkerClickListener(myClusterManager)
@@ -147,8 +147,9 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 if (washroomId != null) {
                     val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
                     viewIntent.putExtra("ID", washroomId)
-                    viewIntent.putExtra("ID", washroomId)
-                    viewIntent.putExtra("ID", washroomId)
+                    viewIntent.putExtra("name", washroomName)
+                    viewIntent.putExtra("date", date)
+                    viewIntent.putExtra("gender", gender)
                     startActivity(viewIntent)
                 }
             }
@@ -226,36 +227,201 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             val reviewViewModel = ReviewViewModel()
             for (location in allLocations) {
                 var rating = 0.0
-                var soap = true
-                var paper = true
-                var access = true
+                var soap = "true"
+                var paper = "true"
+                var access = "true"
                 val allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                allReviews.sortedByDescending { it.dateAdded }
+
                 val latLng = LatLng(location.lat, location.lng)
                 if (allReviews.size != 0) {
                     for (review in allReviews) {
                         rating += review.cleanliness
                     }
                     rating /= allReviews.size
+                    if (allReviews[0].sufficientSoap == 0) {
+                        soap = "false"
+                    } else if (allReviews[0].sufficientSoap == 2) {
+                        soap = "unknown"
+                    }
 
+                    if (allReviews[0].sufficientPaperTowels == 0) {
+                        paper = "false"
+                    } else if (allReviews[0].sufficientSoap == 2) {
+                        paper = "unknown"
+                    }
+
+                    if (allReviews[0].accessibility == 0) {
+                        access = "false"
+                    } else if (allReviews[0].accessibility == 2) {
+                        access = "unknown"
+                    }
                 }
-                val snippet = location.name + ", " + location.roomNumber + ";" + rating
-                val title = soap.toString() + "," + paper.toString() + "," + access.toString()
-                val item = MyItem(latLng, title, snippet, BitmapDescriptorFactory.fromBitmap(bubble.makeIcon(rating.toString())), location.id)
+
+                val snippet = location.name + ", " + location.roomNumber + ";" + rating.toInt()
+                val title = soap + "," + paper + "," + access
+                val item = MyItem(latLng, title, snippet, BitmapDescriptorFactory.fromBitmap(bubble.makeIcon(rating.toInt().toString())), location.id, location.date, location.gender)
                 arr.add(item)
             }
             setClusterOnMainThread(arr)
-
         }
     }
 
-        suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
-            withContext(Dispatchers.Main){
-                val fragment = getSupportFragmentManager().findFragmentByTag("Load") as DialogFragment
-                fragment.dismiss()
-                myClusterManager.addItems(locationList)
-                myClusterManager.cluster()
+    suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
+        withContext(Dispatchers.Main){
+            val fragment = getSupportFragmentManager().findFragmentByTag("Load") as DialogFragment
+            fragment.dismiss()
+            myClusterManager.addItems(locationList)
+            myClusterManager.cluster()
+        }
+    }
+
+    fun updateToilet(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
+        val bubble = IconGenerator(this)
+        val arr = ArrayList<MyItem>()
+        var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
+        bubble.setStyle(IconGenerator.STYLE_PURPLE)
+        val locationViewModel = LocationViewModel()
+        val loadingDialogFragment = LoadingDialogFragment()
+        CoroutineScope(Dispatchers.IO).launch {
+            loadingDialogFragment.show(supportFragmentManager, "Load")
+            var allLocations = locationViewModel.getAllLocations()
+            val reviewViewModel = ReviewViewModel()
+            for (location in allLocations) {
+                var rating = 0.0
+                val allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                allReviews.sortedByDescending { it.dateAdded }
+                if (allReviews.size != 0) {
+                    for (review in allReviews) {
+                        rating += review.cleanliness
+                    }
+                    rating /= allReviews.size
+
+                    if (paperCheck) {
+                        if (allReviews[0].sufficientPaperTowels == 1) {
+                            newLocations.add(location)
+                        }
+                    }
+                    if (soapCheck) {
+                        if (allReviews[0].sufficientSoap == 1) {
+                            newLocations.add(location)
+                        }
+                    }
+                    if (accessCheck) {
+                        if (allReviews[0].accessibility == 1) {
+                            newLocations.add(location)
+                        }
+                    }
+                }
+                if (maleCheck) {
+                    if (location.gender == 0) {
+                        newLocations.add(location)
+                    }
+                }
+                if (femaleCheck) {
+                    if (location.gender == 1) {
+                        newLocations.add(location)
+                    }
+                }
+
+                if (rating >= startValue && rating <= endValue) {
+                    newLocations.add(location)
+                }
+            }
+
+            val updates = newLocations.distinctBy { it.id }
+            for(update in updates) {
+                val updateLatLng = LatLng(update.lat, update.lng)
+                var updateRating = 0.0
+                var updateSoap = "true"
+                var updatePaper = "true"
+                var updateAccess = "true"
+                val updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
+                updateAllReviews.sortedByDescending { it.dateAdded }
+                if (updateAllReviews.size != 0) {
+                    for (review in updateAllReviews) {
+                        updateRating += review.cleanliness
+                    }
+                    updateRating /= updateAllReviews.size
+                    if (updateAllReviews[0].sufficientSoap == 0) {
+                        updateSoap = "false"
+                    } else if (updateAllReviews[0].sufficientSoap == 2) {
+                        updateSoap = "unknown"
+                    }
+
+                    if (updateAllReviews[0].sufficientPaperTowels == 0) {
+                        updatePaper = "false"
+                    } else if (updateAllReviews[0].sufficientSoap == 2) {
+                        updatePaper = "unknown"
+                    }
+
+                    if (updateAllReviews[0].accessibility == 0) {
+                        updateAccess = "false"
+                    } else if (updateAllReviews[0].accessibility == 2) {
+                        updateAccess = "unknown"
+                    }
+                }
+                val snippet = update.name + ", " + update.roomNumber + ";" + updateRating.toInt()
+                val title = updateSoap + "," + updatePaper + "," + updateAccess
+                val item = MyItem(
+                    updateLatLng,
+                    title,
+                    snippet,
+                    BitmapDescriptorFactory.fromBitmap(
+                        bubble.makeIcon(
+                            updateRating.toInt().toString()
+                        )
+                    ),
+                    update.id,
+                    update.date,
+                    update.gender
+                )
+                arr.add(item)
+            }
+            setClusterOnMainThread(arr)
+        }
+    }
+
+    override fun onFilterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
+        mMap.clear()
+        myClusterManager.clearItems()
+        updateToilet(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
+        myClusterManager = ClusterManager<MyItem>(applicationContext , mMap)
+        myClusterManager.renderer = MarkerClusterRenderer(this, mMap, myClusterManager)
+        myClusterManager.markerCollection.setInfoWindowAdapter(MyInfoWindowAdapter(this))
+        myClusterManager.setOnClusterItemClickListener {
+            washroomId = it.getId()
+            washroomName = it.snippet?.split(",")?.get(0)
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
+            date = dateTimeFormat.format(it.getDate())
+            if (it.getGender() == 0) {
+                gender = "Male"
+            } else if (it.getGender() == 1) {
+                gender = "Female"
+            } else {
+                gender = "Universal"
+            }
+            return@setOnClusterItemClickListener false
+        }
+        mMap.setOnMarkerClickListener(myClusterManager)
+        mMap.setOnCameraIdleListener(myClusterManager)
+        mMap.setInfoWindowAdapter(myClusterManager.markerManager)
+        myClusterManager.setOnClusterItemInfoWindowClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                if (washroomId != null) {
+                    val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
+                    viewIntent.putExtra("ID", washroomId)
+                    viewIntent.putExtra("name", washroomName)
+                    viewIntent.putExtra("date", date)
+                    viewIntent.putExtra("gender", gender)
+                    startActivity(viewIntent)
+                }
             }
         }
+        mMap.setOnInfoWindowClickListener(myClusterManager)
+    }
+
+
 
 
         //Log.d("TAi", arr.size.toString())
@@ -282,21 +448,6 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         //val toiletMarkOptions = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.warning)).anchor(bubble.getAnchorU(), bubble.getAnchorV()).title("true, false, true").snippet("AQ, 2008;4.7")
         //myMarker = mMap.addMarker(toiletMarkOptions)!!
         //myMarker.showInfoWindow()
-    }
-
-    override fun onMarkerClick(marker: Marker): Boolean {
-        if (marker.equals(myMarker)) {
-            marker.showInfoWindow()
-            return false
-        }
-        return true
-    }
-
-    override fun onInfoWindowClick(marker: Marker) {
-        val viewIntent = Intent(this, DisplayActivity::class.java)
-        startActivity(viewIntent)
-    }
-
 
     fun onAddNewLocationClick(view: View) {
 
@@ -329,8 +480,6 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     }
 
-
-
     fun onAddNewWashroomClick(view: View){
         println("HERE")
         //ratingBar = findViewById(R.id.ratingBar)
@@ -338,3 +487,4 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     }
 }
+

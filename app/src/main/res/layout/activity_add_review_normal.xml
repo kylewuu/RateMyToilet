@@ -37,7 +37,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <RatingBar
-                android:id="@+id/ratingBar"
+                android:id="@+id/normalUserRating"
                 android:isIndicator="false"
                 style="?android:attr/ratingBarStyleIndicator"
                 android:layout_width="wrap_content"
@@ -79,7 +79,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/paperGroup"
+                android:id="@+id/soapGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
@@ -250,7 +250,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName2"
+                android:id="@+id/normalReviewText"
                 android:layout_width="360dp"
                 android:layout_height="190dp"
                 android:layout_marginStart="16dp"
@@ -270,14 +270,37 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/saveNormalReview"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:backgroundTint="@color/white"
-        app:tint="#9754CB"
-        app:srcCompat="@drawable/ic_save"
-        android:layout_gravity="right"
-        android:layout_marginRight="15dp" />
+        android:orientation="horizontal"
+        android:layout_gravity="center">
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/cancelNormalReview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/white"
+            app:tint="#9754CB"
+            app:srcCompat="@drawable/ic_cancel"
+            android:layout_gravity="right"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/saveNormalReview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/white"
+            app:tint="#9754CB"
+            app:srcCompat="@drawable/ic_save"
+            android:layout_gravity="right"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="40dp"
+
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"/>
+    </LinearLayout>
 </LinearLayout>

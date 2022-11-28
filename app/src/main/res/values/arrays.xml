@@ -18,5 +18,9 @@
         <item>5</item>
     </array>
 
-
+    <array name="genderArray">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Universal</item>
+    </array>
 </resources>

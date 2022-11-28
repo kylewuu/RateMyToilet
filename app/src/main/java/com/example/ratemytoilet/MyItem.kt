@@ -10,13 +10,17 @@ class MyItem : ClusterItem {
     private val mSnippet: String
     private val mIcon : BitmapDescriptor
     private val myId : String
+    private val myDate : Long
+    private val myGender : Int
 
-    constructor(mPosition: LatLng, mTitle: String, mSnippet: String, mIcon : BitmapDescriptor, myId : String) {
+    constructor(mPosition: LatLng, mTitle: String, mSnippet: String, mIcon : BitmapDescriptor, myId : String, myDate : Long, myGender : Int) {
         this.mPosition = mPosition
         this.mTitle = mTitle
         this.mSnippet = mSnippet
         this.mIcon = mIcon
         this.myId = myId
+        this.myDate = myDate
+        this.myGender = myGender
     }
 
     override fun getPosition(): LatLng {
@@ -37,6 +41,14 @@ class MyItem : ClusterItem {
 
     fun getId() : String? {
         return myId
+    }
+
+    fun getDate() : Long? {
+        return myDate
+    }
+
+    fun getGender() : Int? {
+        return myGender
     }
 
 }
