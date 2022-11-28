@@ -9,42 +9,34 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
-import android.widget.RatingBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-
-import com.google.firebase.ktx.Firebase
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.example.ratemytoilet.database.DatabaseUsageExamples
 import com.example.ratemytoilet.database.LocationViewModel
-import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.auth.User
+import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
 
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, FilterDialogFragment.FilterListener {
     private var myLocationMarker : Marker ?= null
@@ -101,7 +93,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         super.onStart()
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
-            //loadLaunchScreen()
+//            loadLaunchScreen()
         }
     }
 

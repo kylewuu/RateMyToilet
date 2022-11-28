@@ -12,6 +12,7 @@ import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -71,16 +72,28 @@ class DisplayActivity : AppCompatActivity() {
             allReviews.sortedByDescending { it.dateAdded }
             if (allReviews.size != 0) {
                 var rating = 0.0
-                rateNumber.setText("(" + allReviews.size + ")")
+                CoroutineScope(Main).launch {
+                    rateNumber.setText("(" + allReviews.size + ")")
+                }
                 if (allReviews[0].sufficientPaperTowels == 0) {
-                    paperText.setText("No")
+                    CoroutineScope(Main).launch {
+                        paperText.setText("No")
+                    }
                 } else if (allReviews[0].sufficientPaperTowels == 2) {
-                    paperText.setText("Unknown")
+                    CoroutineScope(Main).launch {
+                        paperText.setText("Unknown")
+                    }
+
                 }
                 if (allReviews[0].sufficientSoap == 0) {
-                    soapText.setText("No")
+                    CoroutineScope(Main).launch {
+                        soapText.setText("No")
+                    }
+
                 } else if (allReviews[0].sufficientSoap == 2) {
-                    paperText.setText("Unknown")
+                    CoroutineScope(Main).launch {
+                        paperText.setText("Unknown")
+                    }
                 }
                 for (review in allReviews) {
                     rating += review.cleanliness
@@ -90,7 +103,9 @@ class DisplayActivity : AppCompatActivity() {
                     userCommentList.add(user)
                 }
                 rating /= allReviews.size
-                rate.setRating(rating.toFloat())
+                CoroutineScope(Main).launch {
+                    rate.setRating(rating.toFloat())
+                }
             }
         }
 
