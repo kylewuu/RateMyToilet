@@ -11,26 +11,30 @@ import android.location.LocationManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import androidx.core.app.ActivityCompat
-import com.google.firebase.auth.ktx.auth
+
 import com.google.firebase.ktx.Firebase
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import com.example.ratemytoilet.database.DatabaseUsageExamples
+import com.example.ratemytoilet.database.LocationViewModel
+import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.auth.User
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
+import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -43,7 +47,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
     private lateinit var locationManager: LocationManager
 
     private var mapCentered = false
-    private lateinit var myMarker : Marker
+    private var washroomId : String ?= null
     private lateinit var  markerOptions: MarkerOptions
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
@@ -53,6 +57,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -80,7 +85,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
         DatabaseUsageExamples.initializeLocationViewModel(this)
     }
 
-    override fun onStart() {
+    /*override fun onStart() {
         super.onStart()
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
@@ -91,7 +96,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
     private fun loadLaunchScreen() {
         val intent = Intent(this, LaunchActivity::class.java)
         startActivity(intent)
-    }
+    }*/
 
     /**
      * Manipulates the map once available.
@@ -112,14 +117,27 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
         myClusterManager = ClusterManager<MyItem>(applicationContext , mMap)
         myClusterManager.renderer = MarkerClusterRenderer(this, mMap, myClusterManager)
         myClusterManager.markerCollection.setInfoWindowAdapter(MyInfoWindowAdapter(this))
+        myClusterManager.setOnClusterItemClickListener {
+            washroomId = it.getId()
+            return@setOnClusterItemClickListener false
+        }
         mMap.setOnMarkerClickListener(myClusterManager)
         mMap.setOnCameraIdleListener(myClusterManager)
         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
         myClusterManager.setOnClusterItemInfoWindowClickListener {
-            val viewIntent = Intent(this, DisplayActivity::class.java)
-            startActivity(viewIntent)
+            CoroutineScope(Dispatchers.Main).launch {
+                if (washroomId != null) {
+                    val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
+                    viewIntent.putExtra("ID", washroomId)
+                    viewIntent.putExtra("ID", washroomId)
+                    viewIntent.putExtra("ID", washroomId)
+                    startActivity(viewIntent)
+                }
+            }
         }
         mMap.setOnInfoWindowClickListener(myClusterManager)
+        Log.d("TAi", mMap.cameraPosition.zoom.toString())
+        //addLocation()
         checkPermission()
     }
 
@@ -179,14 +197,57 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
     }
 
     fun getToiletLocation() {
-        val latLng = LatLng(49.278762746674886, -122.9172651303747)
+        val bubble = IconGenerator(this)
+        val arr = ArrayList<MyItem>()
+        bubble.setStyle(IconGenerator.STYLE_PURPLE)
+        val locationViewModel = LocationViewModel()
+        val loadingDialogFragment = LoadingDialogFragment()
+        CoroutineScope(Dispatchers.IO).launch {
+            loadingDialogFragment.show(supportFragmentManager, "Load")
+            var allLocations = locationViewModel.getAllLocations()
+            val reviewViewModel = ReviewViewModel()
+            for (location in allLocations) {
+                var rating = 0.0
+                var soap = true
+                var paper = true
+                var access = true
+                val allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                val latLng = LatLng(location.lat, location.lng)
+                if (allReviews.size != 0) {
+                    for (review in allReviews) {
+                        rating += review.cleanliness
+                    }
+                    rating /= allReviews.size
+
+                }
+                val snippet = location.name + ", " + location.roomNumber + ";" + rating
+                val title = soap.toString() + "," + paper.toString() + "," + access.toString()
+                val item = MyItem(latLng, title, snippet, BitmapDescriptorFactory.fromBitmap(bubble.makeIcon(rating.toString())), location.id)
+                arr.add(item)
+            }
+            setClusterOnMainThread(arr)
+
+        }
+    }
+
+        suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
+            withContext(Dispatchers.Main){
+                val fragment = getSupportFragmentManager().findFragmentByTag("Load") as DialogFragment
+                fragment.dismiss()
+                myClusterManager.addItems(locationList)
+                myClusterManager.cluster()
+            }
+        }
+
+
+        //Log.d("TAi", arr.size.toString())
+       /* val latLng = LatLng(49.278762746674886, -122.9172651303747)
         val latlng2 = LatLng(49.27883401764781, -122.9172336167242)
         val latlng3 = LatLng(49.279164723163824, -122.91720144989004)
         val latlng4 = LatLng(49.279182669314714, -122.9171085521842)
         val latlng5 = LatLng(49.27950003509996, -122.91687906260248)
-        val bubble = IconGenerator(this)
-        bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        val arr = ArrayList<MyItem>()
+
+
         val item = MyItem(latLng, "true,false,true", "AQ, 2008;4.7", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.7")))
         val item2 = MyItem(latlng2, "true,true,true", "AQ, 2007;4.5", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.5")))
         val item3 = MyItem(latlng3, "false,true,false", "AQ, 2006;4.3", BitmapDescriptorFactory.fromBitmap(bubble.makeIcon("4.3")))
@@ -196,21 +257,70 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
         arr.add(item2)
         arr.add(item3)
         arr.add(item4)
-        arr.add(item5)
+        arr.add(item5)*/
 
 
-        myClusterManager.addItems(arr)
-        myClusterManager.cluster()
+
         //val toiletMarkOptions = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.warning)).anchor(bubble.getAnchorU(), bubble.getAnchorV()).title("true, false, true").snippet("AQ, 2008;4.7")
         //myMarker = mMap.addMarker(toiletMarkOptions)!!
         //myMarker.showInfoWindow()
-    }
 
     /**
      * Adds a new location to the firestore. Currently does not add any real data.
      */
-    fun addNewLocation(view: View) {
+    /*fun addNewLocation(view: View) {
         count++
         Locations(count)
+    }*/
+
+    fun addLocation() {
+        var locationViewModel = LocationViewModel()
+        var newLocation = com.example.ratemytoilet.database.Location()
+        newLocation.roomNumber = 2008
+        newLocation.gender = 1
+        newLocation.lat = 49.278762746674886
+        newLocation.lng = -122.9172651303747
+        newLocation.date = Calendar.getInstance().timeInMillis
+        newLocation.name = "AQ, 2008"
+
+        var newLocation1 = com.example.ratemytoilet.database.Location()
+        newLocation1.roomNumber = 2007
+        newLocation1.gender = 1
+        newLocation1.lat = 49.27883401764781
+        newLocation1.lng = -122.9172336167242
+        newLocation1.date = Calendar.getInstance().timeInMillis
+        newLocation1.name = "AQ, 2007"
+
+        var newLocation2 = com.example.ratemytoilet.database.Location()
+        newLocation2.roomNumber = 2006
+        newLocation2.gender = 1
+        newLocation2.lat = 49.279164723163824
+        newLocation2.lng = -122.91720144989004
+        newLocation2.date = Calendar.getInstance().timeInMillis
+        newLocation2.name = "AQ, 2006"
+
+        var newLocation3 = com.example.ratemytoilet.database.Location()
+        newLocation3.roomNumber = 2005
+        newLocation3.gender = 1
+        newLocation3.lat = 49.279182669314714
+        newLocation3.lng = -122.9171085521842
+        newLocation3.date = Calendar.getInstance().timeInMillis
+        newLocation3.name = "AQ, 2005"
+
+        var newLocation4 = com.example.ratemytoilet.database.Location()
+        newLocation4.roomNumber = 2004
+        newLocation4.gender = 1
+        newLocation4.lat = 49.27950003509996
+        newLocation4.lng = -122.91687906260248
+        newLocation4.date = Calendar.getInstance().timeInMillis
+        newLocation4.name = "AQ, 2004"
+
+        locationViewModel.addLocation(newLocation)
+        locationViewModel.addLocation(newLocation1)
+        locationViewModel.addLocation(newLocation2)
+        locationViewModel.addLocation(newLocation3)
+        locationViewModel.addLocation(newLocation4)
     }
+
 }
+

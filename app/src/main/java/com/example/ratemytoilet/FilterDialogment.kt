@@ -17,13 +17,6 @@ class FilterDialogment : DialogFragment() {
         val builder = AlertDialog.Builder(requireActivity()).setView(dialogLayout)
         val saveButton = dialogLayout.findViewById<Button>(R.id.applyButton)
         val cancelButton = dialogLayout.findViewById<Button>(R.id.cancelDialogButton)
-        val paperCheck = dialogLayout.findViewById<SwitchCompat>(R.id.paperSwitchCheck)
-        val soapCheck = dialogLayout.findViewById<SwitchCompat>(R.id.soapSwitchCheck)
-        val cleanSpinner = dialogLayout.findViewById<Spinner>(R.id.minimumCleanSpinner)
-        cleanSpinner.adapter = ArrayAdapter.createFromResource(requireActivity(), R.array.clean_spinner, R.layout.spinner_style)
-
-        val genderSpinner = dialogLayout.findViewById<Spinner>(R.id.selectGender)
-        genderSpinner.adapter = ArrayAdapter.createFromResource(requireActivity(), R.array.gender_spinner, R.layout.spinner_style)
 
         saveButton.setOnClickListener {
             dismiss()

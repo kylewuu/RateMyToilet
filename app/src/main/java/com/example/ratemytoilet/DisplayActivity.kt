@@ -2,15 +2,21 @@ package com.example.ratemytoilet
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DisplayActivity : AppCompatActivity() {
     private lateinit var userCommentList: ArrayList<UserComment>
+    private lateinit var washroomId : String
     private lateinit var commentList: ListView
     private lateinit var listAdapter: UserCommentListAdapter
 
@@ -22,6 +28,10 @@ class DisplayActivity : AppCompatActivity() {
         userCommentList = ArrayList()
         listAdapter = UserCommentListAdapter(applicationContext, userCommentList)
         commentList.adapter = listAdapter
+        washroomId = intent.getStringExtra("ID").toString()
+        if (washroomId != null) {
+            Log.d("TAp", washroomId)
+        }
         setData()
     }
 
@@ -40,6 +50,12 @@ class DisplayActivity : AppCompatActivity() {
         val addButton = findViewById<FloatingActionButton>(R.id.addButton)
         val washroomName = findViewById<TextView>(R.id.washroomNameText)
         val rateNumber = findViewById<TextView>(R.id.reviewNumberText)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val reviewViewModel = ReviewViewModel()
+            val allReviews = reviewViewModel.getReviewsForLocation(washroomId)
+
+        }
 
         val user1 = UserComment("TollerUser#123", "Nov 9, 2022", 4.3f, "Very clean washroom would totally come back again", 0L)
         val user2 = UserComment("TollerUser#123", "Nov 9, 2022", 3.4f, "Very clean washroom would totally come back again", 0L)
