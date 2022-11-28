@@ -70,26 +70,33 @@ class DisplayActivity : AppCompatActivity() {
         val rateNumber = findViewById<TextView>(R.id.reviewNumberText)
         val mostRecentComment = findViewById<TextView>(R.id.mostRecentComment)
 
-        washroomName.setText(washroom)
-        genderText.setText(gender)
-        dataText.setText(date)
-        rateNumber.setText("(0)")
-        paperText.setText("Yes")
-        soapText.setText("Yes")
-        rate.setRating(0.0f)
-
         CoroutineScope(Dispatchers.IO).launch {
             val reviewViewModel = ReviewViewModel()
             var allReviews = reviewViewModel.getReviewsForLocation(washroomId)
             allReviews = allReviews.sortedByDescending { it.dateAdded }
-            if (allReviews.size != 0 && allReviews.size != userCommentList.size) {
-                var rating = 0.0
-                CoroutineScope(Main).launch {
-                    rateNumber.setText("(" + allReviews.size + ")")
 
-                    // Display most recent comment
-                    if(allReviews[0].comment != ""){
-                        mostRecentComment.text  = "Most Recent Comment: " + allReviews[0].comment
+            if (allReviews.size != 0 && allReviews.size != userCommentList.size) {
+                withContext(Main) {
+                    launch {
+                        washroomName.setText(washroom)
+                        genderText.setText(gender)
+                        dataText.setText(date)
+                        rateNumber.setText("(0)")
+                        paperText.setText("Yes")
+                        soapText.setText("Yes")
+                        rate.setRating(0.0f)
+                    }
+                }
+
+                var rating = 0.0
+                withContext(Main) {
+                    launch {
+                        rateNumber.setText("(" + allReviews.size + ")")
+
+                        // Display most recent comment
+                        if(allReviews[0].comment != ""){
+                            mostRecentComment.text  = "Most Recent Comment: " + allReviews[0].comment
+                        }
                     }
                 }
                 if (allReviews[0].sufficientPaperTowels == 0) {
@@ -100,7 +107,6 @@ class DisplayActivity : AppCompatActivity() {
                     CoroutineScope(Main).launch {
                         paperText.setText("Unknown")
                     }
-
                 }
                 if (allReviews[0].sufficientSoap == 0) {
                     CoroutineScope(Main).launch {
@@ -109,7 +115,7 @@ class DisplayActivity : AppCompatActivity() {
 
                 } else if (allReviews[0].sufficientSoap == 2) {
                     CoroutineScope(Main).launch {
-                        paperText.setText("Unknown")
+                        soapText.setText("Unknown")
                     }
                 }
                 userCommentList.clear()
