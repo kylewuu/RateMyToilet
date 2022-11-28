@@ -2,6 +2,7 @@ package com.example.ratemytoilet
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.TextView
@@ -67,15 +68,18 @@ class DisplayActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             val reviewViewModel = ReviewViewModel()
-            val allReviews = reviewViewModel.getReviewsForLocation(washroomId)
-            allReviews.sortedByDescending { it.dateAdded }
+            var allReviews = reviewViewModel.getReviewsForLocation(washroomId)
+            allReviews = allReviews.sortedByDescending { it.dateAdded }
+            println(allReviews)
             if (allReviews.size != 0) {
                 var rating = 0.0
                 CoroutineScope(Main).launch {
                     rateNumber.setText("(" + allReviews.size + ")")
 
                     // Display most recent comment
-                    mostRecentComment.text = allReviews[0].comment
+                    if(allReviews[0].comment != ""){
+                        mostRecentComment.text  = "Most Recent Comment: " + allReviews[0].comment
+                    }
                 }
                 if (allReviews[0].sufficientPaperTowels == 0) {
                     CoroutineScope(Main).launch {
@@ -116,7 +120,7 @@ class DisplayActivity : AppCompatActivity() {
         }
 
         addButton.setOnClickListener {
-            val admin = true
+            val admin = false
             if (!admin) {
                 val intent = Intent(this, NormalUserAddReviewActivity::class.java)
                 intent.putExtra("location", washroomId)
