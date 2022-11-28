@@ -7,11 +7,12 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.DialogFragment
-import com.google.android.material.chip.Chip
-import com.google.android.material.slider.RangeSlider
 
+/**
+ * refs:
+ * https://stackoverflow.com/questions/8404140/how-to-dismiss-a-dialogfragment-when-pressing-outside-the-dialog
+ */
 class LoadingDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -30,7 +31,7 @@ class LoadingDialogFragment : DialogFragment() {
             dialog.window!!.setLayout(width.toInt(), height)
             dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.window!!.setGravity(Gravity.CENTER)
-
+            dialog.setCanceledOnTouchOutside(false)
         }
     }
 }
