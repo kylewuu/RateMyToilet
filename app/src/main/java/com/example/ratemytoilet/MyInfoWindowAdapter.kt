@@ -29,6 +29,7 @@ class MyInfoWindowAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
             val soapResult = results[0]
             val paperResult = results[1]
             val accessResult = results[2]
+
             if (soapResult == "true") {
                 soapCheck.setImageResource(R.drawable.checkmark)
             } else if (soapResult == "false"){
