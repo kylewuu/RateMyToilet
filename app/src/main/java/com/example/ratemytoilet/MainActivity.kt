@@ -15,6 +15,9 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
+import android.widget.RatingBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
 import com.google.firebase.ktx.Firebase
@@ -27,6 +30,8 @@ import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
@@ -38,7 +43,7 @@ import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
+class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, OnMarkerClickListener, OnInfoWindowClickListener {
     private var myLocationMarker : Marker ?= null
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMainBinding
@@ -55,9 +60,22 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
 
     private var count = 0
 
+    // Buttons
+    private lateinit var filterButton: Button
+
+
+    // Vars to save for adding new location
+    private lateinit var addLocationLatLng: LatLng
+
+    // Views for adding new location
+    private lateinit var addNewLocationFragment: AddNewLocationFragment
+    private lateinit var ratingBar: RatingBar
+    private lateinit var roomNumber: EditText
+    private lateinit var washroomName: EditText
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -85,18 +103,18 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
         DatabaseUsageExamples.initializeLocationViewModel(this)
     }
 
-    /*override fun onStart() {
+    override fun onStart() {
         super.onStart()
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
-            loadLaunchScreen()
+            //loadLaunchScreen()
         }
     }
 
     private fun loadLaunchScreen() {
         val intent = Intent(this, LaunchActivity::class.java)
         startActivity(intent)
-    }*/
+    }
 
     /**
      * Manipulates the map once available.
@@ -264,63 +282,59 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener{
         //val toiletMarkOptions = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.warning)).anchor(bubble.getAnchorU(), bubble.getAnchorV()).title("true, false, true").snippet("AQ, 2008;4.7")
         //myMarker = mMap.addMarker(toiletMarkOptions)!!
         //myMarker.showInfoWindow()
-
-    /**
-     * Adds a new location to the firestore. Currently does not add any real data.
-     */
-    /*fun addNewLocation(view: View) {
-        count++
-        Locations(count)
-    }*/
-
-    fun addLocation() {
-        var locationViewModel = LocationViewModel()
-        var newLocation = com.example.ratemytoilet.database.Location()
-        newLocation.roomNumber = 2008
-        newLocation.gender = 1
-        newLocation.lat = 49.278762746674886
-        newLocation.lng = -122.9172651303747
-        newLocation.date = Calendar.getInstance().timeInMillis
-        newLocation.name = "AQ, 2008"
-
-        var newLocation1 = com.example.ratemytoilet.database.Location()
-        newLocation1.roomNumber = 2007
-        newLocation1.gender = 1
-        newLocation1.lat = 49.27883401764781
-        newLocation1.lng = -122.9172336167242
-        newLocation1.date = Calendar.getInstance().timeInMillis
-        newLocation1.name = "AQ, 2007"
-
-        var newLocation2 = com.example.ratemytoilet.database.Location()
-        newLocation2.roomNumber = 2006
-        newLocation2.gender = 1
-        newLocation2.lat = 49.279164723163824
-        newLocation2.lng = -122.91720144989004
-        newLocation2.date = Calendar.getInstance().timeInMillis
-        newLocation2.name = "AQ, 2006"
-
-        var newLocation3 = com.example.ratemytoilet.database.Location()
-        newLocation3.roomNumber = 2005
-        newLocation3.gender = 1
-        newLocation3.lat = 49.279182669314714
-        newLocation3.lng = -122.9171085521842
-        newLocation3.date = Calendar.getInstance().timeInMillis
-        newLocation3.name = "AQ, 2005"
-
-        var newLocation4 = com.example.ratemytoilet.database.Location()
-        newLocation4.roomNumber = 2004
-        newLocation4.gender = 1
-        newLocation4.lat = 49.27950003509996
-        newLocation4.lng = -122.91687906260248
-        newLocation4.date = Calendar.getInstance().timeInMillis
-        newLocation4.name = "AQ, 2004"
-
-        locationViewModel.addLocation(newLocation)
-        locationViewModel.addLocation(newLocation1)
-        locationViewModel.addLocation(newLocation2)
-        locationViewModel.addLocation(newLocation3)
-        locationViewModel.addLocation(newLocation4)
     }
 
-}
+    override fun onMarkerClick(marker: Marker): Boolean {
+        if (marker.equals(myMarker)) {
+            marker.showInfoWindow()
+            return false
+        }
+        return true
+    }
 
+    override fun onInfoWindowClick(marker: Marker) {
+        val viewIntent = Intent(this, DisplayActivity::class.java)
+        startActivity(viewIntent)
+    }
+
+
+    fun onAddNewLocationClick(view: View) {
+
+        val viewIntent = Intent(this, AddNewLocationFragment::class.java)
+        startActivity(viewIntent)
+//        DatabaseUsageExamples.addNewLocation()
+
+        // Create fragment
+        /*
+        var addNewLocationFragment = AddNewLocationFragment()
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        transaction.replace(R.id.frameLayout, addNewLocationFragment, "Test")
+        transaction.commit()
+
+         */
+
+        // Remove filter button visibility
+        //filterButton.visibility = View.GONE
+
+        // Re-add action bar, and change the title.
+        /*
+        if (supportActionBar != null) {
+            supportActionBar?.show()
+            supportActionBar?.title = "Add New Washroom"
+        }
+
+         */
+
+
+    }
+
+
+
+    fun onAddNewWashroomClick(view: View){
+        println("HERE")
+        //ratingBar = findViewById(R.id.ratingBar)
+
+
+    }
+}

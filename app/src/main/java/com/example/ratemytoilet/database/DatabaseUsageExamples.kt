@@ -3,6 +3,7 @@ package com.example.ratemytoilet.database
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -44,16 +45,25 @@ class DatabaseUsageExamples {
          * is added
          */
         fun addNewLocation() {
-            var locationViewModel = LocationViewModel()
+            CoroutineScope(IO).launch {
+                var locationViewModel = LocationViewModel()
 
-            var newLocation = Location()
-            newLocation.roomNumber = 789
-            newLocation.gender = 1
-            newLocation.lat = 123.456
-            newLocation.lng = 123.123
-            newLocation.date = Calendar.getInstance().timeInMillis
-            newLocation.name = "Second washroom"
-            locationViewModel.addLocation(newLocation)
+                var newLocation = Location()
+                newLocation.roomNumber = 789
+                newLocation.gender = 1
+                newLocation.lat = 123.456
+                newLocation.lng = 123.123
+                newLocation.date = Calendar.getInstance().timeInMillis
+                newLocation.name = "Second washroom"
+                locationViewModel.addLocation(newLocation).collect {
+                    /**
+                     * "it" here is the documentId of the newly added location. It is the same
+                     * as the locatoinId found in ReviewDb. This can be used to attach a new
+                     * review or to fetch the new location as soon as it is added.
+                     */
+                    println("debugk: documentId $it")
+                }
+            }
         }
 
         /**

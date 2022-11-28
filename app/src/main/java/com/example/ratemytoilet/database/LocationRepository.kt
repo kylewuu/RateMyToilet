@@ -17,6 +17,7 @@ import kotlinx.coroutines.tasks.await
 /**
  * refs:
  * https://medium.com/firebase-developers/android-mvvm-firestore-37c3a8d65404
+ * https://stackoverflow.com/questions/72833016/how-to-return-data-from-inside-of-addonsuccesslistener-method-in-kotlin
  */
 class LocationRepository {
 
@@ -48,8 +49,16 @@ class LocationRepository {
             }
         }
 
-        fun addLocation(newLocation: Location) {
-            collection.add(newLocation.toLocationMap())
+        suspend fun addLocation(newLocation: Location): Flow<String> {
+            return callbackFlow {
+                var listener = collection.add(newLocation.toLocationMap())
+                    .addOnSuccessListener { documentReference ->
+                        var documentId = documentReference.id
+                        trySend(documentId)
+                    }
+                awaitClose {
+                }
+            }
         }
     }
 }
