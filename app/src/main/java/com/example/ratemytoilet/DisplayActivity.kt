@@ -2,7 +2,6 @@ package com.example.ratemytoilet
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.TextView
@@ -25,6 +24,7 @@ class DisplayActivity : AppCompatActivity() {
     private lateinit var date : String
     private lateinit var commentList: ListView
     private lateinit var listAdapter: UserCommentListAdapter
+    private var isUpdated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +40,7 @@ class DisplayActivity : AppCompatActivity() {
         date = intent.getStringExtra("date").toString()
 
         setData()
+        isUpdated = true
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -49,7 +50,12 @@ class DisplayActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-//        setData()
+        if (!isUpdated) setData()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isUpdated = false
     }
 
     fun setData() {
