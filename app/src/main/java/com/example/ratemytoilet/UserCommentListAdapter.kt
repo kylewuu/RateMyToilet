@@ -38,5 +38,8 @@ class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<User
 
     }
 
+    fun update(newList: ArrayList<UserComment>) {
+        arrayList = newList
+    }
 
 }

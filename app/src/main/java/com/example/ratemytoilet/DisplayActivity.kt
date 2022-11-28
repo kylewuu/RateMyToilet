@@ -2,8 +2,6 @@ package com.example.ratemytoilet
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.TextView
@@ -30,7 +28,7 @@ class DisplayActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        commentList = findViewById<ListView>(R.id.commentListView)
+        commentList = findViewById(R.id.commentListView)
         userCommentList = ArrayList()
         listAdapter = UserCommentListAdapter(applicationContext, userCommentList)
         commentList.adapter = listAdapter
@@ -101,6 +99,10 @@ class DisplayActivity : AppCompatActivity() {
                     date = dateTimeFormat.format(review.dateAdded)
                     val user = UserComment(review.id,date, rating.toFloat(), review.comment)
                     userCommentList.add(user)
+                    listAdapter.update(userCommentList)
+                    CoroutineScope(Main).launch {
+                        listAdapter.notifyDataSetChanged()
+                    }
                 }
                 rating /= allReviews.size
                 CoroutineScope(Main).launch {
