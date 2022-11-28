@@ -124,7 +124,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         myClusterManager.setOnClusterItemClickListener {
             washroomId = it.getId()
             washroomName = it.snippet?.split(",")?.get(0)
-            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd yyyy")
             date = dateTimeFormat.format(it.getDate())
             if (it.getGender() == 0) {
                 gender = "Male"
@@ -266,10 +266,13 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
-            val fragment = getSupportFragmentManager().findFragmentByTag("Load") as DialogFragment
-            fragment.dismiss()
-            myClusterManager.addItems(locationList)
-            myClusterManager.cluster()
+            var loadFragment = getSupportFragmentManager().findFragmentByTag("Load")
+            if (loadFragment != null) {
+                val fragment = loadFragment as DialogFragment
+                fragment.dismiss()
+                myClusterManager.addItems(locationList)
+                myClusterManager.cluster()
+            }
         }
     }
 
@@ -389,7 +392,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         myClusterManager.setOnClusterItemClickListener {
             washroomId = it.getId()
             washroomName = it.snippet?.split(",")?.get(0)
-            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd yyyy")
             date = dateTimeFormat.format(it.getDate())
             if (it.getGender() == 0) {
                 gender = "Male"
