@@ -121,8 +121,9 @@ class DisplayActivity : AppCompatActivity() {
                 userCommentList.clear()
                 for (review in allReviews) {
                     rating += review.cleanliness
-                    val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
+                    val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd yyyy")
                     date = dateTimeFormat.format(review.dateAdded)
+
                     val user = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment)
                     withContext(Main) {
                         launch {
