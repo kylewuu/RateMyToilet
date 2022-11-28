@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -30,7 +31,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY" />
+            android:value="AIzaSyCV4BT1MF8LWiFIShSVRIyCdCPmjxGY354" />
 
         <activity
             android:name=".AddLocationMapActivity"
@@ -78,7 +79,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayActivity" />
+        <activity android:name=".DisplayActivity"
+            android:label="Review Washroom"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".NormalUserAddReviewActivity"
+            android:label="Review Washroom"
+            android:parentActivityName=".DisplayActivity"/>
     </application>
 
 </manifest>

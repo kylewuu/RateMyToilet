@@ -1,25 +1,49 @@
 package com.example.ratemytoilet
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.ratemytoilet.database.ReviewViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class DisplayActivity : AppCompatActivity() {
     private lateinit var userCommentList: ArrayList<UserComment>
+    private lateinit var washroomId : String
+    private lateinit var washroom : String
+    private lateinit var gender : String
+    private lateinit var date : String
     private lateinit var commentList: ListView
     private lateinit var listAdapter: UserCommentListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         commentList = findViewById<ListView>(R.id.commentListView)
         userCommentList = ArrayList()
         listAdapter = UserCommentListAdapter(applicationContext, userCommentList)
         commentList.adapter = listAdapter
+        washroomId = intent.getStringExtra("ID").toString()
+        washroom = intent.getStringExtra("name").toString()
+        gender = intent.getStringExtra("gender").toString()
+        date = intent.getStringExtra("date").toString()
+
         setData()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     fun setData() {
@@ -29,30 +53,61 @@ class DisplayActivity : AppCompatActivity() {
         val paperText = findViewById<TextView>(R.id.paperCheckText)
         val soapText = findViewById<TextView>(R.id.soapCheckText)
 
-        val editButton = findViewById<ImageButton>(R.id.editButton)
+        val addButton = findViewById<FloatingActionButton>(R.id.addButton)
         val washroomName = findViewById<TextView>(R.id.washroomNameText)
         val rateNumber = findViewById<TextView>(R.id.reviewNumberText)
 
-        val user1 = UserComment("TollerUser#123", "Nov 9, 2022", 4.3f, "Very clean washroom would totally come back again", 0L)
-        val user2 = UserComment("TollerUser#123", "Nov 9, 2022", 3.4f, "Very clean washroom would totally come back again", 0L)
-        val user3 = UserComment("TollerUser#123", "Nov 9, 2022", 4.5f, "Very clean washroom would totally come back again", 0L)
-        val user4 = UserComment("TollerUser#123", "Nov 9, 2022", 4.5f, "Very clean washroom would totally come back again", 0L)
-        val user5 = UserComment("TollerUser#123", "Nov 9, 2022", 4.5f, "Very clean washroom would totally come back again", 0L)
-        val user6 = UserComment("TollerUser#123", "Nov 9, 2022", 4.5f, "Very clean washroom would totally come back again", 0L)
-        userCommentList.add(user1)
-        userCommentList.add(user2)
-        userCommentList.add(user3)
-        userCommentList.add(user4)
-        userCommentList.add(user5)
-        userCommentList.add(user6)
-
-        washroomName.setText("AQ Washroom")
-        rateNumber.setText("(6)")
-        genderText.setText("Male")
+        washroomName.setText(washroom)
+        genderText.setText(gender)
+        dataText.setText(date)
+        rateNumber.setText("(0)")
         paperText.setText("Yes")
         soapText.setText("Yes")
-        dataText.setText("Nov.7, 2022")
-        rate.setRating(4.7f)
+        rate.setRating(0.0f)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val reviewViewModel = ReviewViewModel()
+            val allReviews = reviewViewModel.getReviewsForLocation(washroomId)
+            allReviews.sortedByDescending { it.dateAdded }
+            if (allReviews.size != 0) {
+                var rating = 0.0
+                rateNumber.setText("(" + allReviews.size + ")")
+                if (allReviews[0].sufficientPaperTowels == 0) {
+                    paperText.setText("No")
+                } else if (allReviews[0].sufficientPaperTowels == 2) {
+                    paperText.setText("Unknown")
+                }
+                if (allReviews[0].sufficientSoap == 0) {
+                    soapText.setText("No")
+                } else if (allReviews[0].sufficientSoap == 2) {
+                    paperText.setText("Unknown")
+                }
+                for (review in allReviews) {
+                    rating += review.cleanliness
+                    val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
+                    date = dateTimeFormat.format(review.dateAdded)
+                    val user = UserComment(review.id,date, rating.toFloat(), review.comment)
+                    userCommentList.add(user)
+                }
+                rating /= allReviews.size
+                rate.setRating(rating.toFloat())
+            }
+        }
+
+        addButton.setOnClickListener {
+            val admin = true
+            if (!admin) {
+                val intent = Intent(this, NormalUserAddReviewActivity::class.java)
+                intent.putExtra("location", washroomId)
+                startActivity(intent)
+            } else {
+                val bundle = Bundle()
+                bundle.putString("message",washroomId);
+                val filterDialogFragment = AdminFragment()
+                filterDialogFragment.arguments = bundle
+                filterDialogFragment.show(supportFragmentManager, "Admin")
+            }
+        }
 
     }
 }

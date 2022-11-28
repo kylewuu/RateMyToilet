@@ -12,4 +12,15 @@
         <item>Female</item>
         <item>Not</item>
     </string-array>
+
+    <array name="range">
+        <item>1</item>
+        <item>5</item>
+    </array>
+
+    <array name="genderArray">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Universal</item>
+    </array>
 </resources>
