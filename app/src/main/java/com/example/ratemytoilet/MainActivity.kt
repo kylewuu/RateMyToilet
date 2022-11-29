@@ -125,11 +125,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             this.startActivity(washroomListActivityIntent)
         }
 
-       /* locationViewModel = LocationViewModel()
-        locationViewModel.locations.observe(this) {
-            updateToilet()
-        }*/
-
+       locationViewModel = LocationViewModel()
     }
 
     override fun onResume() {
@@ -282,7 +278,6 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val bubble = IconGenerator(this)
         val arr = ArrayList<MyItem>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        val locationViewModel = LocationViewModel()
         loadingDialogFragment.show(supportFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
@@ -345,7 +340,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
         if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
-            var allLocations = locationViewModel.locations.value
+            var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
             if (allLocations != null) {
                 for (location in allLocations) {
@@ -375,14 +370,16 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                             }
                         }
                     }
-                    if (maleCheck) {
-                        if (location.gender != 0 && location.gender != 2) {
-                            shouldAdd = false
+                    if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
+                        if (maleCheck) {
+                            if (location.gender != 0 && location.gender != 2) {
+                                shouldAdd = false
+                            }
                         }
-                    }
-                    if (femaleCheck) {
-                        if (location.gender != 1 && location.gender != 2) {
-                            shouldAdd = false
+                        if (femaleCheck) {
+                            if (location.gender != 1 && location.gender != 2) {
+                                shouldAdd = false
+                            }
                         }
                     }
 
