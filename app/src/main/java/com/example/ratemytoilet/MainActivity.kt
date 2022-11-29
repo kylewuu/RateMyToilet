@@ -62,6 +62,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var myClusterManager: ClusterManager<MyItem>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
 
+
+    private var notRunFirstTime = false
     private var maleCheck = false
     private var femaleCheck = false
     private var paperCheck = false
@@ -123,11 +125,40 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             this.startActivity(washroomListActivityIntent)
         }
 
-        locationViewModel = LocationViewModel()
+       /* locationViewModel = LocationViewModel()
         locationViewModel.locations.observe(this) {
             updateToilet()
+        }*/
+
+    }
+
+    override fun onResume() {
+        if (notRunFirstTime) {
+            Log.d("TAe", "resume")
+            mMap.clear()
+            myClusterManager.clearItems()
+            getToiletLocation()
+            mMap.setOnMarkerClickListener(myClusterManager)
+            mMap.setOnCameraIdleListener(myClusterManager)
+            mMap.setInfoWindowAdapter(myClusterManager.markerManager)
+            myClusterManager.setOnClusterItemInfoWindowClickListener {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    if (washroomId != null) {
+                        val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
+                        viewIntent.putExtra("ID", washroomId)
+                        viewIntent.putExtra("name", washroomName)
+                        viewIntent.putExtra("date", date)
+                        viewIntent.putExtra("gender", gender)
+                        startActivity(viewIntent)
+                    }
+                }
+            }
+            mMap.setOnInfoWindowClickListener(myClusterManager)
+        } else {
+            notRunFirstTime = true
         }
 
+        super.onResume()
     }
 
 //
@@ -224,6 +255,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         myLocationMarker = mMap.addMarker(markerOptions)!!
     }
 
+
+
     fun checkPermission() {
         if (Build.VERSION.SDK_INT < 23) return
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -250,7 +283,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val arr = ArrayList<MyItem>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
         val locationViewModel = LocationViewModel()
-        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
+        loadingDialogFragment.show(supportFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
@@ -259,31 +292,30 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 var soap = "true"
                 var paper = "true"
                 var access = "true"
-                val allReviews = reviewViewModel.getReviewsForLocation(location.id)
-                allReviews.sortedByDescending { it.dateAdded }
-                Log.d("TAb",allReviews.size.toString())
+                var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                allReviews = allReviews.sortedByDescending { it.dateAdded }
                 val latLng = LatLng(location.lat, location.lng)
                 if (allReviews.isNotEmpty()) {
                     for (review in allReviews) {
                         rating += review.cleanliness
                     }
                     rating /= allReviews.size
-                    if (allReviews[0].sufficientSoap == 1) {
+                    if (allReviews[0].sufficientSoap == 0) {
                         soap = "false"
-                    } else if (allReviews[0].sufficientSoap == 0) {
+                    } else if (allReviews[0].sufficientSoap == 2) {
                         soap = "unknown"
                     }
 
 
-                    if (allReviews[0].sufficientPaperTowels == 1) {
+                    if (allReviews[0].sufficientPaperTowels == 0) {
                         paper = "false"
-                    } else if (allReviews[0].sufficientSoap == 0) {
+                    } else if (allReviews[0].sufficientPaperTowels == 2) {
                         paper = "unknown"
                     }
 
-                    if (allReviews[0].accessibility == 1) {
+                    if (allReviews[0].accessibility == 0) {
                         access = "false"
-                    } else if (allReviews[0].accessibility == 0) {
+                    } else if (allReviews[0].accessibility == 2) {
                         access = "unknown"
                     }
                 }
@@ -299,13 +331,10 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
-            var loadFragment = supportFragmentManager.findFragmentByTag("Load")
-            if (loadFragment != null) {
-                val fragment = loadFragment as DialogFragment
-                fragment.dismiss()
-                myClusterManager.addItems(locationList)
-                myClusterManager.cluster()
-            }
+            Log.d("TAi", "run")
+            (supportFragmentManager.findFragmentByTag("Load") as DialogFragment).dismiss()
+            myClusterManager.addItems(locationList)
+            myClusterManager.cluster()
         }
     }
 
@@ -346,16 +375,14 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                             }
                         }
                     }
-                    if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
-                        if (maleCheck) {
-                            if (location.gender != 0 && location.gender != 2) {
-                                shouldAdd = false
-                            }
+                    if (maleCheck) {
+                        if (location.gender != 0 && location.gender != 2) {
+                            shouldAdd = false
                         }
-                        if (femaleCheck) {
-                            if (location.gender != 1 && location.gender != 2) {
-                                shouldAdd = false
-                            }
+                    }
+                    if (femaleCheck) {
+                        if (location.gender != 1 && location.gender != 2) {
+                            shouldAdd = false
                         }
                     }
 
@@ -374,28 +401,28 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 var updateSoap = "true"
                 var updatePaper = "true"
                 var updateAccess = "true"
-                val updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
-                updateAllReviews.sortedByDescending { it.dateAdded }
+                var updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
+                updateAllReviews = updateAllReviews.sortedByDescending { it.dateAdded }
                 if (updateAllReviews.size != 0) {
                     for (review in updateAllReviews) {
                         updateRating += review.cleanliness
                     }
                     updateRating /= updateAllReviews.size
-                    if (updateAllReviews[0].sufficientSoap == 1) {
+                    if (updateAllReviews[0].sufficientSoap == 0) {
                         updateSoap = "false"
-                    } else if (updateAllReviews[0].sufficientSoap == 0) {
+                    } else if (updateAllReviews[0].sufficientSoap == 2) {
                         updateSoap = "unknown"
                     }
 
-                    if (updateAllReviews[0].sufficientPaperTowels == 1) {
+                    if (updateAllReviews[0].sufficientPaperTowels == 0) {
                         updatePaper = "false"
-                    } else if (updateAllReviews[0].sufficientSoap == 0) {
+                    } else if (updateAllReviews[0].sufficientSoap == 2) {
                         updatePaper = "unknown"
                     }
 
-                    if (updateAllReviews[0].accessibility == 1) {
+                    if (updateAllReviews[0].accessibility == 0) {
                         updateAccess = "false"
-                    } else if (updateAllReviews[0].accessibility == 0) {
+                    } else if (updateAllReviews[0].accessibility == 2) {
                         updateAccess = "unknown"
                     }
                 }
@@ -480,4 +507,15 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         this.cleanlinessEnd = endValue
     }
 
+    override fun onLocationChanged(locations: MutableList<Location>) {
+    }
+
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+    }
+
+    override fun onProviderEnabled(provider: String) {
+    }
+
+    override fun onProviderDisabled(provider: String) {
+    }
 }
