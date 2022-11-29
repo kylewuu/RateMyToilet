@@ -124,7 +124,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         myClusterManager.setOnClusterItemClickListener {
             washroomId = it.getId()
             washroomName = it.snippet?.split(",")?.get(0)
-            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd yyyy")
+
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
             date = dateTimeFormat.format(it.getDate())
             if (it.getGender() == 0) {
                 gender = "Male"
@@ -392,7 +393,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         myClusterManager.setOnClusterItemClickListener {
             washroomId = it.getId()
             washroomName = it.snippet?.split(",")?.get(0)
-            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd yyyy")
+
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
             date = dateTimeFormat.format(it.getDate())
             if (it.getGender() == 0) {
                 gender = "Male"
@@ -403,6 +405,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             }
             return@setOnClusterItemClickListener false
         }
+
+
         mMap.setOnMarkerClickListener(myClusterManager)
         mMap.setOnCameraIdleListener(myClusterManager)
         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
