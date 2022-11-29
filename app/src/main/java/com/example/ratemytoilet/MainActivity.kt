@@ -19,7 +19,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.LocationViewModel
-import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.example.ratemytoilet.launch.LaunchActivity
@@ -32,14 +31,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * refs:
@@ -89,11 +85,11 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-       /* val currentUser = Firebase.auth.currentUser
+        val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
             loadLaunchScreen()
             finish()
-        }*/
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -296,8 +292,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 var soap = "true"
                 var paper = "true"
                 var access = "true"
-                val allReviews = reviewViewModel.getReviewsForLocation(location.id)
-                allReviews.sortedByDescending { it.dateAdded }
+                var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                allReviews = allReviews.sortedByDescending { it.dateAdded }
                 val latLng = LatLng(location.lat, location.lng)
                 if (allReviews.isNotEmpty()) {
                     for (review in allReviews) {
@@ -405,8 +401,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 var updateSoap = "true"
                 var updatePaper = "true"
                 var updateAccess = "true"
-                val updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
-                updateAllReviews.sortedByDescending { it.dateAdded }
+                var updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
+                updateAllReviews = updateAllReviews.sortedByDescending { it.dateAdded }
                 if (updateAllReviews.size != 0) {
                     for (review in updateAllReviews) {
                         updateRating += review.cleanliness
@@ -522,67 +518,4 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     override fun onProviderDisabled(provider: String) {
     }
-
-    fun addLocation() {
-        CoroutineScope(Dispatchers.Main).launch {
-            var locationViewModel = LocationViewModel()
-
-            var newLocation1 = com.example.ratemytoilet.database.Location()
-            newLocation1.roomNumber = 2001
-            newLocation1.gender = 1
-            newLocation1.lat = 49.27883170343454
-            newLocation1.lng = -122.91723594551543
-            newLocation1.date = Calendar.getInstance().timeInMillis
-            newLocation1.name = "AQ women washroom"
-
-            var newLocation2 = com.example.ratemytoilet.database.Location()
-            newLocation2.roomNumber = 2002
-            newLocation2.gender = 0
-            newLocation2.lat = 49.278769584950695
-            newLocation2.lng = -122.91726410870903
-            newLocation2.date = Calendar.getInstance().timeInMillis
-            newLocation2.name = "AQ man washroom"
-
-            var newLocation3 = com.example.ratemytoilet.database.Location()
-            newLocation3.roomNumber = 2003
-            newLocation3.gender = 1
-            newLocation3.lat = 49.27916667453397
-            newLocation3.lng = -122.91719975380576
-            newLocation3.date = Calendar.getInstance().timeInMillis
-            newLocation3.name = "AQ women washroom 2"
-
-            var newLocation4 = com.example.ratemytoilet.database.Location()
-            newLocation4.roomNumber = 2004
-            newLocation4.gender = 1
-            newLocation4.lat = 49.27918065286712
-            newLocation4.lng = -122.91710615222036
-            newLocation4.date = Calendar.getInstance().timeInMillis
-            newLocation4.name = "AQ women washroom 3"
-
-            var newLocation5 = com.example.ratemytoilet.database.Location()
-            newLocation5.roomNumber = 2005
-            newLocation5.gender = 0
-            newLocation5.lat = 49.2794941365365
-            newLocation5.lng = -122.91683385059164
-            newLocation5.date = Calendar.getInstance().timeInMillis
-            newLocation5.name = "AQ men washroom 2"
-
-            locationViewModel.addLocation(newLocation1).collect {
-                var newReview = Review()
-                newReview.locationId = it
-                Log.d("TAb", it)
-                newReview.leftByAdmin = false
-                newReview.cleanliness = 3
-                newReview.dateAdded = Calendar.getInstance().timeInMillis
-                newReview.sufficientPaperTowels = 1
-                newReview.sufficientSoap = 2
-                newReview.accessibility = 0
-                newReview.comment = "New comment"
-
-                var reviewViewModel = ReviewViewModel()
-                reviewViewModel.addReviewForLocation(newReview)
-            }
-        }
-    }
-
 }
