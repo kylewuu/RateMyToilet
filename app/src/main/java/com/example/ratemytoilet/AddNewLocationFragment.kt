@@ -8,12 +8,12 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat.setBackgroundTintList
+import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
@@ -123,7 +123,7 @@ class AddNewLocationFragment : AppCompatActivity() {
         // Room Number, Room Name, and Location cannot be empty
         if(roomNum != "" && roomName != ""  && addLocationLatLng != null)
         {
-            CoroutineScope(Dispatchers.IO).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 var locationViewModel = LocationViewModel()
                 var newLocation = Location()
 

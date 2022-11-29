@@ -6,9 +6,9 @@ import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -72,7 +72,7 @@ class DisplayActivity : AppCompatActivity() {
         val rateNumber = findViewById<TextView>(R.id.reviewNumberText)
         val mostRecentComment = findViewById<TextView>(R.id.mostRecentComment)
 
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val reviewViewModel = ReviewViewModel()
             var allReviews = reviewViewModel.getReviewsForLocation(washroomId)
             allReviews = allReviews.sortedByDescending { it.dateAdded }
@@ -101,33 +101,33 @@ class DisplayActivity : AppCompatActivity() {
                     }
                 }
                 if (allReviews[0].sufficientPaperTowels == 1) {
-                    CoroutineScope(Main).launch {
+                    lifecycleScope.launch(Main) {
                         paperText.setText("No")
                     }
                 } else if (allReviews[0].sufficientPaperTowels == 2) {
-                    CoroutineScope(Main).launch {
+                    lifecycleScope.launch(Main) {
                         paperText.setText("Yes")
                     }
                 }
                 else{
-                    CoroutineScope(Main).launch {
+                    lifecycleScope.launch(Main) {
                         paperText.setText("Unknown")
                     }
                 }
 
 
                 if (allReviews[0].sufficientSoap == 1) {
-                    CoroutineScope(Main).launch {
+                    lifecycleScope.launch(Main) {
                         soapText.setText("No")
                     }
 
                 } else if (allReviews[0].sufficientSoap == 2) {
-                    CoroutineScope(Main).launch {
+                    lifecycleScope.launch(Main) {
                         soapText.setText("Yes")
                     }
                 }
                 else{
-                    CoroutineScope(Main).launch {
+                    lifecycleScope.launch(Main) {
                         soapText.setText("Unknown")
                     }
                 }
