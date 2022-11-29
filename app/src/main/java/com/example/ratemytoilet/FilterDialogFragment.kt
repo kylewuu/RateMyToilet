@@ -6,11 +6,17 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.DialogFragment
+import com.example.ratemytoilet.MainActivity.Companion.ACCESS_CHECK_KEY
+import com.example.ratemytoilet.MainActivity.Companion.CLEANLINESS_END_KEY
+import com.example.ratemytoilet.MainActivity.Companion.CLEANLINESS_START_KEY
+import com.example.ratemytoilet.MainActivity.Companion.FEMALE_CHECK_KEY
+import com.example.ratemytoilet.MainActivity.Companion.MALE_CHECK_KEY
+import com.example.ratemytoilet.MainActivity.Companion.PAPER_CHECK_KEY
+import com.example.ratemytoilet.MainActivity.Companion.SOAP_CHECK_KEY
 import com.google.android.material.chip.Chip
 import com.google.android.material.slider.RangeSlider
 
@@ -20,20 +26,37 @@ class FilterDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
+        var bundle = arguments
+
+        var maleCheck = bundle?.getBoolean(MALE_CHECK_KEY) ?: false
+        var femaleCheck = bundle?.getBoolean(FEMALE_CHECK_KEY) ?: false
+        var paperCheck = bundle?.getBoolean(PAPER_CHECK_KEY) ?: false
+        var soapCheck = bundle?.getBoolean(SOAP_CHECK_KEY) ?: false
+        var accessCheck = bundle?.getBoolean(ACCESS_CHECK_KEY) ?: false
+        var cleanlinessStart = bundle?.getFloat(CLEANLINESS_START_KEY) ?: 1f
+        var cleanlinessEnd = bundle?.getFloat(CLEANLINESS_END_KEY) ?: 5f
+
         val layoutInflater = requireActivity().layoutInflater
         val dialogLayout = layoutInflater.inflate(R.layout.fragment_dialog, null)
         val builder = AlertDialog.Builder(requireActivity(), R.style.DialogAnimation).setView(dialogLayout)
         val saveButton = dialogLayout.findViewById<Button>(R.id.applyButton)
         val cancelButton = dialogLayout.findViewById<Button>(R.id.cancelDialogButton)
-        val paperCheck = dialogLayout.findViewById<Chip>(R.id.paperChip)
-        val soapCheck = dialogLayout.findViewById<Chip>(R.id.soapChip)
-        val accessCheck = dialogLayout.findViewById<Chip>(R.id.accChip)
-        val maleCheck = dialogLayout.findViewById<Chip>(R.id.maleChip)
-        val femaleCheck = dialogLayout.findViewById<Chip>(R.id.femaleChip)
+        val paperCheckButton = dialogLayout.findViewById<Chip>(R.id.paperChip)
+        val soapCheckButton = dialogLayout.findViewById<Chip>(R.id.soapChip)
+        val accessCheckButton = dialogLayout.findViewById<Chip>(R.id.accChip)
+        val maleCheckButton = dialogLayout.findViewById<Chip>(R.id.maleChip)
+        val femaleCheckButton = dialogLayout.findViewById<Chip>(R.id.femaleChip)
         val cleanliness = dialogLayout.findViewById<RangeSlider>(R.id.cleanRange)
 
+        paperCheckButton.isChecked = paperCheck
+        soapCheckButton.isChecked = soapCheck
+        accessCheckButton.isChecked = accessCheck
+        maleCheckButton.isChecked = maleCheck
+        femaleCheckButton.isChecked = femaleCheck
+        cleanliness.setValues(cleanlinessStart, cleanlinessEnd)
+
         saveButton.setOnClickListener {
-            listener?.onFilterConditionPassed(paperCheck.isChecked, soapCheck.isChecked, accessCheck.isChecked, maleCheck.isChecked, femaleCheck.isChecked, cleanliness.values[0], cleanliness.values[1])
+            listener?.onFilterConditionPassed(paperCheckButton.isChecked, soapCheckButton.isChecked, accessCheckButton.isChecked, maleCheckButton.isChecked, femaleCheckButton.isChecked, cleanliness.values[0], cleanliness.values[1])
             dismiss()
         }
 
