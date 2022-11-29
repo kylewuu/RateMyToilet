@@ -156,7 +156,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Toilet paper Check"
+                android:text="Paper Towel Check"
                 android:textColor="#28104E"
                 android:textSize="16sp"
                 android:textStyle="bold"

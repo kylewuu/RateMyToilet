@@ -268,22 +268,22 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                         rating += review.cleanliness
                     }
                     rating /= allReviews.size
-                    if (allReviews[0].sufficientSoap == 0) {
+                    if (allReviews[0].sufficientSoap == 1) {
                         soap = "false"
-                    } else if (allReviews[0].sufficientSoap == 2) {
+                    } else if (allReviews[0].sufficientSoap == 0) {
                         soap = "unknown"
                     }
 
 
-                    if (allReviews[0].sufficientPaperTowels == 0) {
+                    if (allReviews[0].sufficientPaperTowels == 1) {
                         paper = "false"
-                    } else if (allReviews[0].sufficientSoap == 2) {
+                    } else if (allReviews[0].sufficientSoap == 0) {
                         paper = "unknown"
                     }
 
-                    if (allReviews[0].accessibility == 0) {
+                    if (allReviews[0].accessibility == 1) {
                         access = "false"
-                    } else if (allReviews[0].accessibility == 2) {
+                    } else if (allReviews[0].accessibility == 0) {
                         access = "unknown"
                     }
                 }
@@ -381,21 +381,21 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                         updateRating += review.cleanliness
                     }
                     updateRating /= updateAllReviews.size
-                    if (updateAllReviews[0].sufficientSoap == 0) {
+                    if (updateAllReviews[0].sufficientSoap == 1) {
                         updateSoap = "false"
-                    } else if (updateAllReviews[0].sufficientSoap == 2) {
+                    } else if (updateAllReviews[0].sufficientSoap == 0) {
                         updateSoap = "unknown"
                     }
 
-                    if (updateAllReviews[0].sufficientPaperTowels == 0) {
+                    if (updateAllReviews[0].sufficientPaperTowels == 1) {
                         updatePaper = "false"
-                    } else if (updateAllReviews[0].sufficientSoap == 2) {
+                    } else if (updateAllReviews[0].sufficientSoap == 0) {
                         updatePaper = "unknown"
                     }
 
-                    if (updateAllReviews[0].accessibility == 0) {
+                    if (updateAllReviews[0].accessibility == 1) {
                         updateAccess = "false"
-                    } else if (updateAllReviews[0].accessibility == 2) {
+                    } else if (updateAllReviews[0].accessibility == 0) {
                         updateAccess = "unknown"
                     }
                 }
