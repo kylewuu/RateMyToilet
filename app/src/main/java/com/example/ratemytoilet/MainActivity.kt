@@ -93,14 +93,15 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-       /* val currentUser = Firebase.auth.currentUser
+       val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
             loadLaunchScreen()
             finish()
-        }*/
+        }
         if (savedInstanceState != null) {
             notRunFirstTime = savedInstanceState.getBoolean("status")
         }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         if (getSupportActionBar() != null) {
@@ -135,6 +136,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             this.startActivity(washroomListActivityIntent)
         }
 
+       locationViewModel = LocationViewModel()
+    }
         swipeToRefresh = findViewById(R.id.swipeRefresh)
         swipeToRefresh.setOnRefreshListener {
             Toast.makeText(this, "New Location added", Toast.LENGTH_SHORT).show()
@@ -175,7 +178,6 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         }
 
         super.onResume()
-    }
 
 //
 //    override fun onStart() {
@@ -220,13 +222,15 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         mMap.setOnCameraIdleListener(myClusterManager)
         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
         myClusterManager.setOnClusterItemInfoWindowClickListener {
-            if (washroomId != null) {
-                val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
-                viewIntent.putExtra("ID", washroomId)
-                viewIntent.putExtra("name", washroomName)
-                viewIntent.putExtra("date", date)
-                viewIntent.putExtra("gender", gender)
-                startActivity(viewIntent)
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (washroomId != null) {
+                    val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
+                    viewIntent.putExtra("ID", washroomId)
+                    viewIntent.putExtra("name", washroomName)
+                    viewIntent.putExtra("date", date)
+                    viewIntent.putExtra("gender", gender)
+                    startActivity(viewIntent)
+                }
             }
         }
         mMap.setOnInfoWindowClickListener(myClusterManager)
@@ -296,11 +300,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val bubble = IconGenerator(this)
         val arr = ArrayList<MyItem>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        val locationViewModel = LocationViewModel()
-        //if (loadingDialogFragment.dialog == null && loadingDialogFragment.isAdded()) {
-            loadingDialogFragment.show(supportFragmentManager, "Load")
-        //}
-
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
@@ -311,6 +311,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 var access = "true"
                 var allReviews = reviewViewModel.getReviewsForLocation(location.id)
 
+                allReviews = allReviews.sortedByDescending { it.dateAdded }
+                var allReviews = reviewViewModel.getReviewsForLocation(location.id)
                 allReviews = allReviews.sortedByDescending { it.dateAdded }
                 val latLng = LatLng(location.lat, location.lng)
                 if (allReviews.isNotEmpty()) {
@@ -364,11 +366,9 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        //if (loadingDialogFragment.dialog != null && loadingDialogFragment.isAdded()) {
-            loadingDialogFragment.show(supportFragmentManager, "Load")
-        //}
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
-            var allLocations = locationViewModel.locations.value
+            var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
             if (allLocations != null) {
                 for (location in allLocations) {
@@ -426,8 +426,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 var updateSoap = "true"
                 var updatePaper = "true"
                 var updateAccess = "true"
-                val updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
-                updateAllReviews.sortedByDescending { it.dateAdded }
+                var updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
+                updateAllReviews = updateAllReviews.sortedByDescending { it.dateAdded }
                 if (updateAllReviews.size != 0) {
                     for (review in updateAllReviews) {
                         updateRating += review.cleanliness
@@ -445,7 +445,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                         updatePaper = "unknown"
                     }
 
-                    if (updateAllReviews[0].accessibility == 0) {
+                    if (updateAllReviews[0].accessibility == 1) {
                         updateAccess = "false"
                     } else if (updateAllReviews[0].accessibility == 2) {
                         updateAccess = "unknown"
@@ -543,79 +543,4 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     override fun onProviderDisabled(provider: String) {
     }
-
-    fun addLocation() {
-        CoroutineScope(Dispatchers.Main).launch {
-            var locationViewModel = LocationViewModel()
-
-            var newLocation1 = com.example.ratemytoilet.database.Location()
-            newLocation1.roomNumber = 2001
-            newLocation1.gender = 1
-            newLocation1.lat = 49.27883170343454
-            newLocation1.lng = -122.91723594551543
-            newLocation1.date = Calendar.getInstance().timeInMillis
-            newLocation1.name = "AQ women washroom"
-
-            var newLocation2 = com.example.ratemytoilet.database.Location()
-            newLocation2.roomNumber = 2002
-            newLocation2.gender = 0
-            newLocation2.lat = 49.278769584950695
-            newLocation2.lng = -122.91726410870903
-            newLocation2.date = Calendar.getInstance().timeInMillis
-            newLocation2.name = "AQ man washroom"
-
-            var newLocation3 = com.example.ratemytoilet.database.Location()
-            newLocation3.roomNumber = 2003
-            newLocation3.gender = 1
-            newLocation3.lat = 49.27916667453397
-            newLocation3.lng = -122.91719975380576
-            newLocation3.date = Calendar.getInstance().timeInMillis
-            newLocation3.name = "AQ women washroom 2"
-
-            var newLocation4 = com.example.ratemytoilet.database.Location()
-            newLocation4.roomNumber = 2004
-            newLocation4.gender = 1
-            newLocation4.lat = 49.27918065286712
-            newLocation4.lng = -122.91710615222036
-            newLocation4.date = Calendar.getInstance().timeInMillis
-            newLocation4.name = "AQ women washroom 3"
-
-            var newLocation5 = com.example.ratemytoilet.database.Location()
-            newLocation5.roomNumber = 2005
-            newLocation5.gender = 0
-            newLocation5.lat = 49.2794941365365
-            newLocation5.lng = -122.91683385059164
-            newLocation5.date = Calendar.getInstance().timeInMillis
-            newLocation5.name = "AQ men washroom 2"
-
-            locationViewModel.addLocation(newLocation1).collect {
-                var newReview = Review()
-                newReview.locationId = it
-                Log.d("TAb", it)
-                newReview.leftByAdmin = false
-                newReview.cleanliness = 3
-                newReview.dateAdded = Calendar.getInstance().timeInMillis
-                newReview.sufficientPaperTowels = 1
-                newReview.sufficientSoap = 2
-                newReview.accessibility = 0
-                newReview.comment = "New comment"
-
-                var reviewViewModel = ReviewViewModel()
-                reviewViewModel.addReviewForLocation(newReview)
-            }
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean("status", notRunFirstTime)
-        super.onSaveInstanceState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        if (savedInstanceState != null) {
-            notRunFirstTime = savedInstanceState.getBoolean("status")
-        }
-    }
-
 }

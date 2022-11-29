@@ -126,10 +126,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="Toilet Paper"
+                    android:text="Paper Towels"
                     android:textColor="@color/chip_text_background"
                     android:textSize="12sp"
-                    app:chipIcon="@drawable/toilet"
+                    app:chipIcon="@drawable/pt"
                     app:chipIconVisible="true" />
 
                 <com.google.android.material.chip.Chip
