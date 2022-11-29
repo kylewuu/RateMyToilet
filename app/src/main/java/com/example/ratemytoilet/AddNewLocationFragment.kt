@@ -36,9 +36,9 @@ class AddNewLocationFragment : AppCompatActivity() {
     // Vars to save
     private var gender: Int? = 0
     private var addLocationLatLng : LatLng? = null
-    private var paperTowelValue: Int = 0
-    private var soapValue: Int = 0
-    private var accessValue: Int = 0
+    private var paperTowelValue: Int = 2
+    private var soapValue: Int = 2
+    private var accessValue: Int = 2
 
 
     // Array of genders
@@ -178,7 +178,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onPaperTowelYesClick(view:View){
-        paperTowelValue = 2
+        paperTowelValue = 1
 
         paperTowelButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         paperTowelButtonYes.setTextColor(Color.WHITE)
@@ -192,7 +192,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onPaperTowelNoClick(view:View){
-        paperTowelValue = 1
+        paperTowelValue = 0
 
         paperTowelButtonYes.setBackgroundColor(Color.WHITE)
         paperTowelButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
@@ -205,7 +205,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onSoapYesClick(view:View){
-        soapValue = 2
+        soapValue = 1
 
         soapButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         soapButtonYes.setTextColor(Color.WHITE)
@@ -218,7 +218,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onSoapNoClick(view:View){
-        soapValue = 1
+        soapValue = 0
 
         soapButtonYes.setBackgroundColor(Color.WHITE)
         soapButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
@@ -229,7 +229,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onAccessYesClick(view:View){
-        accessValue = 2
+        accessValue = 1
 
         accessButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         accessButtonYes.setTextColor(Color.WHITE)
@@ -242,7 +242,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onAccessNoClick(view:View){
-        accessValue = 1
+        accessValue = 0
 
         accessButtonYes.setBackgroundColor(Color.WHITE)
         accessButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
