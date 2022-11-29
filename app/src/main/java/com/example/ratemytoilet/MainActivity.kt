@@ -13,11 +13,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
@@ -32,6 +34,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
+import com.google.rpc.context.AttributeContext.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,6 +68,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<MyItem>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
+    private lateinit var swipeToRefresh : SwipeRefreshLayout
 
 
     private var notRunFirstTime = false
@@ -94,7 +98,9 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             loadLaunchScreen()
             finish()
         }*/
-
+        if (savedInstanceState != null) {
+            notRunFirstTime = savedInstanceState.getBoolean("status")
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         if (getSupportActionBar() != null) {
@@ -129,35 +135,41 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             this.startActivity(washroomListActivityIntent)
         }
 
-       /* locationViewModel = LocationViewModel()
-        locationViewModel.locations.observe(this) {
-            updateToilet()
-        }*/
+        swipeToRefresh = findViewById(R.id.swipeRefresh)
+        swipeToRefresh.setOnRefreshListener {
+            Toast.makeText(this, "New Location added", Toast.LENGTH_SHORT).show()
+            swipeToRefresh.isRefreshing = false
+        }
+
+
+
 
     }
 
     override fun onResume() {
         if (notRunFirstTime) {
-            Log.d("TAe", "resume")
-            mMap.clear()
-            myClusterManager.clearItems()
-            getToiletLocation()
-            mMap.setOnMarkerClickListener(myClusterManager)
-            mMap.setOnCameraIdleListener(myClusterManager)
-            mMap.setInfoWindowAdapter(myClusterManager.markerManager)
-            myClusterManager.setOnClusterItemInfoWindowClickListener {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    if (washroomId != null) {
-                        val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
-                        viewIntent.putExtra("ID", washroomId)
-                        viewIntent.putExtra("name", washroomName)
-                        viewIntent.putExtra("date", date)
-                        viewIntent.putExtra("gender", gender)
-                        startActivity(viewIntent)
+            if (mMap != null && myClusterManager != null) {
+                mMap.clear()
+                myClusterManager.clearItems()
+                getToiletLocation()
+                mMap.setOnMarkerClickListener(myClusterManager)
+                mMap.setOnCameraIdleListener(myClusterManager)
+                mMap.setInfoWindowAdapter(myClusterManager.markerManager)
+                myClusterManager.setOnClusterItemInfoWindowClickListener {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        if (washroomId != null) {
+                            val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
+                            viewIntent.putExtra("ID", washroomId)
+                            viewIntent.putExtra("name", washroomName)
+                            viewIntent.putExtra("date", date)
+                            viewIntent.putExtra("gender", gender)
+                            startActivity(viewIntent)
+                        }
                     }
                 }
+                mMap.setOnInfoWindowClickListener(myClusterManager)
+
             }
-            mMap.setOnInfoWindowClickListener(myClusterManager)
         } else {
             notRunFirstTime = true
         }
@@ -208,15 +220,13 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         mMap.setOnCameraIdleListener(myClusterManager)
         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
         myClusterManager.setOnClusterItemInfoWindowClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                if (washroomId != null) {
-                    val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
-                    viewIntent.putExtra("ID", washroomId)
-                    viewIntent.putExtra("name", washroomName)
-                    viewIntent.putExtra("date", date)
-                    viewIntent.putExtra("gender", gender)
-                    startActivity(viewIntent)
-                }
+            if (washroomId != null) {
+                val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
+                viewIntent.putExtra("ID", washroomId)
+                viewIntent.putExtra("name", washroomName)
+                viewIntent.putExtra("date", date)
+                viewIntent.putExtra("gender", gender)
+                startActivity(viewIntent)
             }
         }
         mMap.setOnInfoWindowClickListener(myClusterManager)
@@ -287,7 +297,10 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val arr = ArrayList<MyItem>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
         val locationViewModel = LocationViewModel()
-        loadingDialogFragment.show(supportFragmentManager, "Load")
+        //if (loadingDialogFragment.dialog == null && loadingDialogFragment.isAdded()) {
+            loadingDialogFragment.show(supportFragmentManager, "Load")
+        //}
+
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
@@ -296,8 +309,9 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 var soap = "true"
                 var paper = "true"
                 var access = "true"
-                val allReviews = reviewViewModel.getReviewsForLocation(location.id)
-                allReviews.sortedByDescending { it.dateAdded }
+                var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+
+                allReviews = allReviews.sortedByDescending { it.dateAdded }
                 val latLng = LatLng(location.lat, location.lng)
                 if (allReviews.isNotEmpty()) {
                     for (review in allReviews) {
@@ -335,8 +349,11 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
-            Log.d("TAi", "run")
-            (supportFragmentManager.findFragmentByTag("Load") as DialogFragment).dismiss()
+            var loadFragment = supportFragmentManager.findFragmentByTag("Load")
+            if (loadFragment != null) {
+                val fragment = loadFragment as DialogFragment
+                fragment.dismiss()
+            }
             myClusterManager.addItems(locationList)
             myClusterManager.cluster()
         }
@@ -347,7 +364,9 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
+        //if (loadingDialogFragment.dialog != null && loadingDialogFragment.isAdded()) {
+            loadingDialogFragment.show(supportFragmentManager, "Load")
+        //}
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.locations.value
             val reviewViewModel = ReviewViewModel()
@@ -379,14 +398,16 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                             }
                         }
                     }
-                    if (maleCheck) {
-                        if (location.gender != 0 && location.gender != 2) {
-                            shouldAdd = false
+                    if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
+                        if (maleCheck) {
+                            if (location.gender != 0 && location.gender != 2) {
+                                shouldAdd = false
+                            }
                         }
-                    }
-                    if (femaleCheck) {
-                        if (location.gender != 1 && location.gender != 2) {
-                            shouldAdd = false
+                        if (femaleCheck) {
+                            if (location.gender != 1 && location.gender != 2) {
+                                shouldAdd = false
+                            }
                         }
                     }
 
@@ -582,6 +603,18 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 var reviewViewModel = ReviewViewModel()
                 reviewViewModel.addReviewForLocation(newReview)
             }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean("status", notRunFirstTime)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if (savedInstanceState != null) {
+            notRunFirstTime = savedInstanceState.getBoolean("status")
         }
     }
 

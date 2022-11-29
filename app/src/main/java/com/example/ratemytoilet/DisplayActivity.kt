@@ -2,6 +2,7 @@ package com.example.ratemytoilet
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.TextView
@@ -9,10 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -25,6 +24,8 @@ class DisplayActivity : AppCompatActivity() {
     private lateinit var access : String
     private lateinit var commentList: ListView
     private lateinit var listAdapter: UserCommentListAdapter
+    private var comment = "No one left comment yet"
+    private var stop = false
     private var isUpdated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +34,7 @@ class DisplayActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         commentList = findViewById(R.id.commentListView)
         userCommentList = ArrayList()
-        listAdapter = UserCommentListAdapter(applicationContext, userCommentList)
+        listAdapter = UserCommentListAdapter(this, userCommentList)
         commentList.adapter = listAdapter
         washroomId = intent.getStringExtra("ID").toString()
         washroom = intent.getStringExtra("name").toString()
@@ -42,7 +43,6 @@ class DisplayActivity : AppCompatActivity() {
         access = intent.getStringExtra("access").toString()
 
         setData()
-        isUpdated = true
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -51,14 +51,22 @@ class DisplayActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
+
+        if (isUpdated) {
+            userCommentList.clear()
+            setData()
+            Log.d("TAb", "resume")
+        } else {
+            isUpdated = true
+        }
         super.onResume()
-        if (!isUpdated) setData()
+        //if (!isUpdated) setData()
     }
 
-    override fun onPause() {
+    /*override fun onPause() {
         super.onPause()
         isUpdated = false
-    }
+    }*/
 
     fun setData() {
         val dataText = findViewById<TextView>(R.id.dateText)
@@ -71,24 +79,16 @@ class DisplayActivity : AppCompatActivity() {
         val washroomName = findViewById<TextView>(R.id.washroomNameText)
         val rateNumber = findViewById<TextView>(R.id.reviewNumberText)
         val mostRecentComment = findViewById<TextView>(R.id.mostRecentComment)
+        washroomName.setText(washroom)
+        genderText.setText(gender)
+        dataText.setText(date)
 
         lifecycleScope.launch(Dispatchers.IO) {
             val reviewViewModel = ReviewViewModel()
             var allReviews = reviewViewModel.getReviewsForLocation(washroomId)
             allReviews = allReviews.sortedByDescending { it.dateAdded }
-            if (allReviews.size != 0 && allReviews.size != userCommentList.size) {
-                withContext(Main) {
-                    launch {
-                        washroomName.setText(washroom)
-                        genderText.setText(gender)
-                        dataText.setText(date)
-                        rateNumber.setText("(0)")
-                        paperText.setText("Yes")
-                        soapText.setText("Yes")
-                        rate.setRating(0.0f)
-                    }
-                }
 
+            if (allReviews.size != 0 && allReviews.size != userCommentList.size) {
                 var rating = 0.0
                 withContext(Main) {
                     launch {
@@ -132,8 +132,6 @@ class DisplayActivity : AppCompatActivity() {
                     }
                 }
 
-
-                userCommentList.clear()
                 for (review in allReviews) {
                     rating += review.cleanliness
 

@@ -78,7 +78,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="40dp"
                     android:layout_marginTop="16dp"
-                    android:progressTint="#ffd700" />
+                    android:progressTint="#ffd700"
+                    android:stepSize="1"/>
 
             </LinearLayout>
 
