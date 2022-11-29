@@ -87,8 +87,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
-            loadLaunchScreen()
-            finish()
+            //loadLaunchScreen()
+            //finish()
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
