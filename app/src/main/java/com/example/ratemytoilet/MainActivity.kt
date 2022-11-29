@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat
 /**
  * refs:
  * https://www.howtocreate.co.uk/xor.html
+ * https://stackoverflow.com/questions/21352571/android-how-do-i-check-if-dialogfragment-is-showing
  */
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, FilterDialogFragment.FilterListener {
     private var myLocationMarker : Marker ?= null
@@ -59,6 +60,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<MyItem>
+    private lateinit var loadingDialogFragment: LoadingDialogFragment
 
     private var maleCheck = false
     private var femaleCheck = false
@@ -112,6 +114,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             filterDialogFragment.arguments = bundle
             filterDialogFragment.show(supportFragmentManager, "Filter")
         }
+
+        loadingDialogFragment = LoadingDialogFragment()
 
         val listButton = findViewById<Button>(R.id.listButton)
         listButton.setOnClickListener {
@@ -246,9 +250,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val arr = ArrayList<MyItem>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
         val locationViewModel = LocationViewModel()
-        val loadingDialogFragment = LoadingDialogFragment()
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
-            loadingDialogFragment.show(supportFragmentManager, "Load")
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
             for (location in allLocations) {
@@ -311,9 +314,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        val loadingDialogFragment = LoadingDialogFragment()
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
-            loadingDialogFragment.show(supportFragmentManager, "Load")
             var allLocations = locationViewModel.locations.value
             val reviewViewModel = ReviewViewModel()
             if (allLocations != null) {
