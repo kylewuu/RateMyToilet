@@ -88,7 +88,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
             loadLaunchScreen()
-            finish()
+//            finish()
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -278,7 +278,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val bubble = IconGenerator(this)
         val arr = ArrayList<MyItem>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        loadingDialogFragment.show(supportFragmentManager, "Load")
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
