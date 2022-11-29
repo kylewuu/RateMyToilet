@@ -100,11 +100,11 @@ class DisplayActivity : AppCompatActivity() {
                         }
                     }
                 }
-                if (allReviews[0].sufficientPaperTowels == 1) {
+                if (allReviews[0].sufficientPaperTowels == 0) {
                     lifecycleScope.launch(Main) {
                         paperText.setText("No")
                     }
-                } else if (allReviews[0].sufficientPaperTowels == 2) {
+                } else if (allReviews[0].sufficientPaperTowels == 1) {
                     lifecycleScope.launch(Main) {
                         paperText.setText("Yes")
                     }
@@ -116,12 +116,12 @@ class DisplayActivity : AppCompatActivity() {
                 }
 
 
-                if (allReviews[0].sufficientSoap == 1) {
+                if (allReviews[0].sufficientSoap == 0) {
                     lifecycleScope.launch(Main) {
                         soapText.setText("No")
                     }
 
-                } else if (allReviews[0].sufficientSoap == 2) {
+                } else if (allReviews[0].sufficientSoap == 1) {
                     lifecycleScope.launch(Main) {
                         soapText.setText("Yes")
                     }

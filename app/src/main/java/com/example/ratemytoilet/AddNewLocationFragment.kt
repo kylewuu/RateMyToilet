@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -141,6 +142,7 @@ class AddNewLocationFragment : AppCompatActivity() {
                     newReview.locationId = it
                     newReview.leftByAdmin = false
                     newReview.cleanliness = rating
+                    Log.d("TAo", rating.toString())
                     newReview.dateAdded = Calendar.getInstance().timeInMillis
                     newReview.sufficientPaperTowels = paperTowelValue
                     newReview.sufficientSoap = soapValue
