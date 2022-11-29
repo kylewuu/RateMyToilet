@@ -21,6 +21,9 @@ class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<User
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        if (arrayList == null || arrayList.size == 0) {
+            return TextView(context)
+        }
         val view:View = View.inflate(context, R.layout.cardview_list_layout, null)
         val userNameText = view.findViewById<TextView>(R.id.userNameText)
         val dateText = view.findViewById<TextView>(R.id.userDate)
@@ -38,5 +41,8 @@ class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<User
 
     }
 
+    fun update(newList: ArrayList<UserComment>) {
+        arrayList = newList
+    }
 
 }

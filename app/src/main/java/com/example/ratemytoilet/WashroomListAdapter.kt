@@ -14,20 +14,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
+import java.text.DecimalFormat
 
 
 // Based off class demo
 class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter() {
 
 
-    // Returns the values associated with a key in the database
-    override fun getItem(position: Int): (Array<String>) {
-        return arrayOf(
-            locationList.get(position).id
 
-        )
-
+    override fun getItem(position: Int): (Location) {
+        return locationList.get(position)
     }
 
 
@@ -59,7 +55,7 @@ class WashroomListAdapter(private val context: Context, private var locationList
         var averageCleanlinessRating = 0.0
         var paperTowelsValue = ""
         var soapValue = ""
-
+        val decimalFormat = DecimalFormat("#.#")
 
 
         // Retrieve reviews for a location
@@ -159,7 +155,8 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     ratingsText.text = averageCleanlinessRating.toInt().toString()
                 }
                 else{
-                    ratingsText.text = averageCleanlinessRating.toString()
+                    var formattedCleanlinessRating = decimalFormat.format(averageCleanlinessRating).toString()
+                    ratingsText.text = formattedCleanlinessRating
                 }
 
 

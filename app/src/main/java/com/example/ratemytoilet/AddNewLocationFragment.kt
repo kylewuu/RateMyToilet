@@ -8,12 +8,12 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat.setBackgroundTintList
+import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
@@ -28,12 +28,17 @@ class AddNewLocationFragment : AppCompatActivity() {
     private lateinit var paperTowelButtonNo: Button
     private lateinit var soapButtonYes: Button
     private lateinit var soapButtonNo: Button
+    private lateinit var accessButtonYes: Button
+    private lateinit var accessButtonNo: Button
+    private lateinit var commentBox :EditText
 
     // Vars to save
     private var gender: Int? = 0
     private var addLocationLatLng : LatLng? = null
     private var paperTowelValue: Int = 0
     private var soapValue: Int = 0
+    private var accessValue: Int = 0
+
 
     // Array of genders
     val genderArray = arrayOf("Male", "Female", "Universal")
@@ -49,9 +54,12 @@ class AddNewLocationFragment : AppCompatActivity() {
         paperTowelButtonNo = findViewById<Button>(R.id.bt_paperTowelsNo)
         soapButtonYes = findViewById<Button>(R.id.bt_soapYes)
         soapButtonNo = findViewById<Button>(R.id.bt_soapNo)
+        accessButtonYes = findViewById<Button>(R.id.bt_accessYes)
+        accessButtonNo = findViewById<Button>(R.id.bt_accessNo)
+        commentBox = findViewById<EditText>(R.id.et_comment)
 
         // Setup spinner for Gender
-        val genderSelected = findViewById<TextView>(R.id.tv_genderSelected)
+
         val spinner = findViewById<Spinner>(R.id.sp_gender)
         spinner?.adapter = ArrayAdapter(this, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, genderArray ) as SpinnerAdapter
 
@@ -60,7 +68,6 @@ class AddNewLocationFragment : AppCompatActivity() {
         spinner?.onItemSelectedListener = object:AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 gender = p2
-                genderSelected.text = genderArray[p2]
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -116,7 +123,7 @@ class AddNewLocationFragment : AppCompatActivity() {
         // Room Number, Room Name, and Location cannot be empty
         if(roomNum != "" && roomName != ""  && addLocationLatLng != null)
         {
-            CoroutineScope(Dispatchers.IO).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 var locationViewModel = LocationViewModel()
                 var newLocation = Location()
 
@@ -137,8 +144,8 @@ class AddNewLocationFragment : AppCompatActivity() {
                     newReview.dateAdded = Calendar.getInstance().timeInMillis
                     newReview.sufficientPaperTowels = paperTowelValue
                     newReview.sufficientSoap = soapValue
-                    newReview.accessibility = 0
-                    newReview.comment = ""
+                    newReview.accessibility = accessValue
+                    newReview.comment = commentBox.text.toString()
 
                     var reviewViewModel = ReviewViewModel()
                     reviewViewModel.addReviewForLocation(newReview)
@@ -169,7 +176,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onPaperTowelYesClick(view:View){
-        paperTowelValue = 1
+        paperTowelValue = 2
 
         paperTowelButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         paperTowelButtonYes.setTextColor(Color.WHITE)
@@ -183,7 +190,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onPaperTowelNoClick(view:View){
-        paperTowelValue = 2
+        paperTowelValue = 1
 
         paperTowelButtonYes.setBackgroundColor(Color.WHITE)
         paperTowelButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
@@ -196,7 +203,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onSoapYesClick(view:View){
-        soapValue = 1
+        soapValue = 2
 
         soapButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         soapButtonYes.setTextColor(Color.WHITE)
@@ -209,13 +216,37 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onSoapNoClick(view:View){
-        soapValue = 2
+        soapValue = 1
 
         soapButtonYes.setBackgroundColor(Color.WHITE)
         soapButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
 
         soapButtonNo.setBackgroundColor(Color.parseColor("#9754CB"))
         soapButtonNo.setTextColor(Color.WHITE)
+    }
+
+
+    fun onAccessYesClick(view:View){
+        accessValue = 2
+
+        accessButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
+        accessButtonYes.setTextColor(Color.WHITE)
+
+
+        accessButtonNo.setBackgroundColor(Color.WHITE)
+        accessButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
+    }
+
+
+
+    fun onAccessNoClick(view:View){
+        accessValue = 1
+
+        accessButtonYes.setBackgroundColor(Color.WHITE)
+        accessButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
+
+        accessButtonNo.setBackgroundColor(Color.parseColor("#9754CB"))
+        accessButtonNo.setTextColor(Color.WHITE)
     }
 
 

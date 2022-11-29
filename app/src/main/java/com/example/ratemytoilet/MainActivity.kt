@@ -9,43 +9,39 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
-import android.widget.RatingBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-
-import com.google.firebase.ktx.Firebase
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import com.example.ratemytoilet.database.DatabaseUsageExamples
+import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.LocationViewModel
-import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.auth.User
+import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
 
+/**
+ * refs:
+ * https://www.howtocreate.co.uk/xor.html
+ * https://stackoverflow.com/questions/21352571/android-how-do-i-check-if-dialogfragment-is-showing
+ */
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, FilterDialogFragment.FilterListener {
     private var myLocationMarker : Marker ?= null
     private lateinit var mMap: GoogleMap
@@ -53,6 +49,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     private val PERMISSION_REQUEST_CODE = 0
     private lateinit var locationManager: LocationManager
+    private lateinit var locationViewModel: LocationViewModel
 
     private var mapCentered = false
     private var washroomId : String ?= null
@@ -63,11 +60,34 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<MyItem>
+    private lateinit var loadingDialogFragment: LoadingDialogFragment
 
-    private var count = 0
+    private var maleCheck = false
+    private var femaleCheck = false
+    private var paperCheck = false
+    private var soapCheck = false
+    private var accessCheck = false
+    private var cleanlinessStart = 1f
+    private var cleanlinessEnd = 5f
+
+    companion object {
+        var MALE_CHECK_KEY = "male_check_key"
+        var FEMALE_CHECK_KEY = "female_check_key"
+        var PAPER_CHECK_KEY = "paper_check_key"
+        var SOAP_CHECK_KEY = "soap_check_key"
+        var ACCESS_CHECK_KEY = "access_check_key"
+        var CLEANLINESS_START_KEY = "cleanliness_start_key"
+        var CLEANLINESS_END_KEY = "cleanliness_end_key"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val currentUser = Firebase.auth.currentUser
+        if (currentUser == null) {
+            loadLaunchScreen()
+            finish()
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -83,8 +103,19 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val filterButton = findViewById<Button>(R.id.filterButton)
         filterButton.setOnClickListener {
             val filterDialogFragment = FilterDialogFragment()
+            var bundle = Bundle()
+            bundle.putBoolean(MALE_CHECK_KEY, maleCheck)
+            bundle.putBoolean(FEMALE_CHECK_KEY, femaleCheck)
+            bundle.putBoolean(PAPER_CHECK_KEY, paperCheck)
+            bundle.putBoolean(SOAP_CHECK_KEY, soapCheck)
+            bundle.putBoolean(ACCESS_CHECK_KEY, accessCheck)
+            bundle.putFloat(CLEANLINESS_START_KEY, cleanlinessStart)
+            bundle.putFloat(CLEANLINESS_END_KEY, cleanlinessEnd)
+            filterDialogFragment.arguments = bundle
             filterDialogFragment.show(supportFragmentManager, "Filter")
         }
+
+        loadingDialogFragment = LoadingDialogFragment()
 
         val listButton = findViewById<Button>(R.id.listButton)
         listButton.setOnClickListener {
@@ -92,33 +123,27 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             this.startActivity(washroomListActivityIntent)
         }
 
-
-        DatabaseUsageExamples.initializeLocationViewModel(this)
-    }
-
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser = Firebase.auth.currentUser
-        if (currentUser == null) {
-            //loadLaunchScreen()
+        locationViewModel = LocationViewModel()
+        locationViewModel.locations.observe(this) {
+            updateToilet()
         }
+
     }
+
+//
+//    override fun onStart() {
+//        super.onStart()
+//        val currentUser = Firebase.auth.currentUser
+//        if (currentUser == null) {
+//            loadLaunchScreen()
+//        }
+//    }
 
     private fun loadLaunchScreen() {
         val intent = Intent(this, LaunchActivity::class.java)
         startActivity(intent)
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
@@ -132,7 +157,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         myClusterManager.setOnClusterItemClickListener {
             washroomId = it.getId()
             washroomName = it.snippet?.split(",")?.get(0)
-            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
+
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
             date = dateTimeFormat.format(it.getDate())
             if (it.getGender() == 0) {
                 gender = "Male"
@@ -147,7 +173,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         mMap.setOnCameraIdleListener(myClusterManager)
         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
         myClusterManager.setOnClusterItemInfoWindowClickListener {
-            CoroutineScope(Dispatchers.Main).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 if (washroomId != null) {
                     val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
                     viewIntent.putExtra("ID", washroomId)
@@ -224,9 +250,8 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val arr = ArrayList<MyItem>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
         val locationViewModel = LocationViewModel()
-        val loadingDialogFragment = LoadingDialogFragment()
-        CoroutineScope(Dispatchers.IO).launch {
-            loadingDialogFragment.show(supportFragmentManager, "Load")
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
+        lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
             for (location in allLocations) {
@@ -238,27 +263,27 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                 allReviews.sortedByDescending { it.dateAdded }
                 Log.d("TAb",allReviews.size.toString())
                 val latLng = LatLng(location.lat, location.lng)
-                if (allReviews.size != 0) {
+                if (allReviews.isNotEmpty()) {
                     for (review in allReviews) {
                         rating += review.cleanliness
                     }
                     rating /= allReviews.size
-                    if (allReviews[0].sufficientSoap == 0) {
+                    if (allReviews[0].sufficientSoap == 1) {
                         soap = "false"
-                    } else if (allReviews[0].sufficientSoap == 2) {
+                    } else if (allReviews[0].sufficientSoap == 0) {
                         soap = "unknown"
                     }
 
 
-                    if (allReviews[0].sufficientPaperTowels == 0) {
+                    if (allReviews[0].sufficientPaperTowels == 1) {
                         paper = "false"
-                    } else if (allReviews[0].sufficientSoap == 2) {
+                    } else if (allReviews[0].sufficientSoap == 0) {
                         paper = "unknown"
                     }
 
-                    if (allReviews[0].accessibility == 0) {
+                    if (allReviews[0].accessibility == 1) {
                         access = "false"
-                    } else if (allReviews[0].accessibility == 2) {
+                    } else if (allReviews[0].accessibility == 0) {
                         access = "unknown"
                     }
                 }
@@ -272,65 +297,73 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         }
     }
 
-    suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
+    private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
-            val fragment = getSupportFragmentManager().findFragmentByTag("Load") as DialogFragment
-            fragment.dismiss()
-            myClusterManager.addItems(locationList)
-            myClusterManager.cluster()
+            var loadFragment = supportFragmentManager.findFragmentByTag("Load")
+            if (loadFragment != null) {
+                val fragment = loadFragment as DialogFragment
+                fragment.dismiss()
+                myClusterManager.addItems(locationList)
+                myClusterManager.cluster()
+            }
         }
     }
 
-    fun updateToilet(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
+    private fun updateToilet() {
         val bubble = IconGenerator(this)
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        val locationViewModel = LocationViewModel()
-        val loadingDialogFragment = LoadingDialogFragment()
-        CoroutineScope(Dispatchers.IO).launch {
-            loadingDialogFragment.show(supportFragmentManager, "Load")
-            var allLocations = locationViewModel.getAllLocations()
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
+        lifecycleScope.launch(Dispatchers.IO) {
+            var allLocations = locationViewModel.locations.value
             val reviewViewModel = ReviewViewModel()
-            for (location in allLocations) {
-                var rating = 0.0
-                val allReviews = reviewViewModel.getReviewsForLocation(location.id)
-                allReviews.sortedByDescending { it.dateAdded }
-                if (allReviews.size != 0) {
-                    for (review in allReviews) {
-                        rating += review.cleanliness
-                    }
-                    rating /= allReviews.size
+            if (allLocations != null) {
+                for (location in allLocations) {
+                    var shouldAdd = true
+                    var rating = 0.0
+                    var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                    allReviews = allReviews.sortedByDescending { it.dateAdded }
+                    if (allReviews.isNotEmpty()) {
+                        for (review in allReviews) {
+                            rating += review.cleanliness
+                        }
+                        rating /= allReviews.size
 
-                    if (paperCheck) {
-                        if (allReviews[0].sufficientPaperTowels == 1) {
-                            newLocations.add(location)
+                        if (paperCheck) {
+                            if (allReviews[0].sufficientPaperTowels != 1) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (soapCheck) {
+                            if (allReviews[0].sufficientSoap != 1) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (accessCheck) {
+                            if (allReviews[0].accessibility != 1) {
+                                shouldAdd = false
+                            }
                         }
                     }
-                    if (soapCheck) {
-                        if (allReviews[0].sufficientSoap == 1) {
-                            newLocations.add(location)
+                    if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
+                        if (maleCheck) {
+                            if (location.gender != 0 && location.gender != 2) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (femaleCheck) {
+                            if (location.gender != 1 && location.gender != 2) {
+                                shouldAdd = false
+                            }
                         }
                     }
-                    if (accessCheck) {
-                        if (allReviews[0].accessibility == 1) {
-                            newLocations.add(location)
-                        }
-                    }
-                }
-                if (maleCheck) {
-                    if (location.gender == 0) {
-                        newLocations.add(location)
-                    }
-                }
-                if (femaleCheck) {
-                    if (location.gender == 1) {
-                        newLocations.add(location)
-                    }
-                }
 
-                if (rating >= startValue && rating <= endValue) {
-                    newLocations.add(location)
+                    if (rating !in cleanlinessStart..cleanlinessEnd) {
+                        shouldAdd = false
+                    }
+
+                    if (shouldAdd) newLocations.add(location)
                 }
             }
 
@@ -348,21 +381,21 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
                         updateRating += review.cleanliness
                     }
                     updateRating /= updateAllReviews.size
-                    if (updateAllReviews[0].sufficientSoap == 0) {
+                    if (updateAllReviews[0].sufficientSoap == 1) {
                         updateSoap = "false"
-                    } else if (updateAllReviews[0].sufficientSoap == 2) {
+                    } else if (updateAllReviews[0].sufficientSoap == 0) {
                         updateSoap = "unknown"
                     }
 
-                    if (updateAllReviews[0].sufficientPaperTowels == 0) {
+                    if (updateAllReviews[0].sufficientPaperTowels == 1) {
                         updatePaper = "false"
-                    } else if (updateAllReviews[0].sufficientSoap == 2) {
+                    } else if (updateAllReviews[0].sufficientSoap == 0) {
                         updatePaper = "unknown"
                     }
 
-                    if (updateAllReviews[0].accessibility == 0) {
+                    if (updateAllReviews[0].accessibility == 1) {
                         updateAccess = "false"
-                    } else if (updateAllReviews[0].accessibility == 2) {
+                    } else if (updateAllReviews[0].accessibility == 0) {
                         updateAccess = "unknown"
                     }
                 }
@@ -390,14 +423,16 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     override fun onFilterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
         mMap.clear()
         myClusterManager.clearItems()
-        updateToilet(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
+        saveFilterConditions(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
+        updateToilet()
         myClusterManager = ClusterManager<MyItem>(applicationContext , mMap)
         myClusterManager.renderer = MarkerClusterRenderer(this, mMap, myClusterManager)
         myClusterManager.markerCollection.setInfoWindowAdapter(MyInfoWindowAdapter(this))
         myClusterManager.setOnClusterItemClickListener {
             washroomId = it.getId()
             washroomName = it.snippet?.split(",")?.get(0)
-            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM.dd.yyyy")
+
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
             date = dateTimeFormat.format(it.getDate())
             if (it.getGender() == 0) {
                 gender = "Male"
@@ -408,11 +443,13 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             }
             return@setOnClusterItemClickListener false
         }
+
+
         mMap.setOnMarkerClickListener(myClusterManager)
         mMap.setOnCameraIdleListener(myClusterManager)
         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
         myClusterManager.setOnClusterItemInfoWindowClickListener {
-            CoroutineScope(Dispatchers.Main).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 if (washroomId != null) {
                     val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
                     viewIntent.putExtra("ID", washroomId)
@@ -433,125 +470,14 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         startActivity(viewIntent)
     }
 
-    /*fun addLocation() {
-        CoroutineScope(Dispatchers.Main).launch {
-            var locationViewModel = LocationViewModel()
+    private fun saveFilterConditions(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
+        this.paperCheck = paperCheck
+        this.soapCheck = soapCheck
+        this.accessCheck = accessCheck
+        this.maleCheck = maleCheck
+        this.femaleCheck = femaleCheck
+        this.cleanlinessStart = startValue
+        this.cleanlinessEnd = endValue
+    }
 
-            var newLocation1 = com.example.ratemytoilet.database.Location()
-            newLocation1.roomNumber = 2001
-            newLocation1.gender = 1
-            newLocation1.lat = 49.27883170343454
-            newLocation1.lng = -122.91723594551543
-            newLocation1.date = Calendar.getInstance().timeInMillis
-            newLocation1.name = "AQ women washroom"
-
-            var newLocation2 = com.example.ratemytoilet.database.Location()
-            newLocation2.roomNumber = 2002
-            newLocation2.gender = 0
-            newLocation2.lat = 49.278769584950695
-            newLocation2.lng = -122.91726410870903
-            newLocation2.date = Calendar.getInstance().timeInMillis
-            newLocation2.name = "AQ man washroom"
-
-            var newLocation3 = com.example.ratemytoilet.database.Location()
-            newLocation3.roomNumber = 2003
-            newLocation3.gender = 1
-            newLocation3.lat = 49.27916667453397
-            newLocation3.lng = -122.91719975380576
-            newLocation3.date = Calendar.getInstance().timeInMillis
-            newLocation3.name = "AQ women washroom 2"
-
-            var newLocation4 = com.example.ratemytoilet.database.Location()
-            newLocation4.roomNumber = 2004
-            newLocation4.gender = 1
-            newLocation4.lat = 49.27918065286712
-            newLocation4.lng = -122.91710615222036
-            newLocation4.date = Calendar.getInstance().timeInMillis
-            newLocation4.name = "AQ women washroom 3"
-
-            var newLocation5 = com.example.ratemytoilet.database.Location()
-            newLocation5.roomNumber = 2005
-            newLocation5.gender = 0
-            newLocation5.lat = 49.2794941365365
-            newLocation5.lng = -122.91683385059164
-            newLocation5.date = Calendar.getInstance().timeInMillis
-            newLocation5.name = "AQ men washroom 2"
-
-            *//*locationViewModel.addLocation(newLocation1).collect{
-                var newReview = Review()
-                newReview.locationId = it
-                Log.d("TAb", it)
-                newReview.leftByAdmin = false
-                newReview.cleanliness = 3
-                newReview.dateAdded = Calendar.getInstance().timeInMillis
-                newReview.sufficientPaperTowels = 1
-                newReview.sufficientSoap = 2
-                newReview.accessibility = 0
-                newReview.comment = "New comment"
-
-                var reviewViewModel = ReviewViewModel()
-                reviewViewModel.addReviewForLocation(newReview)
-            }*//*
-           *//* locationViewModel.addLocation(newLocation2).collect{
-                var newReview = Review()
-                newReview.locationId = it
-                Log.d("TAb", it)
-                newReview.leftByAdmin = false
-                newReview.cleanliness = 4
-                newReview.dateAdded = Calendar.getInstance().timeInMillis
-                newReview.sufficientPaperTowels = 0
-                newReview.sufficientSoap = 1
-                newReview.accessibility = 1
-                newReview.comment = "New comment"
-
-                var reviewViewModel = ReviewViewModel()
-                reviewViewModel.addReviewForLocation(newReview)
-            }*//*
-           *//* locationViewModel.addLocation(newLocation3).collect{
-                var newReview = Review()
-                newReview.locationId = it
-                Log.d("TAb", it)
-                newReview.leftByAdmin = false
-                newReview.cleanliness = 6
-                newReview.dateAdded = Calendar.getInstance().timeInMillis
-                newReview.sufficientPaperTowels = 3
-                newReview.sufficientSoap = 1
-                newReview.accessibility = 0
-                newReview.comment = "New comment"
-
-                var reviewViewModel = ReviewViewModel()
-                reviewViewModel.addReviewForLocation(newReview)
-            }*//*
-            *//*locationViewModel.addLocation(newLocation4).collect{
-                var newReview = Review()
-                newReview.locationId = it
-                Log.d("TAb", it)
-                newReview.leftByAdmin = false
-                newReview.cleanliness = 3
-                newReview.dateAdded = Calendar.getInstance().timeInMillis
-                newReview.sufficientPaperTowels = 1
-                newReview.sufficientSoap = 2
-                newReview.accessibility = 0
-                newReview.comment = "New comment"
-
-                var reviewViewModel = ReviewViewModel()
-                reviewViewModel.addReviewForLocation(newReview)
-            }*//*
-            *//*locationViewModel.addLocation(newLocation5).collect{
-                var newReview = Review()
-                newReview.locationId = it
-                Log.d("TAb", it)
-                newReview.leftByAdmin = false
-                newReview.cleanliness = 3
-                newReview.dateAdded = Calendar.getInstance().timeInMillis
-                newReview.sufficientPaperTowels = 1
-                newReview.sufficientSoap = 2
-                newReview.accessibility = 0
-                newReview.comment = "New comment"
-
-                var reviewViewModel = ReviewViewModel()
-                reviewViewModel.addReviewForLocation(newReview)
-            }*//*
-        }*/
-    //}
 }
