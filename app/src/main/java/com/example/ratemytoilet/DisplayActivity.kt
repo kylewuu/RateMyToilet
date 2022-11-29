@@ -100,25 +100,39 @@ class DisplayActivity : AppCompatActivity() {
                         }
                     }
                 }
-                if (allReviews[0].sufficientPaperTowels == 0) {
+                if (allReviews[0].sufficientPaperTowels == 1) {
                     CoroutineScope(Main).launch {
                         paperText.setText("No")
                     }
                 } else if (allReviews[0].sufficientPaperTowels == 2) {
                     CoroutineScope(Main).launch {
+                        paperText.setText("Yes")
+                    }
+                }
+                else{
+                    CoroutineScope(Main).launch {
                         paperText.setText("Unknown")
                     }
                 }
-                if (allReviews[0].sufficientSoap == 0) {
+
+
+                if (allReviews[0].sufficientSoap == 1) {
                     CoroutineScope(Main).launch {
                         soapText.setText("No")
                     }
 
                 } else if (allReviews[0].sufficientSoap == 2) {
                     CoroutineScope(Main).launch {
+                        soapText.setText("Yes")
+                    }
+                }
+                else{
+                    CoroutineScope(Main).launch {
                         soapText.setText("Unknown")
                     }
                 }
+
+
                 userCommentList.clear()
                 for (review in allReviews) {
                     rating += review.cleanliness

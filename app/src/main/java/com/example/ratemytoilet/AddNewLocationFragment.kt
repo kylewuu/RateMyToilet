@@ -176,7 +176,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onPaperTowelYesClick(view:View){
-        paperTowelValue = 1
+        paperTowelValue = 2
 
         paperTowelButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         paperTowelButtonYes.setTextColor(Color.WHITE)
@@ -190,7 +190,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onPaperTowelNoClick(view:View){
-        paperTowelValue = 2
+        paperTowelValue = 1
 
         paperTowelButtonYes.setBackgroundColor(Color.WHITE)
         paperTowelButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
@@ -203,7 +203,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onSoapYesClick(view:View){
-        soapValue = 1
+        soapValue = 2
 
         soapButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         soapButtonYes.setTextColor(Color.WHITE)
@@ -216,7 +216,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onSoapNoClick(view:View){
-        soapValue = 2
+        soapValue = 1
 
         soapButtonYes.setBackgroundColor(Color.WHITE)
         soapButtonYes.setTextColor(Color.parseColor("#B6B6B6"))
@@ -227,7 +227,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
     fun onAccessYesClick(view:View){
-        accessValue = 0
+        accessValue = 2
 
         accessButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         accessButtonYes.setTextColor(Color.WHITE)

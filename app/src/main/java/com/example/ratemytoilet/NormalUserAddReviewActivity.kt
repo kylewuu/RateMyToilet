@@ -17,9 +17,9 @@ import java.util.*
 
 class NormalUserAddReviewActivity : AppCompatActivity() {
     private var rating = 0.0f
-    private var paperResult = 1
-    private var soapResult = 1
-    private var accResult = 1
+    private var paperResult = 2
+    private var soapResult = 2
+    private var accResult = 2
     private var comment = ""
     private lateinit var review : Review
     private var washroomId : String ?= null
@@ -57,30 +57,30 @@ class NormalUserAddReviewActivity : AppCompatActivity() {
         val paperChipT = paperGroup.getChildAt(0) as Chip
         val paperChipF = paperGroup.getChildAt(1) as Chip
         if (paperChipF.isChecked) {
-            paperResult = 0
+            paperResult = 1
         }
         if (!paperChipT.isChecked && !paperChipF.isChecked) {
-            paperResult = 2
+            paperResult = 0
         }
 
         val soapGroup = findViewById<ChipGroup>(R.id.soapGroup)
         val soapChipT = soapGroup.getChildAt(0) as Chip
         val soapChipF = soapGroup.getChildAt(1) as Chip
         if (soapChipF.isChecked) {
-            soapResult = 0
+            soapResult = 1
         }
         if (!soapChipT.isChecked && !soapChipF.isChecked) {
-            soapResult = 2
+            soapResult = 0
         }
 
         val accGroup = findViewById<ChipGroup>(R.id.accessGroup)
         val accChipT = accGroup.getChildAt(0) as Chip
         val accChipF = accGroup.getChildAt(1) as Chip
         if (accChipF.isChecked) {
-            accResult = 0
+            accResult = 1
         }
         if (!accChipT.isChecked && !accChipF.isChecked) {
-            accResult = 2
+            accResult = 0
         }
 
         val commentText = findViewById<EditText>(R.id.normalReviewText)
