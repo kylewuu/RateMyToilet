@@ -131,7 +131,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Has toilet paper?"
+                    android:text="Has paper towels?"
                     android:textColor="#28104E"
                     android:textSize="20sp"
                     android:textStyle="bold"

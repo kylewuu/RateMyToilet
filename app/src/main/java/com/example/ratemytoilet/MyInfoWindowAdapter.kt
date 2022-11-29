@@ -31,27 +31,27 @@ class MyInfoWindowAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
             val accessResult = results[2]
 
             if (soapResult == "true") {
-                soapCheck.setImageResource(R.drawable.uncheck)
-            } else if (soapResult == "false"){
-                soapCheck.setImageResource(R.drawable.unknown)
-            } else {
                 soapCheck.setImageResource(R.drawable.checkmark)
+            } else if (soapResult == "false"){
+                soapCheck.setImageResource(R.drawable.uncheck)
+            } else {
+                soapCheck.setImageResource(R.drawable.unknown)
             }
 
             if (paperResult == "true") {
-                paperCheck.setImageResource(R.drawable.uncheck)
-            } else if (paperResult == "false"){
-                paperCheck.setImageResource(R.drawable.unknown)
-            } else {
                 paperCheck.setImageResource(R.drawable.checkmark)
+            } else if (paperResult == "false"){
+                paperCheck.setImageResource(R.drawable.uncheck)
+            } else {
+                paperCheck.setImageResource(R.drawable.unknown)
             }
 
             if (accessResult == "true") {
-                accessCheck.setImageResource(R.drawable.uncheck)
-            } else if (accessResult == "false"){
-                accessCheck.setImageResource(R.drawable.unknown)
-            } else {
                 accessCheck.setImageResource(R.drawable.checkmark)
+            } else if (accessResult == "false"){
+                accessCheck.setImageResource(R.drawable.uncheck)
+            } else {
+                accessCheck.setImageResource(R.drawable.unknown)
             }
         }
 
