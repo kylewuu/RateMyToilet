@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
@@ -30,7 +31,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -81,6 +81,12 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val currentUser = Firebase.auth.currentUser
+        if (currentUser == null) {
+            loadLaunchScreen()
+            finish()
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         if (getSupportActionBar() != null) {
@@ -120,14 +126,14 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     }
 
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser = Firebase.auth.currentUser
-        if (currentUser == null) {
+//
+//    override fun onStart() {
+//        super.onStart()
+//        val currentUser = Firebase.auth.currentUser
+//        if (currentUser == null) {
 //            loadLaunchScreen()
-        }
-    }
+//        }
+//    }
 
     private fun loadLaunchScreen() {
         val intent = Intent(this, LaunchActivity::class.java)
@@ -163,7 +169,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         mMap.setOnCameraIdleListener(myClusterManager)
         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
         myClusterManager.setOnClusterItemInfoWindowClickListener {
-            CoroutineScope(Dispatchers.Main).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 if (washroomId != null) {
                     val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
                     viewIntent.putExtra("ID", washroomId)
@@ -241,7 +247,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
         val locationViewModel = LocationViewModel()
         val loadingDialogFragment = LoadingDialogFragment()
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             loadingDialogFragment.show(supportFragmentManager, "Load")
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
@@ -290,7 +296,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
-            var loadFragment = getSupportFragmentManager().findFragmentByTag("Load")
+            var loadFragment = supportFragmentManager.findFragmentByTag("Load")
             if (loadFragment != null) {
                 val fragment = loadFragment as DialogFragment
                 fragment.dismiss()
@@ -306,7 +312,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
         val loadingDialogFragment = LoadingDialogFragment()
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             loadingDialogFragment.show(supportFragmentManager, "Load")
             var allLocations = locationViewModel.locations.value
             val reviewViewModel = ReviewViewModel()
@@ -441,7 +447,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         mMap.setOnCameraIdleListener(myClusterManager)
         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
         myClusterManager.setOnClusterItemInfoWindowClickListener {
-            CoroutineScope(Dispatchers.Main).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 if (washroomId != null) {
                     val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
                     viewIntent.putExtra("ID", washroomId)

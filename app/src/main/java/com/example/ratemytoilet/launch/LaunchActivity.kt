@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.example.ratemytoilet.MainActivity
 import com.example.ratemytoilet.databinding.ActivityLaunchBinding
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -21,6 +22,8 @@ class LaunchActivity : AppCompatActivity() {
         super.onStart()
         val currentUser = Firebase.auth.currentUser
         if (currentUser != null) {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
             finish()
         }
     }
