@@ -17,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import com.example.ratemytoilet.database.DatabaseUsageExamples
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
@@ -38,6 +37,10 @@ import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
+/**
+ * refs:
+ * https://www.howtocreate.co.uk/xor.html
+ */
 class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener, FilterDialogFragment.FilterListener {
     private var myLocationMarker : Marker ?= null
     private lateinit var mMap: GoogleMap
@@ -45,6 +48,7 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
 
     private val PERMISSION_REQUEST_CODE = 0
     private lateinit var locationManager: LocationManager
+    private lateinit var locationViewModel: LocationViewModel
 
     private var mapCentered = false
     private var washroomId : String ?= null
@@ -109,8 +113,11 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
             this.startActivity(washroomListActivityIntent)
         }
 
+        locationViewModel = LocationViewModel()
+        locationViewModel.locations.observe(this) {
+            updateToilet()
+        }
 
-        DatabaseUsageExamples.initializeLocationViewModel(this)
     }
 
 
@@ -127,15 +134,6 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         startActivity(intent)
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
@@ -307,57 +305,58 @@ class MainActivity :  AppCompatActivity(), OnMapReadyCallback, LocationListener,
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        val locationViewModel = LocationViewModel()
         val loadingDialogFragment = LoadingDialogFragment()
         CoroutineScope(Dispatchers.IO).launch {
             loadingDialogFragment.show(supportFragmentManager, "Load")
-            var allLocations = locationViewModel.getAllLocations()
+            var allLocations = locationViewModel.locations.value
             val reviewViewModel = ReviewViewModel()
-            for (location in allLocations) {
-                var shouldAdd = true
-                var rating = 0.0
-                var allReviews = reviewViewModel.getReviewsForLocation(location.id)
-                allReviews = allReviews.sortedByDescending { it.dateAdded }
-                if (allReviews.isNotEmpty()) {
-                    for (review in allReviews) {
-                        rating += review.cleanliness
-                    }
-                    rating /= allReviews.size
+            if (allLocations != null) {
+                for (location in allLocations) {
+                    var shouldAdd = true
+                    var rating = 0.0
+                    var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                    allReviews = allReviews.sortedByDescending { it.dateAdded }
+                    if (allReviews.isNotEmpty()) {
+                        for (review in allReviews) {
+                            rating += review.cleanliness
+                        }
+                        rating /= allReviews.size
 
-                    if (paperCheck) {
-                        if (allReviews[0].sufficientPaperTowels != 1) {
-                            shouldAdd = false
+                        if (paperCheck) {
+                            if (allReviews[0].sufficientPaperTowels != 1) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (soapCheck) {
+                            if (allReviews[0].sufficientSoap != 1) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (accessCheck) {
+                            if (allReviews[0].accessibility != 1) {
+                                shouldAdd = false
+                            }
                         }
                     }
-                    if (soapCheck) {
-                        if (allReviews[0].sufficientSoap != 1) {
-                            shouldAdd = false
+                    if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
+                        if (maleCheck) {
+                            if (location.gender != 0 && location.gender != 2) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (femaleCheck) {
+                            if (location.gender != 1 && location.gender != 2) {
+                                shouldAdd = false
+                            }
                         }
                     }
-                    if (accessCheck) {
-                        if (allReviews[0].accessibility != 1) {
-                            shouldAdd = false
-                        }
-                    }
-                }
-                if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
-                    if (maleCheck) {
-                        if (location.gender != 0 && location.gender != 2) {
-                            shouldAdd = false
-                        }
-                    }
-                    if (femaleCheck) {
-                        if (location.gender != 1 && location.gender != 2) {
-                            shouldAdd = false
-                        }
-                    }
-                }
 
-                if (rating !in cleanlinessStart..cleanlinessEnd) {
-                    shouldAdd = false
-                }
+                    if (rating !in cleanlinessStart..cleanlinessEnd) {
+                        shouldAdd = false
+                    }
 
-                if (shouldAdd) newLocations.add(location)
+                    if (shouldAdd) newLocations.add(location)
+                }
             }
 
             val updates = newLocations.distinctBy { it.id }
