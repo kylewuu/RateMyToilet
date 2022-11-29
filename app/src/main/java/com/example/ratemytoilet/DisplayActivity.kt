@@ -22,6 +22,7 @@ class DisplayActivity : AppCompatActivity() {
     private lateinit var washroom : String
     private lateinit var gender : String
     private lateinit var date : String
+    private lateinit var access : String
     private lateinit var commentList: ListView
     private lateinit var listAdapter: UserCommentListAdapter
     private var isUpdated = false
@@ -38,6 +39,7 @@ class DisplayActivity : AppCompatActivity() {
         washroom = intent.getStringExtra("name").toString()
         gender = intent.getStringExtra("gender").toString()
         date = intent.getStringExtra("date").toString()
+        access = intent.getStringExtra("access").toString()
 
         setData()
         isUpdated = true
@@ -74,7 +76,6 @@ class DisplayActivity : AppCompatActivity() {
             val reviewViewModel = ReviewViewModel()
             var allReviews = reviewViewModel.getReviewsForLocation(washroomId)
             allReviews = allReviews.sortedByDescending { it.dateAdded }
-
             if (allReviews.size != 0 && allReviews.size != userCommentList.size) {
                 withContext(Main) {
                     launch {
@@ -121,7 +122,8 @@ class DisplayActivity : AppCompatActivity() {
                 userCommentList.clear()
                 for (review in allReviews) {
                     rating += review.cleanliness
-                    val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd yyyy")
+
+                    val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
                     date = dateTimeFormat.format(review.dateAdded)
 
                     val user = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment)
