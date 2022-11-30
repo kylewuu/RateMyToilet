@@ -16,11 +16,18 @@ Functionality the team is currently working on include:
 - Compiled user reviews via a list view
 - Cloud-based storage of user accounts, reviews, and landmark locations 
 
+## New in Show and Tell 2
+-  Implemented a tab system that utilizes fragments. Previously, there were separate activities.
+-  Transitioned to phone authentication instead of email-based account authentication (as some email providers filtered the verification email as spam). This also reduces onboarding friction, as there is now only one button ("SIGN IN") and the application automatically detects if an account exists for the phone or not.
+-  Utilize Firestore to store cloud-based data and also retrieve live updates inside the app utilizing Coroutines, LiveDatas, and Flows.
+-  Integrate an admin mode that allows the university to view advanced information about washrooms, effectively resulting in a washroom management system (WIP)
+
+
 ## Notes
 Several important points to consider:
-- The app currently does not send a verification email since several email providers, including SFU, have blocked outgoing emails from the Firebase domain. As such, the app will utilize phone authentication instead, as it reduces on-boarding friction and the potential for spam/bot accounts. 
-- The application of the selected filter to map landmarks is currently a WIP
-- While list views are used for now, the app will transition to recycler views for pages with unbounded (and potentially high number of) list items.
-- App logic for retrieving and persisting cloud data is currently a WIP
 - Documentation is currently a WIP (Focus for the first show and tell was on implementing base logic. Once the code is refined, it will then be fully documented)
-
+- A toolbar layout will soon be added to change between fragment "tabs", thus eliminating the current floating action button workflow.
+- A profile page will be added that allows users to view information about their account (e.g. number of reviews).
+- Filtering utilizing cloud data is currently a WIP
+- UI will be polished to resemble a sleek social app.
+- Potentially more components to be added to user reviews (e.g. soap, towel availability)
