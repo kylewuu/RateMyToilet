@@ -17,9 +17,9 @@ Functionality the team is currently working on include:
 - Cloud-based storage of user accounts, reviews, and landmark locations 
 
 ## New in Show and Tell 2
--  Implemented a tab system that utilizes fragments. Previously, there were separate activities.
 -  Transitioned to phone authentication instead of email-based account authentication (as some email providers filtered the verification email as spam). This also reduces onboarding friction, as there is now only one button ("SIGN IN") and the application automatically detects if an account exists for the phone or not.
 -  Utilize Firestore to store cloud-based data and also retrieve live updates inside the app utilizing Coroutines, LiveDatas, and Flows.
+-  Mapping capabilities for rendering washroom landmarks on the map for users to navigate to.
 -  Integrate an admin mode that allows the university to view advanced information about washrooms, effectively resulting in a washroom management system (WIP)
 
 
