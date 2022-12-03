@@ -21,7 +21,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
@@ -57,7 +56,6 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<MyItem>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
-    private lateinit var swipeToRefresh : SwipeRefreshLayout
     private lateinit var updateMap : String
 
 
@@ -74,7 +72,6 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         if (it) {
             initLocationManager()
             getToiletLocation()
-            //Log.d("TAp", "true")
         } else {
             Toast.makeText(activity,"Permission Denied",Toast.LENGTH_SHORT).show()
         }
@@ -457,7 +454,6 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     fun filterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
         mMap.clear()
         myClusterManager.clearItems()
-        //Log.d("TAy", paperCheck.toString())
         saveFilterConditions(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
         updateToilet()
         myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
@@ -478,7 +474,6 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
             }
             return@setOnClusterItemClickListener false
         }
-
 
         mMap.setOnMarkerClickListener(myClusterManager)
         mMap.setOnCameraIdleListener(myClusterManager)
@@ -524,5 +519,4 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
 
     override fun onProviderDisabled(provider: String) {
     }
-
 }
