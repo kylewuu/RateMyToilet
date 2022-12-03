@@ -41,6 +41,7 @@ class AddNewLocationFragment : AppCompatActivity() {
     private var accessValue: Int = 2
 
     private lateinit var updatePreference : SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
     // Array of genders
     val genderArray = arrayOf("Male", "Female", "Universal")
@@ -52,7 +53,7 @@ class AddNewLocationFragment : AppCompatActivity() {
         setContentView(R.layout.fragment_add_new_location)
 
         updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
-        val editor = updatePreference.edit()
+        editor = updatePreference.edit()
 
         // Set views
         paperTowelButtonYes = findViewById<Button>(R.id.bt_paperTowelsYes)
@@ -175,7 +176,6 @@ class AddNewLocationFragment : AppCompatActivity() {
 
             }
 
-            val editor = updatePreference.edit()
             editor.putString("updateReview", "Yes")
             editor.apply()
 
@@ -256,7 +256,6 @@ class AddNewLocationFragment : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val editor = updatePreference.edit()
         editor.putString("updateReview", "No")
         editor.apply()
         super.onBackPressed()
