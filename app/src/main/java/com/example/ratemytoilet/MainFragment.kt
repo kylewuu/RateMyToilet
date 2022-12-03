@@ -1,25 +1,52 @@
 package com.example.ratemytoilet
 
+import android.Manifest
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.location.Criteria
+import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.ratemytoilet.database.LocationViewModel
+import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
+import com.example.ratemytoilet.launch.LaunchActivity
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
-import kotlin.collections.ArrayList
+import com.google.maps.android.ui.IconGenerator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
-/**
- * refs:
- * https://www.howtocreate.co.uk/xor.html
- * https://stackoverflow.com/questions/21352571/android-how-do-i-check-if-dialogfragment-is-showing
- */
-class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*, OnMapReadyCallback, LocationListener, */ {
-    private var myLocationMarker: Marker? = null
+class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
+    private var myLocationMarker : Marker?= null
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMainBinding
 
@@ -28,17 +55,17 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
     private lateinit var locationViewModel: LocationViewModel
 
     private var mapCentered = false
-    private var washroomId: String? = null
-    private var washroomName: String? = null
-    private var gender: String? = null
-    private var date: String? = null
-    private lateinit var markerOptions: MarkerOptions
-    private lateinit var polylineOptions: PolylineOptions
-    private lateinit var polylines: ArrayList<Polyline>
+    private var washroomId : String ?= null
+    private var washroomName : String ?= null
+    private var gender : String ?= null
+    private var date : String ?= null
+    private lateinit var  markerOptions: MarkerOptions
+    private lateinit var  polylineOptions: PolylineOptions
+    private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<MyItem>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
-    private lateinit var swipeToRefresh: SwipeRefreshLayout
-    private lateinit var updateMap: String
+    private lateinit var swipeToRefresh : SwipeRefreshLayout
+    private lateinit var updateMap : String
 
 
     private var notRunFirstTime = false
@@ -49,6 +76,16 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
     private var accessCheck = false
     private var cleanlinessStart = 1f
     private var cleanlinessEnd = 5f
+    private val locationPermissionResultReceiver = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) {
+            initLocationManager()
+            getToiletLocation()
+            //Log.d("TAp", "true")
+        } else {
+            Toast.makeText(activity,"Permission Denied",Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     companion object {
         var MALE_CHECK_KEY = "male_check_key"
@@ -60,35 +97,18 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
         var CLEANLINESS_END_KEY = "cleanliness_end_key"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment)
-        val myFragment = MainFragment()
-        supportFragmentManager.beginTransaction().add(R.id.container, myFragment, "Map").commit()
-
-
-        /*val currentUser = Firebase.auth.currentUser
-         if (currentUser == null) {
-             loadLaunchScreen()
-             finish()
-         }*/
-
-        /*if (savedInstanceState != null) {
-            notRunFirstTime = savedInstanceState.getBoolean("status")
-        }
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        if (getSupportActionBar() != null) {
-            getSupportActionBar()?.hide();
-        }
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.activity_main, container, false)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        locationViewModel = LocationViewModel()
+        loadingDialogFragment = LoadingDialogFragment()
 
-        val filterButton = findViewById<Button>(R.id.filterButton)
+        if ((activity as AppCompatActivity).getSupportActionBar() != null) {
+            (activity as AppCompatActivity).getSupportActionBar()?.hide();
+        }
+
+        val filterButton = view.findViewById<Button>(R.id.filterButton)
         filterButton.setOnClickListener {
             val filterDialogFragment = FilterDialogFragment()
             var bundle = Bundle()
@@ -100,38 +120,22 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
             bundle.putFloat(CLEANLINESS_START_KEY, cleanlinessStart)
             bundle.putFloat(CLEANLINESS_END_KEY, cleanlinessEnd)
             filterDialogFragment.arguments = bundle
-            filterDialogFragment.show(supportFragmentManager, "Filter")
+            filterDialogFragment.show(childFragmentManager, "Filter")
         }
 
-        loadingDialogFragment = LoadingDialogFragment()
-
-        val listButton = findViewById<Button>(R.id.listButton)
+        val listButton = view.findViewById<Button>(R.id.listButton)
         listButton.setOnClickListener {
-            val washroomListActivityIntent = Intent(this, WashroomListActivity::class.java)
+            val washroomListActivityIntent = Intent(activity, WashroomListActivity::class.java)
             this.startActivity(washroomListActivityIntent)
         }
 
-       locationViewModel = LocationViewModel()*/
-        /*swipeToRefresh = findViewById(R.id.swipeRefresh)
-        swipeToRefresh.setOnRefreshListener {
-            Toast.makeText(this, "New Location added", Toast.LENGTH_SHORT).show()
-            swipeToRefresh.isRefreshing = false
-        }*/
-
+        return view
     }
 
-    override fun onFilterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
-        val fragment = supportFragmentManager.findFragmentByTag("Map") as MainFragment
-
-        fragment.filterConditionPassed(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
-
-    }
-}
-
-    /*override fun onResume() {
+    override fun onResume() {
         if (notRunFirstTime) {
-            val sharedPref = getSharedPreferences("update", MODE_PRIVATE)
-            updateMap = sharedPref.getString("updateReview", "NULL").toString()
+            val sharedPref = activity?.getSharedPreferences("update", MODE_PRIVATE)
+            updateMap = sharedPref?.getString("updateReview", "NULL").toString()
             Log.d("TAp", updateMap)
             if (updateMap != "NULL") {
                 if (updateMap == "Yes") {
@@ -145,7 +149,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
                         myClusterManager.setOnClusterItemInfoWindowClickListener {
                             lifecycleScope.launch(Dispatchers.IO) {
                                 if (washroomId != null) {
-                                    val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
+                                    val viewIntent = Intent(activity, DisplayActivity::class.java)
                                     viewIntent.putExtra("ID", washroomId)
                                     viewIntent.putExtra("name", washroomName)
                                     viewIntent.putExtra("date", date)
@@ -166,69 +170,23 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
 
         super.onResume()
     }
-//
-//    override fun onStart() {
-//        super.onStart()
-//        val currentUser = Firebase.auth.currentUser
-//        if (currentUser == null) {
-//            loadLaunchScreen()
-//        }
-//    }
+
+   /* override fun onStart() {
+        super.onStart()
+        val currentUser = Firebase.auth.currentUser
+        if (currentUser == null) {
+            loadLaunchScreen()
+        }
+    }
 
     private fun loadLaunchScreen() {
-        val intent = Intent(this, LaunchActivity::class.java)
+        val intent = Intent(activity, LaunchActivity::class.java)
         startActivity(intent)
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-        polylineOptions = PolylineOptions()
-        polylineOptions.color(Color.BLACK)
-        polylines = ArrayList()
-        markerOptions = MarkerOptions()
-        myClusterManager = ClusterManager<MyItem>(applicationContext , mMap)
-        myClusterManager.renderer = MarkerClusterRenderer(this, mMap, myClusterManager)
-        myClusterManager.markerCollection.setInfoWindowAdapter(MyInfoWindowAdapter(this))
-        myClusterManager.setOnClusterItemClickListener {
-            washroomId = it.getId()
-            washroomName = it.snippet?.split(",")?.get(0)
-
-            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
-            date = dateTimeFormat.format(it.getDate())
-            if (it.getGender() == 0) {
-                gender = "Male"
-            } else if (it.getGender() == 1) {
-                gender = "Female"
-            } else {
-                gender = "Universal"
-            }
-            return@setOnClusterItemClickListener false
-        }
-        mMap.setOnMarkerClickListener(myClusterManager)
-        mMap.setOnCameraIdleListener(myClusterManager)
-        mMap.setInfoWindowAdapter(myClusterManager.markerManager)
-        myClusterManager.setOnClusterItemInfoWindowClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                if (washroomId != null) {
-                    val viewIntent = Intent(this@MainActivity, DisplayActivity::class.java)
-                    viewIntent.putExtra("ID", washroomId)
-                    viewIntent.putExtra("name", washroomName)
-                    viewIntent.putExtra("date", date)
-                    viewIntent.putExtra("gender", gender)
-                    startActivity(viewIntent)
-                }
-            }
-        }
-        mMap.setOnInfoWindowClickListener(myClusterManager)
-        Log.d("TAi", mMap.cameraPosition.zoom.toString())
-        //addLocation()
-        checkPermission()
-    }
+    }*/
 
     fun initLocationManager() {
         try {
-            locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+            locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val criteria = Criteria()
             criteria.accuracy = Criteria.ACCURACY_FINE
             val provider : String? = locationManager.getBestProvider(criteria, true)
@@ -256,38 +214,62 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
             mapCentered = true
         }
 
-        markerOptions.position(latLng).title("ME").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+        markerOptions.position(latLng).title("ME").icon(
+            BitmapDescriptorFactory.defaultMarker(
+                BitmapDescriptorFactory.HUE_BLUE))
         myLocationMarker = mMap.addMarker(markerOptions)!!
     }
 
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+        polylineOptions = PolylineOptions()
+        polylineOptions.color(Color.BLACK)
+        polylines = ArrayList()
+        markerOptions = MarkerOptions()
+        myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
+        myClusterManager.renderer = context?.let { MarkerClusterRenderer(it, mMap, myClusterManager) }
+        myClusterManager.markerCollection.setInfoWindowAdapter(context?.let { MyInfoWindowAdapter(it) })
+        myClusterManager.setOnClusterItemClickListener {
+            washroomId = it.getId()
+            washroomName = it.snippet?.split(",")?.get(0)
 
-
-    fun checkPermission() {
-        if (Build.VERSION.SDK_INT < 23) return
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), PERMISSION_REQUEST_CODE)
-        else {
-            initLocationManager()
-            getToiletLocation()
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
+            date = dateTimeFormat.format(it.getDate())
+            if (it.getGender() == 0) {
+                gender = "Male"
+            } else if (it.getGender() == 1) {
+                gender = "Female"
+            } else {
+                gender = "Universal"
+            }
+            return@setOnClusterItemClickListener false
         }
-
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initLocationManager()
-                getToiletLocation()
+        mMap.setOnMarkerClickListener(myClusterManager)
+        mMap.setOnCameraIdleListener(myClusterManager)
+        mMap.setInfoWindowAdapter(myClusterManager.markerManager)
+        myClusterManager.setOnClusterItemInfoWindowClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (washroomId != null) {
+                    val viewIntent = Intent(activity, DisplayActivity::class.java)
+                    viewIntent.putExtra("ID", washroomId)
+                    viewIntent.putExtra("name", washroomName)
+                    viewIntent.putExtra("date", date)
+                    viewIntent.putExtra("gender", gender)
+                    startActivity(viewIntent)
+                }
             }
         }
+        mMap.setOnInfoWindowClickListener(myClusterManager)
+
+        locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     fun getToiletLocation() {
-        val bubble = IconGenerator(this)
+        val bubble = IconGenerator(context)
         val arr = ArrayList<MyItem>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
@@ -336,7 +318,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
 
     private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
-            var loadFragment = supportFragmentManager.findFragmentByTag("Load")
+            var loadFragment = childFragmentManager.findFragmentByTag("Load")
             if (loadFragment != null) {
                 val fragment = loadFragment as DialogFragment
                 fragment.dismiss()
@@ -347,11 +329,11 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
     }
 
     private fun updateToilet() {
-        val bubble = IconGenerator(this)
+        val bubble = IconGenerator(context)
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(supportFragmentManager, "Load")
+        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
@@ -457,10 +439,52 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
         }
     }
 
+    fun filterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
+        mMap.clear()
+        myClusterManager.clearItems()
+        //Log.d("TAy", paperCheck.toString())
+        saveFilterConditions(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
+        updateToilet()
+        myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
+        myClusterManager.renderer = context?.let { MarkerClusterRenderer(it, mMap, myClusterManager) }
+        myClusterManager.markerCollection.setInfoWindowAdapter(context?.let { MyInfoWindowAdapter(it) })
+        myClusterManager.setOnClusterItemClickListener {
+            washroomId = it.getId()
+            washroomName = it.snippet?.split(",")?.get(0)
 
-    // Start AddNewLocationFragment in order to add a new washroom location
+            val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
+            date = dateTimeFormat.format(it.getDate())
+            if (it.getGender() == 0) {
+                gender = "Male"
+            } else if (it.getGender() == 1) {
+                gender = "Female"
+            } else {
+                gender = "Universal"
+            }
+            return@setOnClusterItemClickListener false
+        }
+
+
+        mMap.setOnMarkerClickListener(myClusterManager)
+        mMap.setOnCameraIdleListener(myClusterManager)
+        mMap.setInfoWindowAdapter(myClusterManager.markerManager)
+        myClusterManager.setOnClusterItemInfoWindowClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (washroomId != null) {
+                    val viewIntent = Intent(activity, DisplayActivity::class.java)
+                    viewIntent.putExtra("ID", washroomId)
+                    viewIntent.putExtra("name", washroomName)
+                    viewIntent.putExtra("date", date)
+                    viewIntent.putExtra("gender", gender)
+                    startActivity(viewIntent)
+                }
+            }
+        }
+        mMap.setOnInfoWindowClickListener(myClusterManager)
+    }
+
     fun onAddNewLocationClick(view: View) {
-        val viewIntent = Intent(this, AddNewLocationFragment::class.java)
+        val viewIntent = Intent(activity, AddNewLocationFragment::class.java)
         startActivity(viewIntent)
     }
 
@@ -484,5 +508,6 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener/*
     }
 
     override fun onProviderDisabled(provider: String) {
-    }*/
-//}
+    }
+
+}

@@ -42,6 +42,11 @@ class DisplayActivity : AppCompatActivity() {
         date = intent.getStringExtra("date").toString()
         access = intent.getStringExtra("access").toString()
 
+        val sharedPref = getSharedPreferences("update", MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        editor.putString("updateReview", "No")
+        editor.apply()
+
         setData()
     }
 
@@ -51,7 +56,6 @@ class DisplayActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-
         if (isUpdated) {
             userCommentList.clear()
             setData()
