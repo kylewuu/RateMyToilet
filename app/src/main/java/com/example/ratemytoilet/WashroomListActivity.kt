@@ -1,6 +1,7 @@
 package com.example.ratemytoilet
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -9,6 +10,13 @@ import android.widget.AdapterView
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.ratemytoilet.MainActivity.Companion.accessCheck
+import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
+import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
+import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
+import com.example.ratemytoilet.MainActivity.Companion.maleCheck
+import com.example.ratemytoilet.MainActivity.Companion.paperCheck
+import com.example.ratemytoilet.MainActivity.Companion.soapCheck
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
@@ -34,31 +42,19 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
     private lateinit var arrayAdapter: WashroomListAdapter
     private val monthArray = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
     private lateinit var locationViewModel: LocationViewModel
-    private var maleCheck = false
-    private var femaleCheck = false
-    private var paperCheck = false
-    private var soapCheck = false
-    private var accessCheck = false
-    private var cleanlinessStart = 1f
-    private var cleanlinessEnd = 5f
 
+    private lateinit var updatePreference : SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        var bundle = intent.extras
-        maleCheck = bundle?.getBoolean(MainActivity.MALE_CHECK_KEY) ?: false
-        femaleCheck = bundle?.getBoolean(MainActivity.FEMALE_CHECK_KEY) ?: false
-        paperCheck = bundle?.getBoolean(MainActivity.PAPER_CHECK_KEY) ?: false
-        soapCheck = bundle?.getBoolean(MainActivity.SOAP_CHECK_KEY) ?: false
-        accessCheck = bundle?.getBoolean(MainActivity.ACCESS_CHECK_KEY) ?: false
-        cleanlinessStart = bundle?.getFloat(MainActivity.CLEANLINESS_START_KEY) ?: 1f
-        cleanlinessEnd = bundle?.getFloat(MainActivity.CLEANLINESS_END_KEY) ?: 5f
-
         // Remove app name from toolbar
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
+        editor = updatePreference.edit()
 
         // List of locations
         myListView = findViewById(R.id.lv_locations)
@@ -161,6 +157,8 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
 
                     if (shouldAdd) newLocations.add(location)
                 }
+            } else {
+                newLocations = allLocations as ArrayList<Location>
             }
 
             withContext(Main) {
@@ -208,13 +206,17 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
         startValue: Float,
         endValue: Float
     ) {
-        this.paperCheck = paperCheck
-        this.soapCheck = soapCheck
-        this.accessCheck = accessCheck
-        this.maleCheck = maleCheck
-        this.femaleCheck = femaleCheck
-        this.cleanlinessStart = startValue
-        this.cleanlinessEnd = endValue
+        MainActivity.paperCheck = paperCheck
+        MainActivity.soapCheck = soapCheck
+        MainActivity.accessCheck = accessCheck
+        MainActivity.maleCheck = maleCheck
+        MainActivity.femaleCheck = femaleCheck
+        MainActivity.cleanlinessStart = startValue
+        MainActivity.cleanlinessEnd = endValue
+
+        editor.putString("updateReview", "Yes")
+        editor.apply()
+
         loadWashrooms()
     }
 }

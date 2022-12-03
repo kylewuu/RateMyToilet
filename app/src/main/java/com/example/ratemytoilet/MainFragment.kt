@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
@@ -21,9 +22,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.ratemytoilet.MainActivity.Companion.accessCheck
+import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
+import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
+import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
+import com.example.ratemytoilet.MainActivity.Companion.maleCheck
+import com.example.ratemytoilet.MainActivity.Companion.notRunFirstTime
+import com.example.ratemytoilet.MainActivity.Companion.paperCheck
+import com.example.ratemytoilet.MainActivity.Companion.previousLocationsSize
+import com.example.ratemytoilet.MainActivity.Companion.soapCheck
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
-import com.example.ratemytoilet.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -40,9 +49,7 @@ import java.text.SimpleDateFormat
 class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private var myLocationMarker : Marker?= null
     private lateinit var mMap: GoogleMap
-    private lateinit var binding: ActivityMainBinding
 
-    private val PERMISSION_REQUEST_CODE = 0
     private lateinit var locationManager: LocationManager
     private lateinit var locationViewModel: LocationViewModel
 
@@ -57,21 +64,13 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private lateinit var myClusterManager: ClusterManager<MyItem>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
     private lateinit var updateMap : String
+    private lateinit var updatePreference: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
-
-    private var notRunFirstTime = false
-    private var maleCheck = false
-    private var femaleCheck = false
-    private var paperCheck = false
-    private var soapCheck = false
-    private var accessCheck = false
-    private var cleanlinessStart = 1f
-    private var cleanlinessEnd = 5f
-    private var previousLocationsSize = -1
     private val locationPermissionResultReceiver = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
             initLocationManager()
-            getToiletLocation()
+            loadWashrooms()
         } else {
             Toast.makeText(activity,"Permission Denied",Toast.LENGTH_SHORT).show()
         }
@@ -94,6 +93,8 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         mapFragment.getMapAsync(this)
         locationViewModel = LocationViewModel()
         loadingDialogFragment = LoadingDialogFragment()
+        updatePreference = activity?.getSharedPreferences("update", MODE_PRIVATE)!!
+        editor = updatePreference.edit()
 
         if ((activity as AppCompatActivity).getSupportActionBar() != null) {
             (activity as AppCompatActivity).getSupportActionBar()?.hide();
@@ -117,6 +118,15 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         val listButton = view.findViewById<Button>(R.id.listButton)
         listButton.setOnClickListener {
             val washroomListActivityIntent = Intent(activity, WashroomListActivity::class.java)
+            var bundle = Bundle()
+            bundle.putBoolean(MALE_CHECK_KEY, maleCheck)
+            bundle.putBoolean(FEMALE_CHECK_KEY, femaleCheck)
+            bundle.putBoolean(PAPER_CHECK_KEY, paperCheck)
+            bundle.putBoolean(SOAP_CHECK_KEY, soapCheck)
+            bundle.putBoolean(ACCESS_CHECK_KEY, accessCheck)
+            bundle.putFloat(CLEANLINESS_START_KEY, cleanlinessStart)
+            bundle.putFloat(CLEANLINESS_END_KEY, cleanlinessEnd)
+            washroomListActivityIntent.putExtras(bundle)
             this.startActivity(washroomListActivityIntent)
         }
 
@@ -146,10 +156,12 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
             //Log.d("TAp", updateMap)
             if (updateMap != "NULL") {
                 if (updateMap == "Yes") {
+                    editor.putString("updateReview", "No")
+                    editor.apply()
                     if (mMap != null && myClusterManager != null) {
                         mMap.clear()
                         myClusterManager.clearItems()
-                        getToiletLocation()
+                        loadWashrooms()
                         mMap.setOnMarkerClickListener(myClusterManager)
                         mMap.setOnCameraIdleListener(myClusterManager)
                         mMap.setInfoWindowAdapter(myClusterManager.markerManager)
@@ -278,56 +290,6 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
             locationManager.removeUpdates(this)
     }
 
-    fun getToiletLocation() {
-        val bubble = IconGenerator(context)
-        val arr = ArrayList<MyItem>()
-        bubble.setStyle(IconGenerator.STYLE_PURPLE)
-        if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
-        lifecycleScope.launch(Dispatchers.IO) {
-            var allLocations = locationViewModel.getAllLocations()
-            val reviewViewModel = ReviewViewModel()
-            for (location in allLocations) {
-                var rating = 0.0
-                var soap = "true"
-                var paper = "true"
-                var access = "true"
-                var allReviews = reviewViewModel.getReviewsForLocation(location.id)
-                allReviews = allReviews.sortedByDescending { it.dateAdded }
-                val latLng = LatLng(location.lat, location.lng)
-                if (allReviews.isNotEmpty()) {
-                    for (review in allReviews) {
-                        rating += review.cleanliness
-                    }
-                    rating /= allReviews.size
-                    if (allReviews[0].sufficientSoap == 0) {
-                        soap = "false"
-                    } else if (allReviews[0].sufficientSoap == 2) {
-                        soap = "unknown"
-                    }
-
-
-                    if (allReviews[0].sufficientPaperTowels == 0) {
-                        paper = "false"
-                    } else if (allReviews[0].sufficientPaperTowels == 2) {
-                        paper = "unknown"
-                    }
-
-                    if (allReviews[0].accessibility == 0) {
-                        access = "false"
-                    } else if (allReviews[0].accessibility == 2) {
-                        access = "unknown"
-                    }
-                }
-
-                val snippet = location.name + ", " + location.roomNumber + ";" + rating.toInt()
-                val title = soap + "," + paper + "," + access
-                val item = MyItem(latLng, title, snippet, BitmapDescriptorFactory.fromBitmap(bubble.makeIcon(rating.toInt().toString())), location.id, location.date, location.gender)
-                arr.add(item)
-            }
-            setClusterOnMainThread(arr)
-        }
-    }
-
     private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
             var loadFragment = childFragmentManager.findFragmentByTag("Load")
@@ -340,7 +302,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         }
     }
 
-    private fun updateToilet() {
+    private fun loadWashrooms() {
         val bubble = IconGenerator(context)
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
@@ -349,7 +311,15 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
-            if (allLocations != null) {
+            if (allLocations != null &&
+                (paperCheck ||
+                        soapCheck ||
+                        accessCheck ||
+                        maleCheck ||
+                        femaleCheck ||
+                        cleanlinessStart != 1f ||
+                        cleanlinessEnd != 5f)
+            ) {
                 for (location in allLocations) {
                     var shouldAdd = true
                     var rating = 0.0
@@ -396,58 +366,62 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
 
                     if (shouldAdd) newLocations.add(location)
                 }
+            } else if (allLocations != null){
+                newLocations = allLocations as java.util.ArrayList<com.example.ratemytoilet.database.Location>
             }
 
-            val updates = newLocations.distinctBy { it.id }
-            for(update in updates) {
-                val updateLatLng = LatLng(update.lat, update.lng)
-                var updateRating = 0.0
-                var updateSoap = "true"
-                var updatePaper = "true"
-                var updateAccess = "true"
-                var updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
-                updateAllReviews = updateAllReviews.sortedByDescending { it.dateAdded }
-                if (updateAllReviews.size != 0) {
-                    for (review in updateAllReviews) {
-                        updateRating += review.cleanliness
-                    }
-                    updateRating /= updateAllReviews.size
-                    if (updateAllReviews[0].sufficientSoap == 0) {
-                        updateSoap = "false"
-                    } else if (updateAllReviews[0].sufficientSoap == 2) {
-                        updateSoap = "unknown"
-                    }
+            if (newLocations.isNotEmpty()) {
+                val updates = newLocations.distinctBy { it.id }
+                for(update in updates) {
+                    val updateLatLng = LatLng(update.lat, update.lng)
+                    var updateRating = 0.0
+                    var updateSoap = "true"
+                    var updatePaper = "true"
+                    var updateAccess = "true"
+                    var updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
+                    updateAllReviews = updateAllReviews.sortedByDescending { it.dateAdded }
+                    if (updateAllReviews.size != 0) {
+                        for (review in updateAllReviews) {
+                            updateRating += review.cleanliness
+                        }
+                        updateRating /= updateAllReviews.size
+                        if (updateAllReviews[0].sufficientSoap == 0) {
+                            updateSoap = "false"
+                        } else if (updateAllReviews[0].sufficientSoap == 2) {
+                            updateSoap = "unknown"
+                        }
 
-                    if (updateAllReviews[0].sufficientPaperTowels == 0) {
-                        updatePaper = "false"
-                    } else if (updateAllReviews[0].sufficientPaperTowels == 2) {
-                        updatePaper = "unknown"
-                    }
+                        if (updateAllReviews[0].sufficientPaperTowels == 0) {
+                            updatePaper = "false"
+                        } else if (updateAllReviews[0].sufficientPaperTowels == 2) {
+                            updatePaper = "unknown"
+                        }
 
-                    if (updateAllReviews[0].accessibility == 0) {
-                        updateAccess = "false"
-                    } else if (updateAllReviews[0].accessibility == 2) {
-                        updateAccess = "unknown"
+                        if (updateAllReviews[0].accessibility == 0) {
+                            updateAccess = "false"
+                        } else if (updateAllReviews[0].accessibility == 2) {
+                            updateAccess = "unknown"
+                        }
                     }
+                    val snippet = update.name + ", " + update.roomNumber + ";" + updateRating.toInt()
+                    val title = updateSoap + "," + updatePaper + "," + updateAccess
+                    val item = MyItem(
+                        updateLatLng,
+                        title,
+                        snippet,
+                        BitmapDescriptorFactory.fromBitmap(
+                            bubble.makeIcon(
+                                updateRating.toInt().toString()
+                            )
+                        ),
+                        update.id,
+                        update.date,
+                        update.gender
+                    )
+                    arr.add(item)
                 }
-                val snippet = update.name + ", " + update.roomNumber + ";" + updateRating.toInt()
-                val title = updateSoap + "," + updatePaper + "," + updateAccess
-                val item = MyItem(
-                    updateLatLng,
-                    title,
-                    snippet,
-                    BitmapDescriptorFactory.fromBitmap(
-                        bubble.makeIcon(
-                            updateRating.toInt().toString()
-                        )
-                    ),
-                    update.id,
-                    update.date,
-                    update.gender
-                )
-                arr.add(item)
+                setClusterOnMainThread(arr)
             }
-            setClusterOnMainThread(arr)
         }
     }
 
@@ -455,7 +429,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         mMap.clear()
         myClusterManager.clearItems()
         saveFilterConditions(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
-        updateToilet()
+        loadWashrooms()
         myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
         myClusterManager.renderer = context?.let { MarkerClusterRenderer(it, mMap, myClusterManager) }
         myClusterManager.markerCollection.setInfoWindowAdapter(context?.let { MyInfoWindowAdapter(it) })
@@ -499,13 +473,13 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     }
 
     private fun saveFilterConditions(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
-        this.paperCheck = paperCheck
-        this.soapCheck = soapCheck
-        this.accessCheck = accessCheck
-        this.maleCheck = maleCheck
-        this.femaleCheck = femaleCheck
-        this.cleanlinessStart = startValue
-        this.cleanlinessEnd = endValue
+        MainActivity.paperCheck = paperCheck
+        MainActivity.soapCheck = soapCheck
+        MainActivity.accessCheck = accessCheck
+        MainActivity.maleCheck = maleCheck
+        MainActivity.femaleCheck = femaleCheck
+        MainActivity.cleanlinessStart = startValue
+        MainActivity.cleanlinessEnd = endValue
     }
 
     override fun onLocationChanged(locations: MutableList<Location>) {

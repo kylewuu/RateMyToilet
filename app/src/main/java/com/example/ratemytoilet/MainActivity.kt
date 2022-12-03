@@ -17,6 +17,16 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         var ACCESS_CHECK_KEY = "access_check_key"
         var CLEANLINESS_START_KEY = "cleanliness_start_key"
         var CLEANLINESS_END_KEY = "cleanliness_end_key"
+
+        var notRunFirstTime = false
+        var maleCheck = false
+        var femaleCheck = false
+        var paperCheck = false
+        var soapCheck = false
+        var accessCheck = false
+        var cleanlinessStart = 1f
+        var cleanlinessEnd = 5f
+        var previousLocationsSize = -1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
