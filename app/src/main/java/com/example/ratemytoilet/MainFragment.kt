@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
@@ -19,9 +18,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -29,14 +25,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.databinding.ActivityMainBinding
-import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +69,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private var accessCheck = false
     private var cleanlinessStart = 1f
     private var cleanlinessEnd = 5f
+    private var previousLocationsSize = -1
     private val locationPermissionResultReceiver = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
             initLocationManager()
@@ -129,6 +123,22 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
             this.startActivity(washroomListActivityIntent)
         }
 
+        val addButton = view.findViewById<Button>(R.id.addNewLocation)
+        addButton.setOnClickListener {
+            onAddNewLocationClick()
+        }
+
+        locationViewModel = LocationViewModel()
+        locationViewModel.locations.observe(viewLifecycleOwner) {
+            if (previousLocationsSize == -1) {
+                previousLocationsSize = it.size
+            }
+            if (previousLocationsSize != it.size) {
+                Toast.makeText(activity, "New Location added", Toast.LENGTH_SHORT).show()
+            }
+            Log.d("TAp", previousLocationsSize.toString())
+        }
+
         return view
     }
 
@@ -136,7 +146,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         if (notRunFirstTime) {
             val sharedPref = activity?.getSharedPreferences("update", MODE_PRIVATE)
             updateMap = sharedPref?.getString("updateReview", "NULL").toString()
-            Log.d("TAp", updateMap)
+            //Log.d("TAp", updateMap)
             if (updateMap != "NULL") {
                 if (updateMap == "Yes") {
                     if (mMap != null && myClusterManager != null) {
@@ -263,6 +273,12 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         mMap.setOnInfoWindowClickListener(myClusterManager)
 
         locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (locationManager != null)
+            locationManager.removeUpdates(this)
     }
 
     fun getToiletLocation() {
@@ -482,7 +498,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         mMap.setOnInfoWindowClickListener(myClusterManager)
     }
 
-    fun onAddNewLocationClick(view: View) {
+    fun onAddNewLocationClick() {
         val viewIntent = Intent(activity, AddNewLocationFragment::class.java)
         startActivity(viewIntent)
     }
