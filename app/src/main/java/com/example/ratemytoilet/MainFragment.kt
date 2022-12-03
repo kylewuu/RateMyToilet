@@ -280,7 +280,6 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
                 var access = "true"
                 var allReviews = reviewViewModel.getReviewsForLocation(location.id)
                 allReviews = allReviews.sortedByDescending { it.dateAdded }
-                allReviews = allReviews.sortedByDescending { it.dateAdded }
                 val latLng = LatLng(location.lat, location.lng)
                 if (allReviews.isNotEmpty()) {
                     for (review in allReviews) {
@@ -408,11 +407,11 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
 
                     if (updateAllReviews[0].sufficientPaperTowels == 0) {
                         updatePaper = "false"
-                    } else if (updateAllReviews[0].sufficientSoap == 2) {
+                    } else if (updateAllReviews[0].sufficientPaperTowels == 2) {
                         updatePaper = "unknown"
                     }
 
-                    if (updateAllReviews[0].accessibility == 1) {
+                    if (updateAllReviews[0].accessibility == 0) {
                         updateAccess = "false"
                     } else if (updateAllReviews[0].accessibility == 2) {
                         updateAccess = "unknown"
