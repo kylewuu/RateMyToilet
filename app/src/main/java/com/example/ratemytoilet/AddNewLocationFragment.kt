@@ -2,6 +2,7 @@ package com.example.ratemytoilet
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -39,6 +40,7 @@ class AddNewLocationFragment : AppCompatActivity() {
     private var soapValue: Int = 2
     private var accessValue: Int = 2
 
+    private lateinit var updatePreference : SharedPreferences
 
     // Array of genders
     val genderArray = arrayOf("Male", "Female", "Universal")
@@ -48,6 +50,9 @@ class AddNewLocationFragment : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_add_new_location)
+
+        updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
+        val editor = updatePreference.edit()
 
         // Set views
         paperTowelButtonYes = findViewById<Button>(R.id.bt_paperTowelsYes)
@@ -121,10 +126,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
         // Room Number, Room Name, and Location cannot be empty
-        if (rating <= 0.0) {
-            Toast.makeText(this, "The minimum rating is 1 star.", Toast.LENGTH_SHORT).show()
-        }
-        else if(addLocationLatLng == null){
+        if(addLocationLatLng == null){
             // Show toast indicating location parameter is missing
             val toast = Toast.makeText(applicationContext, "Missing Location", Toast.LENGTH_SHORT)
             toast.show()
@@ -138,6 +140,8 @@ class AddNewLocationFragment : AppCompatActivity() {
             // Show toast indicating room name parameter is missing
             val toast = Toast.makeText(applicationContext, "Missing Washroom Name", Toast.LENGTH_SHORT)
             toast.show()
+        } else if (rating <= 0.0) {
+            Toast.makeText(this, "The minimum rating is 1 star.", Toast.LENGTH_SHORT).show()
         } else {
             lifecycleScope.launch(Dispatchers.IO) {
                 var locationViewModel = LocationViewModel()
@@ -168,12 +172,16 @@ class AddNewLocationFragment : AppCompatActivity() {
                     reviewViewModel.addReviewForLocation(newReview)
 
                 }
+
             }
+
+            val editor = updatePreference.edit()
+            editor.putString("updateReview", "Yes")
+            editor.apply()
 
             finish()
         }
     }
-
 
     fun onPaperTowelYesClick(view:View){
         paperTowelValue = 1
@@ -186,8 +194,6 @@ class AddNewLocationFragment : AppCompatActivity() {
         paperTowelButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
 
     }
-
-
 
     fun onPaperTowelNoClick(view:View){
         paperTowelValue = 0
@@ -249,8 +255,11 @@ class AddNewLocationFragment : AppCompatActivity() {
         accessButtonNo.setTextColor(Color.WHITE)
     }
 
-
-
-
+    override fun onBackPressed() {
+        val editor = updatePreference.edit()
+        editor.putString("updateReview", "No")
+        editor.apply()
+        super.onBackPressed()
+    }
 
 }
