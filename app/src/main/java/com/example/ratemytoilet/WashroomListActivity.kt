@@ -181,15 +181,6 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
         return when (item.getItemId()) {
             R.id.action_maintain -> {
                 val filterDialogFragment = FilterDialogFragment()
-                var bundle = Bundle()
-                bundle.putBoolean(MainActivity.MALE_CHECK_KEY, maleCheck)
-                bundle.putBoolean(MainActivity.FEMALE_CHECK_KEY, femaleCheck)
-                bundle.putBoolean(MainActivity.PAPER_CHECK_KEY, paperCheck)
-                bundle.putBoolean(MainActivity.SOAP_CHECK_KEY, soapCheck)
-                bundle.putBoolean(MainActivity.ACCESS_CHECK_KEY, accessCheck)
-                bundle.putFloat(MainActivity.CLEANLINESS_START_KEY, cleanlinessStart)
-                bundle.putFloat(MainActivity.CLEANLINESS_END_KEY, cleanlinessEnd)
-                filterDialogFragment.arguments = bundle
                 filterDialogFragment.show(supportFragmentManager, "Filter")
                 true
             }
