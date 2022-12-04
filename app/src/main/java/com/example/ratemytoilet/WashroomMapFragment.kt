@@ -1,10 +1,8 @@
 package com.example.ratemytoilet
 
 import android.Manifest
-import android.content.Context
+import android.content.*
 import android.content.Context.MODE_PRIVATE
-import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
@@ -89,6 +87,12 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
                 Toast.makeText(activity,"Permission Denied",Toast.LENGTH_SHORT).show()
             }
         }
+
+        // Register for Receiver
+        val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        filter.addAction(Intent.ACTION_PROVIDER_CHANGED)
+        getActivity()?.registerReceiver(locationSwitchStateReceiver, filter)
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -137,7 +141,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     override fun onResume() {
         super.onResume()
         mapView.onResume()
-
         if (notRunFirstTime) {
             val sharedPref = activity?.getSharedPreferences("update", MODE_PRIVATE)
             updateMap = sharedPref?.getString("updateReview", "NULL").toString()
@@ -172,7 +175,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
 
     private fun loadLaunchScreen() {
         val intent = Intent(activity, LaunchActivity::class.java)
-        startActivity(intent)
+        //startActivity(intent)
     }
 
     fun initLocationManager() {
@@ -239,6 +242,19 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
 
         if (locationManager != null)
             locationManager.removeUpdates(this)
+
+        // Unregister receiver
+        getActivity()?.unregisterReceiver(locationSwitchStateReceiver)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -416,10 +432,14 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     }
 
     override fun onProviderEnabled(provider: String) {
+        println("DEBUG: Provider Enabled" )
     }
 
     override fun onProviderDisabled(provider: String) {
+        println("DEBUG: Provider Disabled" )
     }
+
+
 
     private fun setClusterManager() {
         myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
@@ -458,4 +478,28 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         }
         mMap.setOnInfoWindowClickListener(myClusterManager)
     }
+
+
+
+    // Detects if the location is turned on in the map fragment. If detected, it will start the location manager again with function initLocationManager().
+
+    // Helps to solve the issue where the location is turned off in another fragment (ex. Washroom List Fragment), and the map view is re-opened with location still turned off.
+    // This will detect if the location is turned back on in the map view and start up location manager to detect new locations. Otherwise, location will not be updated.
+    private val locationSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (LocationManager.PROVIDERS_CHANGED_ACTION == intent.action) {
+                val locationManager =
+                    context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                if (isGpsEnabled || isNetworkEnabled) {
+                    //  is enabled
+                    initLocationManager()
+                }
+            }
+        }
+    }
+
+
+
 }
