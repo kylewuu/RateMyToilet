@@ -134,6 +134,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
                 previousLocationsSize = it.size
             }
             if (previousLocationsSize != it.size) {
+                previousLocationsSize = it.size
                 Toast.makeText(activity, "New Location added", Toast.LENGTH_SHORT).show()
             }
             Log.d("TAp", previousLocationsSize.toString())
