@@ -1,10 +1,17 @@
 package com.example.ratemytoilet
 
+
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
+import android.location.Criteria
+import android.location.LocationManager
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
@@ -47,6 +54,12 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
     private lateinit var updatePreference : SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
 
+
+    // User location vars
+    private lateinit var locationManager: LocationManager
+    private var userLocation: android.location.Location? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -61,6 +74,11 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
 
         updatePreference = requireContext().getSharedPreferences("update", MODE_PRIVATE)
         editor = updatePreference.edit()
+
+
+        // Get Location
+        getUserLocation()
+
 
         // List of locations
         myListView = view.findViewById(R.id.lv_locations)
@@ -128,6 +146,7 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
                 for (location in allLocations) {
                     var shouldAdd = true
                     var rating = 0.0
+
                     var allReviews = reviewViewModel.getReviewsForLocation(location.id)
                     allReviews = allReviews.sortedByDescending { it.dateAdded }
                     if (allReviews.isNotEmpty()) {
@@ -204,4 +223,26 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
 
         loadWashrooms()
     }
+
+
+    private fun getUserLocation() {
+        try {
+            locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val criteria = Criteria()
+            criteria.accuracy = Criteria.ACCURACY_FINE
+            val provider : String? = locationManager.getBestProvider(criteria, true)
+            if(provider != null) {
+                val location = locationManager.getLastKnownLocation(provider)
+                if (location != null){
+                    println(location)
+                    userLocation = location
+
+                }
+            }
+        }
+        catch (e: SecurityException) {
+        }
+    }
+
+
 }
