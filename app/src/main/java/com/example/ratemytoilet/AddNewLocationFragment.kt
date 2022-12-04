@@ -2,13 +2,13 @@ package com.example.ratemytoilet
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat.setBackgroundTintList
 import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
@@ -40,6 +40,8 @@ class AddNewLocationFragment : AppCompatActivity() {
     private var soapValue: Int = 2
     private var accessValue: Int = 2
 
+    private lateinit var updatePreference : SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
     // Array of genders
     val genderArray = arrayOf("Male", "Female", "Universal")
@@ -49,6 +51,9 @@ class AddNewLocationFragment : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_add_new_location)
+
+        updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
+        editor = updatePreference.edit()
 
         // Set views
         paperTowelButtonYes = findViewById<Button>(R.id.bt_paperTowelsYes)
@@ -122,8 +127,23 @@ class AddNewLocationFragment : AppCompatActivity() {
 
 
         // Room Number, Room Name, and Location cannot be empty
-        if(roomNum != "" && roomName != ""  && addLocationLatLng != null)
-        {
+        if(addLocationLatLng == null){
+            // Show toast indicating location parameter is missing
+            val toast = Toast.makeText(applicationContext, "Missing Location", Toast.LENGTH_SHORT)
+            toast.show()
+        }
+        else if(roomNum == ""){
+            // Show toast indicating room number parameter is missing
+            val toast = Toast.makeText(applicationContext, "Missing Room Number", Toast.LENGTH_SHORT)
+            toast.show()
+        }
+        else if(roomName == ""){
+            // Show toast indicating room name parameter is missing
+            val toast = Toast.makeText(applicationContext, "Missing Washroom Name", Toast.LENGTH_SHORT)
+            toast.show()
+        } else if (rating <= 0.0) {
+            Toast.makeText(this, "The minimum rating is 1 star.", Toast.LENGTH_SHORT).show()
+        } else {
             lifecycleScope.launch(Dispatchers.IO) {
                 var locationViewModel = LocationViewModel()
                 var newLocation = Location()
@@ -153,29 +173,15 @@ class AddNewLocationFragment : AppCompatActivity() {
                     reviewViewModel.addReviewForLocation(newReview)
 
                 }
+
             }
 
-            finish()
+            editor.putString("updateReview", "Yes")
+            editor.apply()
 
-        }
-        else if(addLocationLatLng == null){
-            // Show toast indicating location parameter is missing
-            val toast = Toast.makeText(applicationContext, "Missing Location", Toast.LENGTH_SHORT)
-            toast.show()
-        }
-        else if(roomNum == ""){
-            // Show toast indicating room number parameter is missing
-            val toast = Toast.makeText(applicationContext, "Missing Room Number", Toast.LENGTH_SHORT)
-            toast.show()
-        }
-        else if(roomName == ""){
-            // Show toast indicating room name parameter is missing
-            val toast = Toast.makeText(applicationContext, "Missing Washroom Name", Toast.LENGTH_SHORT)
-            toast.show()
+            finish()
         }
     }
-
-
 
     fun onPaperTowelYesClick(view:View){
         paperTowelValue = 1
@@ -188,8 +194,6 @@ class AddNewLocationFragment : AppCompatActivity() {
         paperTowelButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
 
     }
-
-
 
     fun onPaperTowelNoClick(view:View){
         paperTowelValue = 0
@@ -251,8 +255,10 @@ class AddNewLocationFragment : AppCompatActivity() {
         accessButtonNo.setTextColor(Color.WHITE)
     }
 
-
-
-
+    override fun onBackPressed() {
+        editor.putString("updateReview", "No")
+        editor.apply()
+        super.onBackPressed()
+    }
 
 }
