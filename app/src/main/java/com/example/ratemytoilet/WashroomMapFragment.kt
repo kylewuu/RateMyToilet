@@ -257,16 +257,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         mapView.onLowMemory()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView.onSaveInstanceState(outState)
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
-    }
-
     private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
         withContext(Dispatchers.Main){
             var loadFragment = childFragmentManager.findFragmentByTag("Load")
