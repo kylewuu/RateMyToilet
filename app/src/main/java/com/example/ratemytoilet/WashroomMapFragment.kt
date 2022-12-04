@@ -141,8 +141,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     override fun onResume() {
         super.onResume()
         mapView.onResume()
-
-
         if (notRunFirstTime) {
             val sharedPref = activity?.getSharedPreferences("update", MODE_PRIVATE)
             updateMap = sharedPref?.getString("updateReview", "NULL").toString()
