@@ -3,6 +3,8 @@ package com.example.ratemytoilet
 import android.Manifest
 import android.content.*
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
@@ -428,8 +430,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     override fun onProviderDisabled(provider: String) {
         println("DEBUG: Provider Disabled" )
     }
-
-
 
     private fun setClusterManager() {
         myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
