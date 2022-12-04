@@ -1,8 +1,10 @@
 package com.example.ratemytoilet
 
 import android.Manifest
-import android.content.*
-import android.content.Context.MODE_PRIVATE
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
@@ -30,6 +32,7 @@ import com.example.ratemytoilet.MainActivity.Companion.notRunFirstTime
 import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.previousLocationsSize
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
+import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.launch.LaunchActivity
@@ -69,9 +72,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<MyItem>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
-    private lateinit var updateMap : String
-    private lateinit var updatePreference: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
 
     private lateinit var locationPermissionResultReceiver: ActivityResultLauncher<String>
 
@@ -107,8 +107,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
 
         locationViewModel = LocationViewModel()
         loadingDialogFragment = LoadingDialogFragment()
-        updatePreference = activity?.getSharedPreferences("update", MODE_PRIVATE)!!
-        editor = updatePreference.edit()
 
         if ((activity as AppCompatActivity).getSupportActionBar() != null) {
             (activity as AppCompatActivity).getSupportActionBar()?.hide();
@@ -132,6 +130,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
             }
             if (previousLocationsSize != it.size) {
                 Toast.makeText(activity, "New Location added", Toast.LENGTH_SHORT).show()
+                previousLocationsSize = it.size
             }
             Log.d("TAp", previousLocationsSize.toString())
         }
@@ -142,22 +141,15 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         super.onResume()
         mapView.onResume()
         if (notRunFirstTime) {
-            val sharedPref = activity?.getSharedPreferences("update", MODE_PRIVATE)
-            updateMap = sharedPref?.getString("updateReview", "NULL").toString()
-            //Log.d("TAp", updateMap)
-            if (updateMap != "NULL") {
-                if (updateMap == "Yes") {
-                    editor.putString("updateReview", "No")
-                    editor.apply()
-                    if (mMap != null && myClusterManager != null) {
-                        mMap.clear()
-                        myClusterManager.clearItems()
-                        loadWashrooms()
-                        setClusterManager()
-                    }
+            if (updateMap) {
+                updateMap = false
+                if (mMap != null && myClusterManager != null) {
+                    mMap.clear()
+                    myClusterManager.clearItems()
+                    loadWashrooms()
+                    setClusterManager()
                 }
             }
-
         } else {
             notRunFirstTime = true
         }
@@ -411,8 +403,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         MainActivity.accessCheck = accessCheck
         MainActivity.maleCheck = maleCheck
         MainActivity.femaleCheck = femaleCheck
-        MainActivity.cleanlinessStart = startValue
-        MainActivity.cleanlinessEnd = endValue
+        cleanlinessStart = startValue
+        cleanlinessEnd = endValue
     }
 
     override fun onLocationChanged(locations: MutableList<Location>) {

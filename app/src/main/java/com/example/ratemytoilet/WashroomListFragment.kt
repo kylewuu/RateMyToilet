@@ -1,10 +1,10 @@
 package com.example.ratemytoilet
 
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
@@ -17,6 +17,7 @@ import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
 import com.example.ratemytoilet.MainActivity.Companion.maleCheck
 import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
+import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
@@ -44,13 +45,6 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
     private val monthArray = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
     private lateinit var locationViewModel: LocationViewModel
 
-    private lateinit var updatePreference : SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,8 +53,6 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
         val view = inflater.inflate(R.layout.fragment_list, container, false)
         toolbar = view.findViewById(R.id.toolbar)
 
-        updatePreference = requireContext().getSharedPreferences("update", MODE_PRIVATE)
-        editor = updatePreference.edit()
 
         // List of locations
         myListView = view.findViewById(R.id.lv_locations)
@@ -196,11 +188,10 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
         MainActivity.accessCheck = accessCheck
         MainActivity.maleCheck = maleCheck
         MainActivity.femaleCheck = femaleCheck
-        MainActivity.cleanlinessStart = startValue
-        MainActivity.cleanlinessEnd = endValue
+        cleanlinessStart = startValue
+        cleanlinessEnd = endValue
 
-        editor.putString("updateReview", "Yes")
-        editor.apply()
+        updateMap = true
 
         loadWashrooms()
     }
