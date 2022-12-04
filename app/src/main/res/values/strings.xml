@@ -24,4 +24,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_add_location_map">AddLocationMapActivity</string>
+    <string name="navigation_title_map">Map</string>
+    <string name="navigation_title_washroom_list">List</string>
+    <string name="title_fragment_list">Washrooms Near You</string>
 </resources>

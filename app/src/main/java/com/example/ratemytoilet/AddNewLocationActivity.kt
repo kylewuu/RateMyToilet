@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class AddNewLocationFragment : AppCompatActivity() {
+class AddNewLocationActivity : AppCompatActivity() {
 
     // Views
     private lateinit var ratingBar: RatingBar
@@ -50,7 +50,7 @@ class AddNewLocationFragment : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_add_new_location)
+        setContentView(R.layout.activity_add_new_location)
 
         updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
         editor = updatePreference.edit()

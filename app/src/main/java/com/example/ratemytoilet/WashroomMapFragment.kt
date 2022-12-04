@@ -1,7 +1,7 @@
 package com.example.ratemytoilet
 
 import android.Manifest
-import android.content.Context
+import android.content.*
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
@@ -36,9 +37,10 @@ import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
@@ -49,9 +51,12 @@ import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
+private const val TAG = "WashroomMapFragment"
+
+class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private var myLocationMarker : Marker?= null
     private lateinit var mMap: GoogleMap
+    private lateinit var mapView: MapView
 
     private lateinit var locationManager: LocationManager
     private lateinit var locationViewModel: LocationViewModel
@@ -70,19 +75,38 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private lateinit var updatePreference: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
 
-    private val locationPermissionResultReceiver = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if (it) {
-            initLocationManager()
-            loadWashrooms()
-        } else {
-            Toast.makeText(activity,"Permission Denied",Toast.LENGTH_SHORT).show()
+    private lateinit var locationPermissionResultReceiver: ActivityResultLauncher<String>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // We must register the ActivityResult in onCreate, to ensure it gets registered each time
+        // this fragment is created.
+        locationPermissionResultReceiver = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                initLocationManager()
+                loadWashrooms()
+            } else {
+                Toast.makeText(activity,"Permission Denied",Toast.LENGTH_SHORT).show()
+            }
         }
+
+        // Register for Receiver
+        val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        filter.addAction(Intent.ACTION_PROVIDER_CHANGED)
+        getActivity()?.registerReceiver(locationSwitchStateReceiver, filter)
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.activity_main, container, false)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        val view = inflater.inflate(R.layout.fragment_washroom_map, container, false)
+
+//        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapView = view.findViewById(R.id.map_view)
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
+
+        locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
         locationViewModel = LocationViewModel()
         loadingDialogFragment = LoadingDialogFragment()
         updatePreference = activity?.getSharedPreferences("update", MODE_PRIVATE)!!
@@ -98,13 +122,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
             filterDialogFragment.show(childFragmentManager, "Filter")
         }
 
-        val listButton = view.findViewById<Button>(R.id.listButton)
-        listButton.setOnClickListener {
-            val washroomListActivityIntent = Intent(activity, WashroomListActivity::class.java)
-            this.startActivity(washroomListActivityIntent)
-        }
-
-        val addButton = view.findViewById<Button>(R.id.addNewLocation)
+        val addButton = view.findViewById<FloatingActionButton>(R.id.addNewLocation)
         addButton.setOnClickListener {
             onAddNewLocationClick()
         }
@@ -119,11 +137,12 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
             }
             Log.d("TAp", previousLocationsSize.toString())
         }
-
         return view
     }
 
     override fun onResume() {
+        super.onResume()
+        mapView.onResume()
         if (notRunFirstTime) {
             val sharedPref = activity?.getSharedPreferences("update", MODE_PRIVATE)
             updateMap = sharedPref?.getString("updateReview", "NULL").toString()
@@ -144,12 +163,12 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         } else {
             notRunFirstTime = true
         }
-
-        super.onResume()
     }
 
-   /*override fun onStart() {
+   override fun onStart() {
         super.onStart()
+       mapView.onStart()
+
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
             loadLaunchScreen()
@@ -158,8 +177,8 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
 
     private fun loadLaunchScreen() {
         val intent = Intent(activity, LaunchActivity::class.java)
-        startActivity(intent)
-    }*/
+        //startActivity(intent)
+    }
 
     fun initLocationManager() {
         try {
@@ -198,6 +217,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        Log.d(TAG, "Map is ready!")
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
         polylineOptions = PolylineOptions()
@@ -206,14 +226,37 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         markerOptions = MarkerOptions()
 
         setClusterManager()
+    }
 
-        locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        mapView.onDestroy()
+
         if (locationManager != null)
             locationManager.removeUpdates(this)
+
+        // Unregister receiver
+        getActivity()?.unregisterReceiver(locationSwitchStateReceiver)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
     }
 
     private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
@@ -360,7 +403,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     }
 
     fun onAddNewLocationClick() {
-        val viewIntent = Intent(activity, AddNewLocationFragment::class.java)
+        val viewIntent = Intent(activity, AddNewLocationActivity::class.java)
         startActivity(viewIntent)
     }
 
@@ -381,9 +424,11 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     }
 
     override fun onProviderEnabled(provider: String) {
+        println("DEBUG: Provider Enabled" )
     }
 
     override fun onProviderDisabled(provider: String) {
+        println("DEBUG: Provider Disabled" )
     }
 
     private fun setClusterManager() {
@@ -423,4 +468,28 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         }
         mMap.setOnInfoWindowClickListener(myClusterManager)
     }
+
+
+
+    // Detects if the location is turned on in the map fragment. If detected, it will start the location manager again with function initLocationManager().
+
+    // Helps to solve the issue where the location is turned off in another fragment (ex. Washroom List Fragment), and the map view is re-opened with location still turned off.
+    // This will detect if the location is turned back on in the map view and start up location manager to detect new locations. Otherwise, location will not be updated.
+    private val locationSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (LocationManager.PROVIDERS_CHANGED_ACTION == intent.action) {
+                val locationManager =
+                    context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                if (isGpsEnabled || isNetworkEnabled) {
+                    //  is enabled
+                    initLocationManager()
+                }
+            }
+        }
+    }
+
+
+
 }
