@@ -10,13 +10,13 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.DialogFragment
-import com.example.ratemytoilet.MainActivity.Companion.ACCESS_CHECK_KEY
-import com.example.ratemytoilet.MainActivity.Companion.CLEANLINESS_END_KEY
-import com.example.ratemytoilet.MainActivity.Companion.CLEANLINESS_START_KEY
-import com.example.ratemytoilet.MainActivity.Companion.FEMALE_CHECK_KEY
-import com.example.ratemytoilet.MainActivity.Companion.MALE_CHECK_KEY
-import com.example.ratemytoilet.MainActivity.Companion.PAPER_CHECK_KEY
-import com.example.ratemytoilet.MainActivity.Companion.SOAP_CHECK_KEY
+import com.example.ratemytoilet.MainActivity.Companion.accessCheck
+import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
+import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
+import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
+import com.example.ratemytoilet.MainActivity.Companion.maleCheck
+import com.example.ratemytoilet.MainActivity.Companion.paperCheck
+import com.example.ratemytoilet.MainActivity.Companion.soapCheck
 import com.google.android.material.chip.Chip
 import com.google.android.material.slider.RangeSlider
 
@@ -27,14 +27,6 @@ class FilterDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         var bundle = arguments
-
-        var maleCheck = bundle?.getBoolean(MALE_CHECK_KEY) ?: false
-        var femaleCheck = bundle?.getBoolean(FEMALE_CHECK_KEY) ?: false
-        var paperCheck = bundle?.getBoolean(PAPER_CHECK_KEY) ?: false
-        var soapCheck = bundle?.getBoolean(SOAP_CHECK_KEY) ?: false
-        var accessCheck = bundle?.getBoolean(ACCESS_CHECK_KEY) ?: false
-        var cleanlinessStart = bundle?.getFloat(CLEANLINESS_START_KEY) ?: 1f
-        var cleanlinessEnd = bundle?.getFloat(CLEANLINESS_END_KEY) ?: 5f
 
         val layoutInflater = requireActivity().layoutInflater
         val dialogLayout = layoutInflater.inflate(R.layout.fragment_dialog, null)

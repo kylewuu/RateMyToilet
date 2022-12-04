@@ -1,19 +1,30 @@
 package com.example.ratemytoilet
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.example.ratemytoilet.MainActivity.Companion.accessCheck
+import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
+import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
+import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
+import com.example.ratemytoilet.MainActivity.Companion.maleCheck
+import com.example.ratemytoilet.MainActivity.Companion.paperCheck
+import com.example.ratemytoilet.MainActivity.Companion.soapCheck
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
-import java.text.DateFormat
-import java.text.SimpleDateFormat
+import com.example.ratemytoilet.database.ReviewViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 /*
@@ -24,42 +35,37 @@ https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-
 https://www.javatpoint.com/android-custom-listview
  */
 
-class WashroomListActivity : AppCompatActivity() {
+class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterListener {
 
     private lateinit var myListView: ListView
     private lateinit var arrayList: ArrayList<Location>
     private lateinit var arrayAdapter: WashroomListAdapter
     private val monthArray = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+    private lateinit var locationViewModel: LocationViewModel
 
+    private lateinit var updatePreference : SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-
         // Remove app name from toolbar
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
+        editor = updatePreference.edit()
 
         // List of locations
-        myListView = findViewById<ListView>(R.id.lv_locations)
-
+        myListView = findViewById(R.id.lv_locations)
 
         // Arraylist for displaying entries
         arrayList = ArrayList<Location>()
         arrayAdapter = WashroomListAdapter(this, arrayList)
         myListView.adapter = arrayAdapter
-        var locationViewModel = LocationViewModel()
+        locationViewModel = LocationViewModel()
+        loadWashrooms()
 
-
-        // Reload the array with database values
-        locationViewModel.locations.observe(this, Observer { it ->
-            arrayAdapter.replace(it)
-            arrayAdapter.notifyDataSetChanged()
-        })
-
-
-        // TODO: When a location is clicked, show its reviews
         myListView.isClickable = true
         myListView.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -87,10 +93,77 @@ class WashroomListActivity : AppCompatActivity() {
                 viewIntent.putExtra("date", monthName + ". " + date.toString() + ", " +  year.toString())
                 viewIntent.putExtra("gender", gender)
                 startActivity(viewIntent)
+            }
+        }
+    }
 
+    private fun loadWashrooms() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            var newLocations = ArrayList<Location>()
+            var allLocations = locationViewModel.getAllLocations()
+            val reviewViewModel = ReviewViewModel()
+            if (allLocations != null &&
+                    (paperCheck ||
+                    soapCheck ||
+                    accessCheck ||
+                    maleCheck ||
+                    femaleCheck ||
+                    cleanlinessStart != 1f ||
+                    cleanlinessEnd != 5f)
+            ) {
+                for (location in allLocations) {
+                    var shouldAdd = true
+                    var rating = 0.0
+                    var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                    allReviews = allReviews.sortedByDescending { it.dateAdded }
+                    if (allReviews.isNotEmpty()) {
+                        for (review in allReviews) {
+                            rating += review.cleanliness
+                        }
+                        rating /= allReviews.size
 
+                        if (paperCheck) {
+                            if (allReviews[0].sufficientPaperTowels != 1) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (soapCheck) {
+                            if (allReviews[0].sufficientSoap != 1) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (accessCheck) {
+                            if (allReviews[0].accessibility != 1) {
+                                shouldAdd = false
+                            }
+                        }
+                    }
+                    if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
+                        if (maleCheck) {
+                            if (location.gender != 0 && location.gender != 2) {
+                                shouldAdd = false
+                            }
+                        }
+                        if (femaleCheck) {
+                            if (location.gender != 1 && location.gender != 2) {
+                                shouldAdd = false
+                            }
+                        }
+                    }
 
+                    if (rating !in cleanlinessStart..cleanlinessEnd) {
+                        shouldAdd = false
+                    }
 
+                    if (shouldAdd) newLocations.add(location)
+                }
+            } else {
+                newLocations = allLocations as ArrayList<Location>
+            }
+
+            withContext(Main) {
+                arrayAdapter.replace(newLocations)
+                arrayAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -107,12 +180,34 @@ class WashroomListActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.getItemId()) {
             R.id.action_maintain -> {
-                val filterDialog = FilterDialogFragment()
-                filterDialog.show(supportFragmentManager, "Filter")
-                // TODO: Return filter settings and filter reviews
+                val filterDialogFragment = FilterDialogFragment()
+                filterDialogFragment.show(supportFragmentManager, "Filter")
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onFilterConditionPassed(
+        paperCheck: Boolean,
+        soapCheck: Boolean,
+        accessCheck: Boolean,
+        maleCheck: Boolean,
+        femaleCheck: Boolean,
+        startValue: Float,
+        endValue: Float
+    ) {
+        MainActivity.paperCheck = paperCheck
+        MainActivity.soapCheck = soapCheck
+        MainActivity.accessCheck = accessCheck
+        MainActivity.maleCheck = maleCheck
+        MainActivity.femaleCheck = femaleCheck
+        MainActivity.cleanlinessStart = startValue
+        MainActivity.cleanlinessEnd = endValue
+
+        editor.putString("updateReview", "Yes")
+        editor.apply()
+
+        loadWashrooms()
     }
 }

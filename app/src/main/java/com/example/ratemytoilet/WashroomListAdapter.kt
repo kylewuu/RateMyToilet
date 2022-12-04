@@ -19,13 +19,9 @@ import java.text.DecimalFormat
 
 // Based off class demo
 class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter() {
-
-
-
     override fun getItem(position: Int): (Location) {
         return locationList.get(position)
     }
-
 
     override fun getItemId(position: Int): Long {
         return position.toLong()
@@ -35,7 +31,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
     override fun getCount(): Int {
         return locationList.size
     }
-
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view: View = View.inflate(context, R.layout.layout_adapter, null)
@@ -57,7 +52,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
         var soapValue = ""
         val decimalFormat = DecimalFormat("#.#")
 
-
         // Retrieve reviews for a location
         CoroutineScope(Dispatchers.IO).launch{
 
@@ -74,7 +68,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
                 totalRatingAmount += review.cleanliness
                 arrayOfReviews.add(review)
             }
-
 
 
             // Make sure there exists a review, otherwise divide by 0 error while calculating average cleanliness
@@ -176,20 +169,15 @@ class WashroomListAdapter(private val context: Context, private var locationList
 
         }
 
-
-
         // TODO: Get user location, and find distance relative to washroom location
         var distance = view.findViewById<TextView>(R.id.distance)
         distance.text = "100m"
 
-
         // Set image for rating
         imageView.setImageResource(R.drawable.ellipse3)
 
-
         return view
     }
-
 
     fun replace(newCommentList: List<Location>) {
         locationList = newCommentList
