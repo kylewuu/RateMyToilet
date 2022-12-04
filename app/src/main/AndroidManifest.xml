@@ -38,7 +38,7 @@
             android:exported="false"
             android:label="@string/title_activity_add_location_map" />
         <activity
-            android:name=".AddNewLocationFragment"
+            android:name=".AddNewLocationActivity"
             android:exported="false" />
         <activity
             android:name=".launch.ConfirmPhoneActivity"
@@ -58,13 +58,6 @@
         </activity>
         <activity
             android:name=".launch.LaunchActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
-            android:name=".WashroomListActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
