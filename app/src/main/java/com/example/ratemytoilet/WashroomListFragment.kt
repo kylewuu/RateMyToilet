@@ -21,6 +21,7 @@ import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -93,6 +94,11 @@ class WashroomListFragment : Fragment() {
                 viewIntent.putExtra("gender", gender)
                 startActivity(viewIntent)
             }
+        }
+
+        val addButton = view.findViewById<FloatingActionButton>(R.id.addNewLocation)
+        addButton.setOnClickListener {
+            onAddNewLocationClick()
         }
 
         return view
@@ -200,5 +206,10 @@ class WashroomListFragment : Fragment() {
         updateMap = true
 
         loadWashrooms()
+    }
+
+    private fun onAddNewLocationClick() {
+        val viewIntent = Intent(activity, AddNewLocationActivity::class.java)
+        startActivity(viewIntent)
     }
 }
