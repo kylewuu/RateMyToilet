@@ -1,6 +1,11 @@
 package com.example.ratemytoilet
 
+
 import android.content.Intent
+import android.content.Context
+import android.content.SharedPreferences
+import android.location.Criteria
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +33,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-
 /*
 References:
 https://stackoverflow.com/questions/21422294/how-to-add-button-in-header
@@ -47,6 +51,10 @@ class WashroomListFragment : Fragment() {
     private val monthArray = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
     private lateinit var locationViewModel: LocationViewModel
 
+    // User location vars
+    private lateinit var locationManager: LocationManager
+    private var userLocation: android.location.Location? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,6 +63,8 @@ class WashroomListFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_list, container, false)
         toolbar = view.findViewById(R.id.toolbar)
 
+        // Get Location
+        getUserLocation()
 
         // List of locations
         myListView = view.findViewById(R.id.lv_locations)
@@ -132,6 +142,7 @@ class WashroomListFragment : Fragment() {
                 for (location in allLocations) {
                     var shouldAdd = true
                     var rating = 0.0
+
                     var allReviews = reviewViewModel.getReviewsForLocation(location.id)
                     allReviews = allReviews.sortedByDescending { it.dateAdded }
                     if (allReviews.isNotEmpty()) {
@@ -211,5 +222,24 @@ class WashroomListFragment : Fragment() {
     private fun onAddNewLocationClick() {
         val viewIntent = Intent(activity, AddNewLocationActivity::class.java)
         startActivity(viewIntent)
+    }
+
+    private fun getUserLocation() {
+        try {
+            locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val criteria = Criteria()
+            criteria.accuracy = Criteria.ACCURACY_FINE
+            val provider : String? = locationManager.getBestProvider(criteria, true)
+            if(provider != null) {
+                val location = locationManager.getLastKnownLocation(provider)
+                if (location != null){
+                    println(location)
+                    userLocation = location
+
+                }
+            }
+        }
+        catch (e: SecurityException) {
+        }
     }
 }

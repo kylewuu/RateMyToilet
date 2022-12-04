@@ -421,8 +421,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         println("DEBUG: Provider Disabled" )
     }
 
-
-
     private fun setClusterManager() {
         myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
         myClusterManager.renderer = context?.let { MarkerClusterRenderer(it, mMap, myClusterManager) }

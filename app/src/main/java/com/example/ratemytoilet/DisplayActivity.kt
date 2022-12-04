@@ -138,7 +138,7 @@ class DisplayActivity : AppCompatActivity() {
                     val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
                     date = dateTimeFormat.format(review.dateAdded)
 
-                    val user = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment)
+                    val user = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment, review.sufficientSoap, review.sufficientPaperTowels, review.accessibility)
                     withContext(Main) {
                         launch {
                             userCommentList.add(user)
