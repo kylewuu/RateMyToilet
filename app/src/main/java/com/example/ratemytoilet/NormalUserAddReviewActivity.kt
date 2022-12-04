@@ -1,15 +1,11 @@
 package com.example.ratemytoilet
 
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
 import android.widget.EditText
-import android.widget.ListView
 import android.widget.RatingBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
+import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.chip.Chip
@@ -25,33 +21,28 @@ class NormalUserAddReviewActivity : AppCompatActivity() {
     private var comment = ""
     private lateinit var review : Review
     private var washroomId : String ?= null
-    private lateinit var updatePreference : SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_review_normal)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
-        val editor = updatePreference.edit()
         washroomId = intent.getStringExtra("location").toString()
         review = Review()
         val save = findViewById<FloatingActionButton>(R.id.saveNormalReview)
         val cancel = findViewById<FloatingActionButton>(R.id.cancelNormalReview)
+        updateMap = false
         save.setOnClickListener {
             getData()
             if (rating <= 0.0) {
                 Toast.makeText(this, "The minimum rating is 1 star.", Toast.LENGTH_SHORT).show()
             } else {
                 setData()
-                editor.putString("updateReview", "Yes")
-                editor.apply()
+                updateMap = true
                 finish()
             }
         }
 
         cancel.setOnClickListener {
-            editor.putString("updateReview", "No")
-            editor.apply()
             finish()
         }
 
@@ -60,13 +51,6 @@ class NormalUserAddReviewActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
-    }
-
-    override fun onBackPressed() {
-        val editor = updatePreference.edit()
-        editor.putString("updateReview", "No")
-        editor.apply()
-        super.onBackPressed()
     }
 
     fun getData() {

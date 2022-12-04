@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
@@ -41,12 +43,6 @@ class DisplayActivity : AppCompatActivity() {
         gender = intent.getStringExtra("gender").toString()
         date = intent.getStringExtra("date").toString()
         access = intent.getStringExtra("access").toString()
-
-        val sharedPref = getSharedPreferences("update", MODE_PRIVATE)
-        val editor = sharedPref.edit()
-        editor.putString("updateReview", "No")
-        editor.apply()
-
         setData()
     }
 

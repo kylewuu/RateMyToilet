@@ -2,7 +2,6 @@ package com.example.ratemytoilet
 
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +9,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.Review
@@ -40,9 +40,6 @@ class AddNewLocationActivity : AppCompatActivity() {
     private var soapValue: Int = 2
     private var accessValue: Int = 2
 
-    private lateinit var updatePreference : SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
-
     // Array of genders
     val genderArray = arrayOf("Male", "Female", "Universal")
 
@@ -51,9 +48,6 @@ class AddNewLocationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_new_location)
-
-        updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
-        editor = updatePreference.edit()
 
         // Set views
         paperTowelButtonYes = findViewById<Button>(R.id.bt_paperTowelsYes)
@@ -65,22 +59,19 @@ class AddNewLocationActivity : AppCompatActivity() {
         commentBox = findViewById<EditText>(R.id.et_comment)
 
         // Setup spinner for Gender
-
         val spinner = findViewById<Spinner>(R.id.sp_gender)
         spinner?.adapter = ArrayAdapter(this, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, genderArray ) as SpinnerAdapter
-
 
         // Update textView with selected gender
         spinner?.onItemSelectedListener = object:AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 gender = p2
             }
-
             override fun onNothingSelected(p0: AdapterView<*>?) {
                 //Do nothing
             }
-
         }
+        updateMap = false
     }
 
 
@@ -175,10 +166,7 @@ class AddNewLocationActivity : AppCompatActivity() {
                 }
 
             }
-
-            editor.putString("updateReview", "Yes")
-            editor.apply()
-
+            updateMap = true
             finish()
         }
     }
@@ -253,12 +241,6 @@ class AddNewLocationActivity : AppCompatActivity() {
 
         accessButtonNo.setBackgroundColor(Color.parseColor("#9754CB"))
         accessButtonNo.setTextColor(Color.WHITE)
-    }
-
-    override fun onBackPressed() {
-        editor.putString("updateReview", "No")
-        editor.apply()
-        super.onBackPressed()
     }
 
 }
