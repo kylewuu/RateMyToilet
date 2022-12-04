@@ -34,9 +34,10 @@ https://stackoverflow.com/questions/21422294/how-to-add-button-in-header
 https://www.android--code.com/2020/03/android-kotlin-listview-add-item.html
 https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-of-a-imageview-android
 https://www.javatpoint.com/android-custom-listview
+https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
  */
 
-class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
+class WashroomListFragment : Fragment() {
 
     private lateinit var myListView: ListView
     private lateinit var toolbar: Toolbar
@@ -101,6 +102,11 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
         super.onViewCreated(view, savedInstanceState)
         toolbar.inflateMenu(R.menu.main1)
 
+        toolbar.setOnMenuItemClickListener {
+            val filterDialogFragment = FilterDialogFragment()
+            filterDialogFragment.show(childFragmentManager, "Filter")
+            true
+        }
     }
 
     private fun loadWashrooms() {
@@ -174,7 +180,7 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
         }
     }
 
-    override fun onFilterConditionPassed(
+    fun filterConditionPassed(
         paperCheck: Boolean,
         soapCheck: Boolean,
         accessCheck: Boolean,

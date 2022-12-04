@@ -54,7 +54,7 @@ import java.text.SimpleDateFormat
 
 private const val TAG = "WashroomMapFragment"
 
-class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
+class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private var myLocationMarker : Marker?= null
     private lateinit var mMap: GoogleMap
     private lateinit var mapView: MapView
