@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_GPS" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -38,7 +39,7 @@
             android:exported="false"
             android:label="@string/title_activity_add_location_map" />
         <activity
-            android:name=".AddNewLocationFragment"
+            android:name=".AddNewLocationActivity"
             android:exported="false" />
         <activity
             android:name=".launch.ConfirmPhoneActivity"
@@ -64,13 +65,6 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".WashroomListActivity"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -85,6 +79,8 @@
         <activity android:name=".NormalUserAddReviewActivity"
             android:label="Review Washroom"
             android:parentActivityName=".DisplayActivity"/>
+
+
     </application>
 
 </manifest>

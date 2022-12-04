@@ -1,14 +1,21 @@
 package com.example.ratemytoilet
 
+
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
+import android.location.Criteria
+import android.location.LocationManager
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+
 import android.widget.AdapterView
 import android.widget.ListView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.MainActivity.Companion.accessCheck
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
@@ -35,9 +42,10 @@ https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-
 https://www.javatpoint.com/android-custom-listview
  */
 
-class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterListener {
+class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
 
     private lateinit var myListView: ListView
+    private lateinit var toolbar: Toolbar
     private lateinit var arrayList: ArrayList<Location>
     private lateinit var arrayAdapter: WashroomListAdapter
     private val monthArray = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
@@ -46,22 +54,38 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
     private lateinit var updatePreference : SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
 
+
+    // User location vars
+    private lateinit var locationManager: LocationManager
+    private var userLocation: android.location.Location? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list)
+    }
 
-        // Remove app name from toolbar
-        supportActionBar?.setDisplayShowTitleEnabled(false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_list, container, false)
+        toolbar = view.findViewById(R.id.toolbar)
 
-        updatePreference = this.getSharedPreferences("update", MODE_PRIVATE)
+        updatePreference = requireContext().getSharedPreferences("update", MODE_PRIVATE)
         editor = updatePreference.edit()
 
+
+        // Get Location
+        getUserLocation()
+
+
         // List of locations
-        myListView = findViewById(R.id.lv_locations)
+        myListView = view.findViewById(R.id.lv_locations)
 
         // Arraylist for displaying entries
         arrayList = ArrayList<Location>()
-        arrayAdapter = WashroomListAdapter(this, arrayList)
+        arrayAdapter = WashroomListAdapter(requireContext(), arrayList)
         myListView.adapter = arrayAdapter
         locationViewModel = LocationViewModel()
         loadWashrooms()
@@ -87,7 +111,7 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
                     gender = "Universal"
                 }
 
-                val viewIntent = Intent(this@WashroomListActivity, DisplayActivity::class.java)
+                val viewIntent = Intent(requireActivity(), DisplayActivity::class.java)
                 viewIntent.putExtra("ID", location.id)
                 viewIntent.putExtra("name", location.name)
                 viewIntent.putExtra("date", monthName + ". " + date.toString() + ", " +  year.toString())
@@ -95,6 +119,14 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
                 startActivity(viewIntent)
             }
         }
+
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        toolbar.inflateMenu(R.menu.main1)
+
     }
 
     private fun loadWashrooms() {
@@ -114,6 +146,7 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
                 for (location in allLocations) {
                     var shouldAdd = true
                     var rating = 0.0
+
                     var allReviews = reviewViewModel.getReviewsForLocation(location.id)
                     allReviews = allReviews.sortedByDescending { it.dateAdded }
                     if (allReviews.isNotEmpty()) {
@@ -168,26 +201,6 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
         }
     }
 
-
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main1, menu) // Menu Resource, Menu
-        return true
-    }
-
-
-    // Show filter fragment if filter button is clicked
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.getItemId()) {
-            R.id.action_maintain -> {
-                val filterDialogFragment = FilterDialogFragment()
-                filterDialogFragment.show(supportFragmentManager, "Filter")
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onFilterConditionPassed(
         paperCheck: Boolean,
         soapCheck: Boolean,
@@ -210,4 +223,26 @@ class WashroomListActivity : AppCompatActivity(), FilterDialogFragment.FilterLis
 
         loadWashrooms()
     }
+
+
+    private fun getUserLocation() {
+        try {
+            locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val criteria = Criteria()
+            criteria.accuracy = Criteria.ACCURACY_FINE
+            val provider : String? = locationManager.getBestProvider(criteria, true)
+            if(provider != null) {
+                val location = locationManager.getLastKnownLocation(provider)
+                if (location != null){
+                    println(location)
+                    userLocation = location
+
+                }
+            }
+        }
+        catch (e: SecurityException) {
+        }
+    }
+
+
 }

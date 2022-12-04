@@ -2,6 +2,8 @@ package com.example.ratemytoilet
 
 
 import android.content.Context
+import android.location.Criteria
+import android.location.LocationManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -19,6 +21,14 @@ import java.text.DecimalFormat
 
 // Based off class demo
 class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter() {
+
+
+    // User location vars
+    private lateinit var locationManager: LocationManager
+    private var userLocation: android.location.Location? = null
+
+
+
     override fun getItem(position: Int): (Location) {
         return locationList.get(position)
     }
@@ -35,13 +45,16 @@ class WashroomListAdapter(private val context: Context, private var locationList
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view: View = View.inflate(context, R.layout.layout_adapter, null)
 
+        // Attempt to get User Location
+        getUserLocation()
+
         val washroomName = view.findViewById(R.id.title) as TextView
         val amenities = view.findViewById(R.id.amenities) as TextView
         val imageView = view.findViewById<View>(R.id.icon) as ImageView
         val ratingsText = view.findViewById<View>(R.id.tv_rating) as TextView
 
-
-        washroomName.text = locationList[position].name
+        val washroomInfo = locationList[position]
+        washroomName.text = washroomInfo.name
 
 
         var reviewViewModel = ReviewViewModel()
@@ -55,8 +68,8 @@ class WashroomListAdapter(private val context: Context, private var locationList
         // Retrieve reviews for a location
         CoroutineScope(Dispatchers.IO).launch{
 
-            var locationId = locationList[position].id
-            val genderInt = locationList[position].gender
+            var locationId = washroomInfo.id
+            val genderInt = washroomInfo.gender
 
             var reviews = reviewViewModel.getReviewsForLocation(locationId)
 
@@ -169,9 +182,35 @@ class WashroomListAdapter(private val context: Context, private var locationList
 
         }
 
-        // TODO: Get user location, and find distance relative to washroom location
+
+        // Get user location, and find distance relative to washroom location
         var distance = view.findViewById<TextView>(R.id.distance)
-        distance.text = "100m"
+        val decimalFormatDistance = DecimalFormat("#.##")
+        if(userLocation != null){
+            var washroomLocation: android.location.Location? = android.location.Location("")
+            washroomLocation?.latitude = washroomInfo.lat
+            washroomLocation?.longitude = washroomInfo.lng
+
+            // Get distance between user and washroom
+            var distanceFromUserToWashroom = userLocation?.distanceTo(washroomLocation)
+            if (distanceFromUserToWashroom != null) {
+
+                // If less than a 1 km away, convert distance and show distance in Meters. Otherwise show in KM
+                if (distanceFromUserToWashroom <= 1000){
+                    distance.text = decimalFormatDistance.format(distanceFromUserToWashroom).toString() + " M"
+                }
+                else{
+                    var distanceInKm = distanceFromUserToWashroom/1000
+                    distance.text =  decimalFormatDistance.format(distanceInKm).toString() + " KM"
+                }
+            }
+
+        }
+        else{
+            // Couldn't get user's location. Set distance to ???
+            distance.text = "???"
+        }
+
 
         // Set image for rating
         imageView.setImageResource(R.drawable.ellipse3)
@@ -179,8 +218,30 @@ class WashroomListAdapter(private val context: Context, private var locationList
         return view
     }
 
+
     fun replace(newCommentList: List<Location>) {
         locationList = newCommentList
     }
+
+    // Get the current users location
+    private fun getUserLocation() {
+        try {
+            locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val criteria = Criteria()
+            criteria.accuracy = Criteria.ACCURACY_FINE
+            val provider : String? = locationManager.getBestProvider(criteria, true)
+            if(provider != null) {
+                val location = locationManager.getLastKnownLocation(provider)
+                if (location != null){
+                    println(location)
+                    userLocation = location
+
+                }
+            }
+        }
+        catch (e: SecurityException) {
+        }
+    }
+
 }
 
