@@ -5,12 +5,17 @@ class UserComment {
     var date:String ?= null
     var rate:Float ?= 0.0f
     var comment:String ?= null
+    var soap:Int ?= -1
+    var paper:Int ?= -1
+    var access:Int ?= -1
 
-
-    constructor(userName: String?, date: String?, rate: Float?, comment: String?) {
+    constructor(userName: String?, date: String?, rate: Float?, comment: String?, soap: Int?, paper: Int?, access: Int?) {
         this.userName = userName
         this.date = date
         this.rate = rate
         this.comment = comment
+        this.soap = soap
+        this.paper = paper
+        this.access = access
     }
 }

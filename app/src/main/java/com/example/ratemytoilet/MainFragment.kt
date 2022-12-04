@@ -148,7 +148,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
         super.onResume()
     }
 
-   override fun onStart() {
+   /*override fun onStart() {
         super.onStart()
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
@@ -159,7 +159,7 @@ class MainFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private fun loadLaunchScreen() {
         val intent = Intent(activity, LaunchActivity::class.java)
         startActivity(intent)
-    }
+    }*/
 
     fun initLocationManager() {
         try {
