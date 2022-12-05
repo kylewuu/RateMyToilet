@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +28,7 @@ import com.example.ratemytoilet.MainActivity.Companion.accessCheck
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
 import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
+import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.maleCheck
 import com.example.ratemytoilet.MainActivity.Companion.notRunFirstTime
 import com.example.ratemytoilet.MainActivity.Companion.paperCheck
@@ -92,11 +94,14 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
         filter.addAction(Intent.ACTION_PROVIDER_CHANGED)
         getActivity()?.registerReceiver(locationSwitchStateReceiver, filter)
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_washroom_map, container, false)
+
+//        isAdmin = true
+        var adminTitle = view.findViewById<TextView>(R.id.adminTitle)
+        if (isAdmin) adminTitle.visibility = View.VISIBLE
 
 //        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapView = view.findViewById(R.id.map_view)
@@ -164,7 +169,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
             loadLaunchScreen()
         }
 
-//       isAdmin = true
     }
 
     private fun loadLaunchScreen() {
