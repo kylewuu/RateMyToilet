@@ -73,7 +73,10 @@ class ConfirmPhoneActivity : AppCompatActivity() {
     private fun signInWithCredential(credential: PhoneAuthCredential) {
         auth.signInWithCredential(credential)
             .addOnSuccessListener(this) {
-                loginOrRegister { finish() }
+                loginOrRegister {
+                    finish()
+                    Log.d("TAp", "success")
+                }
             }
             .addOnFailureListener(this) {
                 val ex = it as? FirebaseAuthException

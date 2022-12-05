@@ -292,11 +292,15 @@ class WashroomListFragment : Fragment(), LocationListener {
         loadWashrooms()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister receiver
+        activity?.unregisterReceiver(locationSwitchStateReceiver)
+    }
 
     // Get the current users location
     private fun getUserLocation() {
         try {
-
             locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val criteria = Criteria()
             criteria.accuracy = Criteria.ACCURACY_FINE
