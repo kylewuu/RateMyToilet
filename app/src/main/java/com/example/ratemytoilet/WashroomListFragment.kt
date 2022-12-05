@@ -141,6 +141,7 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
         lifecycleScope.launch(Dispatchers.IO) {
             var newLocations = ArrayList<Location>()
             var allLocations = locationViewModel.getAllLocations()
+            var distanceArray = ArrayList<Float?>()
             val reviewViewModel = ReviewViewModel()
             if (allLocations != null &&
                     (paperCheck ||
@@ -151,6 +152,8 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
                     cleanlinessStart != 1f ||
                     cleanlinessEnd != 5f)
             ) {
+
+
                 for (location in allLocations) {
                     var shouldAdd = true
                     var rating = 0.0
@@ -202,6 +205,13 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
                 newLocations = allLocations as ArrayList<Location>
             }
 
+
+            if(userLocation != null) {
+                newLocations =
+                    newLocations.sortedBy{ calculateDistanceToUser(it.lat, it.lng) }
+                        .toCollection(ArrayList())
+            }
+
             withContext(Main) {
                 arrayAdapter.replace(newLocations)
                 arrayAdapter.notifyDataSetChanged()
@@ -236,15 +246,20 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
     // Get the current users location
     private fun getUserLocation() {
         try {
+
             locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val criteria = Criteria()
             criteria.accuracy = Criteria.ACCURACY_FINE
             val provider : String? = locationManager.getBestProvider(criteria, true)
+
+
             if(provider != null) {
                 val location = locationManager.getLastKnownLocation(provider)
                 if (location != null){
                     // Location found. Set the user's location in the WashroomListAdapter and notify
                     userLocation = location
+                    loadWashrooms()
+
                     arrayAdapter.replaceUserLocation(userLocation)
                     arrayAdapter.notifyDataSetChanged()
                 }
@@ -253,7 +268,6 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
                     locationManager.requestLocationUpdates(provider, 0, 0f, this)
                 }
             }
-
         }
         catch (e: SecurityException) {
         }
@@ -263,8 +277,10 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
     override fun onLocationChanged(location: android.location.Location) {
         // Location found. Set the user's location in the WashroomListAdapter and notify
         userLocation = location
+        loadWashrooms()
         arrayAdapter.replaceUserLocation(userLocation)
         arrayAdapter.notifyDataSetChanged()
+
 
         // Only needs to be updated once. Remove the request
         locationManager.removeUpdates(this)
@@ -290,6 +306,20 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
                 }
             }
         }
+
+    }
+
+    fun calculateDistanceToUser(lat: Double, lng: Double): Float? {
+
+        // Calculate distances
+        var washroomLocation: android.location.Location? = android.location.Location("")
+        washroomLocation?.latitude = lat
+        washroomLocation?.longitude = lng
+        var distanceFromUserToWashroom = userLocation?.distanceTo(washroomLocation)
+
+
+        return distanceFromUserToWashroom
+
 
     }
 

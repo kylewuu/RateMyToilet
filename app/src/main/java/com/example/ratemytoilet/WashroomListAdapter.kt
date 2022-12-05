@@ -160,8 +160,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
             // Change the views. Cannot edit UI in coroutine
             GlobalScope.launch(Dispatchers.Main) {
 
-                // TODO: If rating is 0.0 (double), then set to Int (0). Is needed?
-
                 if(averageCleanlinessRating == 0.0){
                     ratingsText.text = averageCleanlinessRating.toInt().toString()
                 }
@@ -169,8 +167,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     var formattedCleanlinessRating = decimalFormat.format(averageCleanlinessRating).toString()
                     ratingsText.text = formattedCleanlinessRating
                 }
-
-
 
 
                 // Set gender and create amenities string
