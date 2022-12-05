@@ -74,10 +74,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisplayActivity"
-            android:label="Review Washroom"
+            android:label="Washroom Reviews"
             android:parentActivityName=".MainActivity"/>
         <activity android:name=".NormalUserAddReviewActivity"
-            android:label="Washroom Reviews"
+            android:label="Review Washroom"
             android:parentActivityName=".DisplayActivity"/>
 
 

@@ -1,9 +1,8 @@
 package com.example.ratemytoilet
 
 
-import android.content.Intent
 import android.content.Context
-import android.content.SharedPreferences
+import android.content.Intent
 import android.location.Criteria
 import android.location.LocationManager
 import android.os.Bundle
@@ -110,6 +109,8 @@ class WashroomListFragment : Fragment() {
         addButton.setOnClickListener {
             onAddNewLocationClick()
         }
+
+        if (MainActivity.isAdmin) toolbar.title = "ADMIN - Washrooms near you"
 
         return view
     }

@@ -46,6 +46,7 @@ class DisplayActivity : AppCompatActivity(), AdminReviewFragment.AdminReviewList
         date = intent.getStringExtra("date").toString()
         access = intent.getStringExtra("access").toString()
         setData()
+        if (isAdmin) title = "ADMIN - Washroom Reviews"
     }
 
     override fun onSupportNavigateUp(): Boolean {

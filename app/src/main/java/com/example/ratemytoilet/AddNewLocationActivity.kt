@@ -50,6 +50,8 @@ class AddNewLocationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_new_location)
 
+        if (isAdmin) title = "ADMIN - " + getString(R.string.title_activity_add_location_map)
+
         // Set views
         paperTowelButtonYes = findViewById<Button>(R.id.bt_paperTowelsYes)
         paperTowelButtonNo = findViewById<Button>(R.id.bt_paperTowelsNo)
