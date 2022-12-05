@@ -8,4 +8,9 @@
         android:id="@+id/washroom_list"
         android:title="@string/navigation_title_washroom_list"
         android:icon="@android:drawable/ic_dialog_info" />
+
+    <item
+        android:id="@+id/profile"
+        android:title="@string/navigation_title_profile"
+        android:icon="@drawable/ic_profile" />
 </menu>
