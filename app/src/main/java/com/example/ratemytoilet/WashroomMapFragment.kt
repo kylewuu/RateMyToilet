@@ -163,6 +163,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         if (currentUser == null) {
             loadLaunchScreen()
         }
+
+//       isAdmin = true
     }
 
     private fun loadLaunchScreen() {

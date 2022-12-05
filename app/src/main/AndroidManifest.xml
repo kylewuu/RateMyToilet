@@ -77,7 +77,7 @@
             android:label="Review Washroom"
             android:parentActivityName=".MainActivity"/>
         <activity android:name=".NormalUserAddReviewActivity"
-            android:label="Review Washroom"
+            android:label="Washroom Reviews"
             android:parentActivityName=".DisplayActivity"/>
 
 

@@ -6,6 +6,7 @@ import android.widget.RatingBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
+import com.example.ratemytoilet.MainActivity.Companion.updateReviews
 import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.chip.Chip
@@ -38,6 +39,7 @@ class NormalUserAddReviewActivity : AppCompatActivity() {
             } else {
                 setData()
                 updateMap = true
+                updateReviews = true
                 finish()
             }
         }
@@ -91,7 +93,7 @@ class NormalUserAddReviewActivity : AppCompatActivity() {
         comment = commentText.text.toString()
     }
 
-    fun setData() {
+    private fun setData() {
         review.locationId = washroomId.toString()
         review.leftByAdmin = false
         review.dateAdded = Calendar.getInstance().timeInMillis
