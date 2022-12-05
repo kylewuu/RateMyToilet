@@ -137,6 +137,7 @@ class ProfileFragment : Fragment() {
         super.onResume()
 //        updateAdapter()
         updateTotalReviews()
+
     }
 
     private fun updateTotalReviews() {
