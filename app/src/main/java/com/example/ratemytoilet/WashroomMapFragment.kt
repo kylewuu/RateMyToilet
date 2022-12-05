@@ -517,7 +517,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
                 val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
                 if (isGpsEnabled || isNetworkEnabled) {
-                    //  is enabled
+                    // Location is enabled. Recenter map
+                    mapCentered = false
                     initLocationManager()
                 }
             }
