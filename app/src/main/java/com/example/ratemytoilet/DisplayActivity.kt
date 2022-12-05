@@ -8,14 +8,20 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.ratemytoilet.AdminReviewFragment.Companion.ACCESSIBILITY_KEY
+import com.example.ratemytoilet.AdminReviewFragment.Companion.LOCATION_ID_KEY
+import com.example.ratemytoilet.MainActivity.Companion.isAdmin
+import com.example.ratemytoilet.MainActivity.Companion.updateReviews
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-class DisplayActivity : AppCompatActivity() {
+class DisplayActivity : AppCompatActivity(), AdminReviewFragment.AdminReviewListener {
     private lateinit var userCommentList: ArrayList<UserComment>
     private lateinit var washroomId : String
     private lateinit var washroom : String
@@ -24,9 +30,7 @@ class DisplayActivity : AppCompatActivity() {
     private lateinit var access : String
     private lateinit var commentList: ListView
     private lateinit var listAdapter: UserCommentListAdapter
-    private var comment = "No one left comment yet"
-    private var stop = false
-    private var isUpdated = false
+    private var accessibility = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,13 +45,8 @@ class DisplayActivity : AppCompatActivity() {
         gender = intent.getStringExtra("gender").toString()
         date = intent.getStringExtra("date").toString()
         access = intent.getStringExtra("access").toString()
-
-        val sharedPref = getSharedPreferences("update", MODE_PRIVATE)
-        val editor = sharedPref.edit()
-        editor.putString("updateReview", "No")
-        editor.apply()
-
         setData()
+        if (isAdmin) title = "ADMIN - Washroom Reviews"
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -56,23 +55,17 @@ class DisplayActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        if (isUpdated) {
+        if (updateReviews) {
             userCommentList.clear()
             setData()
             Log.d("TAb", "resume")
-        } else {
-            isUpdated = true
         }
         super.onResume()
-        //if (!isUpdated) setData()
     }
 
-    /*override fun onPause() {
-        super.onPause()
-        isUpdated = false
-    }*/
+    private fun setData() {
+        updateReviews = false
 
-    fun setData() {
         val dataText = findViewById<TextView>(R.id.dateText)
         val rate = findViewById<RatingBar>(R.id.overallRate)
         val genderText = findViewById<TextView>(R.id.genderText)
@@ -94,6 +87,7 @@ class DisplayActivity : AppCompatActivity() {
 
             if (allReviews.size != 0 && allReviews.size != userCommentList.size) {
                 var rating = 0.0
+                accessibility = allReviews[0].accessibility
                 withContext(Main) {
                     launch {
                         rateNumber.setText("(" + allReviews.size + ")")
@@ -142,7 +136,7 @@ class DisplayActivity : AppCompatActivity() {
                     val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
                     date = dateTimeFormat.format(review.dateAdded)
 
-                    val user = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment)
+                    val user = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment, review.sufficientSoap, review.sufficientPaperTowels, review.accessibility, review.leftByAdmin)
                     withContext(Main) {
                         launch {
                             userCommentList.add(user)
@@ -163,19 +157,23 @@ class DisplayActivity : AppCompatActivity() {
         }
 
         addButton.setOnClickListener {
-            val admin = false
-            if (!admin) {
+            if (!isAdmin) {
                 val intent = Intent(this, NormalUserAddReviewActivity::class.java)
                 intent.putExtra("location", washroomId)
                 startActivity(intent)
             } else {
                 val bundle = Bundle()
-                bundle.putString("message",washroomId);
-                val filterDialogFragment = AdminFragment()
-                filterDialogFragment.arguments = bundle
-                filterDialogFragment.show(supportFragmentManager, "Admin")
+                bundle.putString(LOCATION_ID_KEY,washroomId)
+                bundle.putInt(ACCESSIBILITY_KEY, accessibility)
+                val adminDialogFragment = AdminReviewFragment()
+                adminDialogFragment.arguments = bundle
+                adminDialogFragment.show(supportFragmentManager, "Admin")
             }
         }
 
+    }
+
+    override fun loadReviews() {
+        onResume()
     }
 }

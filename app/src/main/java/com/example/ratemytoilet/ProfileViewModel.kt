@@ -20,7 +20,7 @@ class ProfileViewModel: ViewModel() {
             val dateTimeFormat : DateFormat = SimpleDateFormat ("MMM dd, yyyy")
             val date = dateTimeFormat.format(review.dateAdded)
 
-            val userComment = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment)
+            val userComment = UserComment(review.id,date, review.cleanliness.toFloat(), review.comment, review.sufficientSoap, review.sufficientPaperTowels, review.accessibility, review.leftByAdmin)
             reviews.add(userComment)
         }
     }

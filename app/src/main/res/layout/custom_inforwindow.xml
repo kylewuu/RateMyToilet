@@ -11,7 +11,7 @@
         android:background="@drawable/radius"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
@@ -33,13 +33,13 @@
             android:id="@+id/paperCheck"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginStart="19dp"
+            android:layout_marginRight="50dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView"
-            app:layout_constraintTop_toBottomOf="@+id/textView4"
-            app:layout_constraintVertical_bias="0.123"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/soapCheck"
+            app:layout_constraintVertical_bias="0.132"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
@@ -60,11 +60,12 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="68dp"
-            android:layout_marginTop="14dp"
-            android:adjustViewBounds="true"
+            android:layout_marginRight="50dp"
             android:scaleType="centerCrop"
-            app:layout_constraintStart_toEndOf="@+id/textView4"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.145"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
@@ -72,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
             android:text="Accessibility"
             android:textColor="#3F51B5"
             android:textStyle="bold"
@@ -84,16 +85,17 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="20dp"
+            android:layout_marginRight="50dp"
             android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            app:layout_constraintStart_toEndOf="@+id/textView5"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/paperCheck"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
             android:id="@+id/locationTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="10dp"
