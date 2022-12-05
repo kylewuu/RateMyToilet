@@ -1,6 +1,7 @@
 package com.example.ratemytoilet
 
 import android.os.Bundle
+import android.provider.ContactsContract.Profile
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -32,6 +33,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
 
         val mapFragment = WashroomMapFragment()
         val listFragment = WashroomListFragment()
+        val profileFragment = ProfileFragment()
 
 //        val viewPager: ViewPager2 = findViewById(R.id.view_pager)
 //        val adapter = ViewPagerAdapter(this)
@@ -44,6 +46,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
             val fragment = when(it.itemId) {
                 R.id.washroom_map -> mapFragment
                 R.id.washroom_list -> listFragment
+                R.id.profile -> profileFragment
                 else -> mapFragment
             }
 //            viewPager.currentItem = position

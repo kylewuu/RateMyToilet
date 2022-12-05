@@ -1,6 +1,9 @@
 package com.example.ratemytoilet.database
 
 import com.example.ratemytoilet.database.Review.Companion.toReview
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -15,14 +18,26 @@ class ReviewRepository {
 
     companion object {
         private var firestore = Firebase.firestore
-        private var collection = firestore.collection("review")
+        private var reviewCollection = firestore.collection("review")
+        private var userCollection = firestore.collection("users")
 
         suspend fun getReviewsForLocation(locationId: String): List<Review> {
-            return collection.whereEqualTo("locationId", locationId).get().await().documents.map { it.toReview() }
+            return reviewCollection.whereEqualTo("locationId", locationId).get().await().documents.map { it.toReview() }
+        }
+
+        suspend fun getReviewsForUserId(userId: String): List<Review> {
+            return firestore.collection("users/${userId}/reviews").get().await().documents.map { it.toReview() }
         }
 
         fun addReviewForLocation(review: Review) {
-            collection.add(review.toReviewMap())
+            val mappedReview = review.toReviewMap()
+            reviewCollection.add(mappedReview)
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser != null) {
+                val userDocument = userCollection.document("${currentUser!!.uid}")
+                userDocument.update("totalReviews", FieldValue.increment(1))
+                userDocument.collection("reviews").add(mappedReview)
+            }
         }
     }
 }
