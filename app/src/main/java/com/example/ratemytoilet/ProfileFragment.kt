@@ -63,6 +63,8 @@ class ProfileFragment : Fragment() {
         if (currentUser != null) {
             adapter = UserCommentListAdapter(requireContext(), profileViewModel.reviews)
             binding.userReviewsListView.adapter = adapter
+        } else {
+            Log.d("TAp", "null")
         }
 
 

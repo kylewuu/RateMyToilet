@@ -155,6 +155,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
         if (notRunFirstTime) {
             if (updateMap) {
+                Log.d("TAp", "true")
                 updateMap = false
                 if (mMap != null && myClusterManager != null) {
                     mMap.clear()
@@ -181,7 +182,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
     private fun loadLaunchScreen() {
         val intent = Intent(activity, LaunchActivity::class.java)
-        //startActivity(intent)
+        startActivity(intent)
     }
 
     fun initLocationManager() {
