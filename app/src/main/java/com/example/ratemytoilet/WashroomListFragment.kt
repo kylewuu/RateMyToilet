@@ -133,6 +133,7 @@ class WashroomListFragment : Fragment(), LocationListener {
         return view
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar.inflateMenu(R.menu.main1)
@@ -144,6 +145,7 @@ class WashroomListFragment : Fragment(), LocationListener {
             true
         }
     }
+
 
     private fun loadWashrooms() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -228,6 +230,7 @@ class WashroomListFragment : Fragment(), LocationListener {
         }
     }
 
+
     private suspend fun filterAdminMarkers(allLocations: List<com.example.ratemytoilet.database.Location>, reviewViewModel: ReviewViewModel): List<com.example.ratemytoilet.database.Location> {
         var filteredLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         for (location in allLocations) {
@@ -261,6 +264,7 @@ class WashroomListFragment : Fragment(), LocationListener {
 
         return filteredLocations
     }
+
 
     fun filterConditionPassed(
         paperCheck: Boolean,
@@ -358,6 +362,7 @@ class WashroomListFragment : Fragment(), LocationListener {
 
     }
 
+
     fun calculateDistanceToUser(lat: Double, lng: Double): Float? {
 
         // Calculate distances
@@ -370,6 +375,13 @@ class WashroomListFragment : Fragment(), LocationListener {
         return distanceFromUserToWashroom
 
 
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister receiver
+        activity?.unregisterReceiver(locationSwitchStateReceiver)
     }
 
 }
