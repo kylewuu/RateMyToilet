@@ -105,8 +105,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
-        locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-
         locationViewModel = LocationViewModel()
         loadingDialogFragment = LoadingDialogFragment()
         updatePreference = activity?.getSharedPreferences("update", MODE_PRIVATE)!!
@@ -224,7 +222,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         polylineOptions.color(Color.BLACK)
         polylines = ArrayList()
         markerOptions = MarkerOptions()
-
+        locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         setClusterManager()
     }
 
