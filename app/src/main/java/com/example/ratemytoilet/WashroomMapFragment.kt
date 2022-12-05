@@ -35,6 +35,7 @@ import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.previousLocationsSize
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
+import com.example.ratemytoilet.ToiletUser.Companion.toToiletUser
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.launch.LaunchActivity
@@ -44,7 +45,9 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
@@ -102,14 +105,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_washroom_map, container, false)
 
-//        isAdmin = true
-        var adminTitle = view.findViewById<TextView>(R.id.adminTitle)
-        if (isAdmin) {
-            adminTitle.visibility = View.VISIBLE
-            markerColor = IconGenerator.STYLE_RED
-        }
-
-
+        setUpAdmin(view)
 //        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapView = view.findViewById(R.id.map_view)
         mapView.onCreate(savedInstanceState)
@@ -524,6 +520,31 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
                 if (isGpsEnabled || isNetworkEnabled) {
                     //  is enabled
                     initLocationManager()
+                }
+            }
+        }
+    }
+
+    private fun setUpAdmin(view: View) {
+        //        isAdmin = true
+        var db = FirebaseFirestore.getInstance()
+        var auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            db.document("users/${currentUser!!.uid}").addSnapshotListener { value, error ->
+                if (value != null) {
+                    val userDocument = value!!.toToiletUser()
+                    Log.i(TAG, "Got user document: $userDocument")
+                    if (userDocument != null) {
+                        isAdmin = userDocument.isAdmin ?: false
+                        println("debugk: $isAdmin")
+
+                        var adminTitle = view.findViewById<TextView>(R.id.adminTitle)
+                        if (isAdmin) {
+                            adminTitle.visibility = View.VISIBLE
+                            markerColor = IconGenerator.STYLE_RED
+                        }
+                    }
                 }
             }
         }
