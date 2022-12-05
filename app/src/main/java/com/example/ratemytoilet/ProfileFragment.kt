@@ -83,8 +83,8 @@ class ProfileFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        updateAdapter()
-        updateTotalReviews()
+        //updateAdapter()
+        //updateTotalReviews()
     }
 
     private fun updateTotalReviews() {
