@@ -30,7 +30,7 @@ If running RateMyToilet from Android Studio is necessary, please comment out the
     }
 ```
 
-This is ***not*** the intended method of running the app, because the sign up page will be disabled and the map will appear. There ***will*** be features that crash the app since there is no user present. Please use the APK if possible and only disable the sign in screen if running in Android Studio is absolutely necessary.
+This is ***not*** the intended method of running the app because the sign up page will be disabled and the map will appear without any users being logged in. There ***will*** be features that crash the app since there is no user present. Please use the APK if possible and only disable the sign in screen if running in Android Studio is absolutely necessary.
 
 ## User Logins
 To avoid having your phone number stored into our Firebase, please use the follow test numbers to login:
