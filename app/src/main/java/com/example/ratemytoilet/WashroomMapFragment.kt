@@ -1,6 +1,7 @@
 package com.example.ratemytoilet
 
 import android.Manifest
+import android.content.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -56,6 +57,7 @@ import java.text.SimpleDateFormat
 
 private const val TAG = "WashroomMapFragment"
 
+
 class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private var myLocationMarker : Marker?= null
     private lateinit var mMap: GoogleMap
@@ -76,6 +78,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private lateinit var loadingDialogFragment: LoadingDialogFragment
 
     private lateinit var locationPermissionResultReceiver: ActivityResultLauncher<String>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,7 +102,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_washroom_map, container, false)
 
-//        isAdmin = true
+        isAdmin = true
         var adminTitle = view.findViewById<TextView>(R.id.adminTitle)
         if (isAdmin) adminTitle.visibility = View.VISIBLE
 
@@ -145,6 +148,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+
         if (notRunFirstTime) {
             if (updateMap) {
                 updateMap = false
@@ -426,6 +430,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onProviderDisabled(provider: String) {
         println("DEBUG: Provider Disabled" )
     }
+
+
 
     private fun setClusterManager() {
         myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
