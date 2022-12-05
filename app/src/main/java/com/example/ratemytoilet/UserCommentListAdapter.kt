@@ -27,7 +27,6 @@ class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<User
             return TextView(context)
         }
         val view:View = View.inflate(context, R.layout.cardview_list_layout, null)
-        val userNameText = view.findViewById<TextView>(R.id.userNameText)
         val dateText = view.findViewById<TextView>(R.id.userDate)
         val comment = view.findViewById<EditText>(R.id.userComment)
         val rating = view.findViewById<RatingBar>(R.id.singleRating)
@@ -35,18 +34,12 @@ class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<User
         val soapState = view.findViewById<TextView>(R.id.soapStateText)
         val accState = view.findViewById<TextView>(R.id.accessStateText)
         val userInformation = arrayList.get(position)
-
-        userNameText.setText(userInformation.userName)
         dateText.setText(userInformation.date)
         comment.setText(userInformation.comment)
         userInformation.paper?.let { setTextState(paperState, it) }
         userInformation.soap?.let { setTextState(soapState, it) }
         userInformation.access?.let { setTextState(accState, it) }
         userInformation.rate?.let { rating.setRating(it) }
-
-        if (userInformation.leftByAdmin) {
-            userNameText.setTextColor(Color.RED)
-        }
 
         return view
 

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/washroom_map"
+        android:id="@id/washroomMapFragment"
         android:title="@string/navigation_title_map"
         android:icon="@android:drawable/ic_dialog_map" />
     <item
-        android:id="@+id/washroom_list"
+        android:id="@id/washroomListFragment"
         android:title="@string/navigation_title_washroom_list"
         android:icon="@android:drawable/ic_dialog_info" />
 
     <item
-        android:id="@+id/profile"
+        android:id="@id/profileFragment"
         android:title="@string/navigation_title_profile"
         android:icon="@drawable/ic_profile" />
 </menu>
