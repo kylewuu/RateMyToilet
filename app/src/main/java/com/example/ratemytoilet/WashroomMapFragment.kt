@@ -102,7 +102,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_washroom_map, container, false)
 
-        isAdmin = true
+//        isAdmin = true
         var adminTitle = view.findViewById<TextView>(R.id.adminTitle)
         if (isAdmin) adminTitle.visibility = View.VISIBLE
 
