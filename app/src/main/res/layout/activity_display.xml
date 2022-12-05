@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    >
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
 
 
         <LinearLayout
@@ -168,7 +174,8 @@
                 android:layout_marginTop="5dp"
                 android:divider="@null"
                 tools:layout_editor_absoluteY="372dp"
-                android:listSelector="@android:color/transparent"/>
+                android:listSelector="@android:color/transparent"
+                android:nestedScrollingEnabled="true"/>
 
 
         </LinearLayout>
@@ -194,4 +201,4 @@
 
 
 </RelativeLayout>
-
+    </ScrollView>
