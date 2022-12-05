@@ -1,13 +1,12 @@
 package com.example.ratemytoilet
 
 
+import android.content.BroadcastReceiver
 import android.content.Context
-
-import android.content.*
-import android.content.Context.MODE_PRIVATE
+import android.content.Intent
+import android.content.IntentFilter
 import android.location.Criteria
 import android.location.LocationListener
-import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -22,6 +21,7 @@ import com.example.ratemytoilet.MainActivity.Companion.accessCheck
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
 import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
+import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.maleCheck
 import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
@@ -151,6 +151,7 @@ class WashroomListFragment : Fragment(), LocationListener {
             var allLocations = locationViewModel.getAllLocations()
             var distanceArray = ArrayList<Float?>()
             val reviewViewModel = ReviewViewModel()
+            if (isAdmin) allLocations = filterAdminMarkers(allLocations, reviewViewModel)
             if (allLocations != null &&
                     (paperCheck ||
                     soapCheck ||
@@ -225,6 +226,40 @@ class WashroomListFragment : Fragment(), LocationListener {
                 arrayAdapter.notifyDataSetChanged()
             }
         }
+    }
+
+    private suspend fun filterAdminMarkers(allLocations: List<com.example.ratemytoilet.database.Location>, reviewViewModel: ReviewViewModel): List<com.example.ratemytoilet.database.Location> {
+        var filteredLocations = ArrayList<com.example.ratemytoilet.database.Location>()
+        for (location in allLocations) {
+            var shouldAdd = false
+            var rating = 0.0
+            var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+            allReviews = allReviews.sortedByDescending { it.dateAdded }
+            if (allReviews.isNotEmpty()) {
+                for (review in allReviews) {
+                    rating += review.cleanliness
+                }
+                rating /= allReviews.size
+
+                if (allReviews[0].sufficientPaperTowels == 0) {
+                    shouldAdd = true
+                }
+
+
+                if (allReviews[0].sufficientSoap == 0) {
+                    shouldAdd = true
+                }
+
+            }
+
+            if (rating < 3) {
+                shouldAdd = true
+            }
+
+            if (shouldAdd) filteredLocations.add(location)
+        }
+
+        return filteredLocations
     }
 
     fun filterConditionPassed(
