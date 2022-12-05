@@ -1,11 +1,8 @@
 package com.example.ratemytoilet
 
-<<<<<<< Updated upstream
-import android.content.Context
-=======
 
+import android.content.Context
 import android.content.*
->>>>>>> Stashed changes
 import android.content.Context.MODE_PRIVATE
 import android.location.Criteria
 import android.location.LocationListener
@@ -271,6 +268,7 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
 
         // Only needs to be updated once. Remove the request
         locationManager.removeUpdates(this)
+
     }
 
 
@@ -292,7 +290,11 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
                 }
             }
         }
+
     }
+
+
+
 
 
 
