@@ -85,8 +85,6 @@ class AddNewLocationActivity : AppCompatActivity() {
         startActivityForResult(viewIntent, 0)
     }
 
-
-
     // Retrieve lat and lng coordinates from the user selected location, from AddLocationMapActivity
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 0) {
