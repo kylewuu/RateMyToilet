@@ -51,6 +51,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
                 else -> mapFragment
             }
             supportFragmentManager.beginTransaction().replace(R.id.container, fragment, currentFragment).commit()
+
             true
         }
     }
@@ -65,4 +66,5 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         }
 
     }
+
 }

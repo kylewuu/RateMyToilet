@@ -2,7 +2,6 @@ package com.example.ratemytoilet
 
 
 import android.content.Context
-import android.location.Criteria
 import android.location.LocationManager
 import android.view.View
 import android.view.ViewGroup
@@ -20,8 +19,8 @@ import java.text.DecimalFormat
 
 
 // Based off class demo
-class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter() {
 
+class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter() {
 
     // User location vars
     private lateinit var locationManager: LocationManager
@@ -44,9 +43,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view: View = View.inflate(context, R.layout.layout_adapter, null)
-
-        // Attempt to get User Location
-        getUserLocation()
 
         val washroomName = view.findViewById(R.id.title) as TextView
         val amenities = view.findViewById(R.id.amenities) as TextView
@@ -155,8 +151,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
             // Change the views. Cannot edit UI in coroutine
             GlobalScope.launch(Dispatchers.Main) {
 
-                // TODO: If rating is 0.0 (double), then set to Int (0). Is needed?
-
                 if(averageCleanlinessRating == 0.0){
                     ratingsText.text = averageCleanlinessRating.toInt().toString()
                 }
@@ -164,8 +158,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     var formattedCleanlinessRating = decimalFormat.format(averageCleanlinessRating).toString()
                     ratingsText.text = formattedCleanlinessRating
                 }
-
-
 
 
                 // Set gender and create amenities string
@@ -207,8 +199,8 @@ class WashroomListAdapter(private val context: Context, private var locationList
 
         }
         else{
-            // Couldn't get user's location. Set distance to ???
-            distance.text = "???"
+            // Couldn't get user's location. Set distance to unknown.
+            distance.text = "---"
         }
 
 
@@ -223,24 +215,8 @@ class WashroomListAdapter(private val context: Context, private var locationList
         locationList = newCommentList
     }
 
-    // Get the current users location
-    private fun getUserLocation() {
-        try {
-            locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val criteria = Criteria()
-            criteria.accuracy = Criteria.ACCURACY_FINE
-            val provider : String? = locationManager.getBestProvider(criteria, true)
-            if(provider != null) {
-                val location = locationManager.getLastKnownLocation(provider)
-                if (location != null){
-                    println(location)
-                    userLocation = location
-
-                }
-            }
-        }
-        catch (e: SecurityException) {
-        }
+    fun replaceUserLocation(passedInUserLocation: android.location.Location?) {
+        userLocation = passedInUserLocation
     }
 
 }
