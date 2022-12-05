@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
@@ -151,7 +152,7 @@ class AddNewLocationActivity : AppCompatActivity() {
                     // Add new review to newly created location
                     var newReview = Review()
                     newReview.locationId = it
-                    newReview.leftByAdmin = false
+                    newReview.leftByAdmin = isAdmin
                     newReview.cleanliness = rating
                     Log.d("TAo", rating.toString())
                     newReview.dateAdded = Calendar.getInstance().timeInMillis

@@ -24,6 +24,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         var previousLocationsSize = -1
 
         var updateMap = false
+        var isAdmin = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

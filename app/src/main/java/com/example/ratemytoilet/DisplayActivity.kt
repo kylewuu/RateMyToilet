@@ -8,6 +8,7 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
@@ -159,8 +160,7 @@ class DisplayActivity : AppCompatActivity() {
         }
 
         addButton.setOnClickListener {
-            val admin = false
-            if (!admin) {
+            if (!isAdmin) {
                 val intent = Intent(this, NormalUserAddReviewActivity::class.java)
                 intent.putExtra("location", washroomId)
                 startActivity(intent)
