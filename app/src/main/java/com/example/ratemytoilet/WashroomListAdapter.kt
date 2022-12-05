@@ -1,13 +1,7 @@
 package com.example.ratemytoilet
 
 
-import android.app.PendingIntent.getActivity
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.location.Criteria
-import android.location.LocationListener
 import android.location.LocationManager
 import android.view.View
 import android.view.ViewGroup
@@ -25,8 +19,8 @@ import java.text.DecimalFormat
 
 
 // Based off class demo
-class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter(){
 
+class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter() {
 
     // User location vars
     private lateinit var locationManager: LocationManager
@@ -49,9 +43,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view: View = View.inflate(context, R.layout.layout_adapter, null)
-
-        // Attempt to get User Location
-
 
         val washroomName = view.findViewById(R.id.title) as TextView
         val amenities = view.findViewById(R.id.amenities) as TextView
@@ -224,12 +215,9 @@ class WashroomListAdapter(private val context: Context, private var locationList
         locationList = newCommentList
     }
 
-
     fun replaceUserLocation(passedInUserLocation: android.location.Location?) {
         userLocation = passedInUserLocation
     }
-
-
 
 }
 

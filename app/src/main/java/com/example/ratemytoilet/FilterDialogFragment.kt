@@ -25,9 +25,6 @@ class FilterDialogFragment : DialogFragment() {
     var listener : FilterListener?= null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        var bundle = arguments
-
         val layoutInflater = requireActivity().layoutInflater
         val dialogLayout = layoutInflater.inflate(R.layout.fragment_dialog, null)
         val builder = AlertDialog.Builder(requireActivity(), R.style.DialogAnimation).setView(dialogLayout)

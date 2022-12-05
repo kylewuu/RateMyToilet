@@ -23,7 +23,7 @@
     <string name="invalid_auth_code">Verification failed. Please ensure the veriifcation code is correct and try again.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_add_location_map">AddLocationMapActivity</string>
+    <string name="title_activity_add_location_map">Add a new washroom</string>
     <string name="navigation_title_map">Map</string>
     <string name="navigation_title_washroom_list">List</string>
     <string name="title_fragment_list">Washrooms Near You</string>

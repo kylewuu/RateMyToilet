@@ -2,10 +2,12 @@ package com.example.ratemytoilet
 
 
 import android.content.Context
+
 import android.content.*
 import android.content.Context.MODE_PRIVATE
 import android.location.Criteria
 import android.location.LocationListener
+import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,15 +25,16 @@ import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
 import com.example.ratemytoilet.MainActivity.Companion.maleCheck
 import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
+import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
-
 
 /*
 References:
@@ -39,9 +42,10 @@ https://stackoverflow.com/questions/21422294/how-to-add-button-in-header
 https://www.android--code.com/2020/03/android-kotlin-listview-add-item.html
 https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-of-a-imageview-android
 https://www.javatpoint.com/android-custom-listview
+https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
  */
 
-class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, LocationListener{
+class WashroomListFragment : Fragment(), LocationListener {
 
     private lateinit var myListView: ListView
     private lateinit var toolbar: Toolbar
@@ -50,16 +54,10 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
     private val monthArray = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
     private lateinit var locationViewModel: LocationViewModel
 
-    private lateinit var updatePreference : SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
-
     // User location vars
     private lateinit var locationManager: LocationManager
     private var userLocation: android.location.Location? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,11 +66,6 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
     ): View? {
         val view = inflater.inflate(R.layout.fragment_list, container, false)
         toolbar = view.findViewById(R.id.toolbar)
-
-
-        updatePreference = requireContext().getSharedPreferences("update", MODE_PRIVATE)
-        editor = updatePreference.edit()
-
 
 
         // Register for Receiver
@@ -84,18 +77,20 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
         // List of locations
         myListView = view.findViewById(R.id.lv_locations)
 
+
         // Arraylist for displaying entries
         arrayList = ArrayList<Location>()
         arrayAdapter = WashroomListAdapter(requireContext(), arrayList)
         myListView.adapter = arrayAdapter
         locationViewModel = LocationViewModel()
 
+
         // Attempt to get users location
         getUserLocation()
 
+
         // Load washrooms
         loadWashrooms()
-
 
 
         myListView.isClickable = true
@@ -128,6 +123,13 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
             }
         }
 
+        val addButton = view.findViewById<FloatingActionButton>(R.id.addNewLocation)
+        addButton.setOnClickListener {
+            onAddNewLocationClick()
+        }
+
+        if (MainActivity.isAdmin) toolbar.title = "ADMIN - Washrooms near you"
+
         return view
     }
 
@@ -135,6 +137,12 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
         super.onViewCreated(view, savedInstanceState)
         toolbar.inflateMenu(R.menu.main1)
 
+
+        toolbar.setOnMenuItemClickListener {
+            val filterDialogFragment = FilterDialogFragment()
+            filterDialogFragment.show(childFragmentManager, "Filter")
+            true
+        }
     }
 
     private fun loadWashrooms() {
@@ -219,7 +227,7 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
         }
     }
 
-    override fun onFilterConditionPassed(
+    fun filterConditionPassed(
         paperCheck: Boolean,
         soapCheck: Boolean,
         accessCheck: Boolean,
@@ -233,11 +241,10 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
         MainActivity.accessCheck = accessCheck
         MainActivity.maleCheck = maleCheck
         MainActivity.femaleCheck = femaleCheck
-        MainActivity.cleanlinessStart = startValue
-        MainActivity.cleanlinessEnd = endValue
+        cleanlinessStart = startValue
+        cleanlinessEnd = endValue
 
-        editor.putString("updateReview", "Yes")
-        editor.apply()
+        updateMap = true
 
         loadWashrooms()
     }
@@ -266,13 +273,20 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
                 else{
                     // Otherwise, wait for provider to give us a new location
                     locationManager.requestLocationUpdates(provider, 0, 0f, this)
+
                 }
             }
         }
         catch (e: SecurityException) {
         }
-
     }
+
+
+    private fun onAddNewLocationClick() {
+        val viewIntent = Intent(activity, AddNewLocationActivity::class.java)
+        startActivity(viewIntent)
+    }
+
 
     override fun onLocationChanged(location: android.location.Location) {
         // Location found. Set the user's location in the WashroomListAdapter and notify
@@ -322,12 +336,5 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, Lo
 
 
     }
-
-
-
-
-
-
-
 
 }
