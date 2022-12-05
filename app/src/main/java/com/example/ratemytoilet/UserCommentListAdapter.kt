@@ -44,6 +44,9 @@ class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<User
         userInformation.access?.let { setTextState(accState, it) }
         userInformation.rate?.let { rating.setRating(it) }
 
+        if (userInformation.leftByAdmin) {
+            userNameText.setTextColor(Color.RED)
+        }
 
         return view
 

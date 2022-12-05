@@ -1,10 +1,10 @@
 package com.example.ratemytoilet
 
 import android.Manifest
-import android.content.*
-import android.content.Context.MODE_PRIVATE
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import android.content.IntentFilter
 import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,11 +28,13 @@ import com.example.ratemytoilet.MainActivity.Companion.accessCheck
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
 import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
+import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.maleCheck
 import com.example.ratemytoilet.MainActivity.Companion.notRunFirstTime
 import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.previousLocationsSize
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
+import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.launch.LaunchActivity
@@ -53,10 +56,12 @@ import java.text.SimpleDateFormat
 
 private const val TAG = "WashroomMapFragment"
 
-class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
+
+class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private var myLocationMarker : Marker?= null
     private lateinit var mMap: GoogleMap
     private lateinit var mapView: MapView
+    private var markerColor = IconGenerator.STYLE_PURPLE
 
     private lateinit var locationManager: LocationManager
     private lateinit var locationViewModel: LocationViewModel
@@ -71,11 +76,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<MyItem>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
-    private lateinit var updateMap : String
-    private lateinit var updatePreference: SharedPreferences
-    private lateinit var editor: SharedPreferences.Editor
 
     private lateinit var locationPermissionResultReceiver: ActivityResultLauncher<String>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,24 +97,31 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
         filter.addAction(Intent.ACTION_PROVIDER_CHANGED)
         getActivity()?.registerReceiver(locationSwitchStateReceiver, filter)
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_washroom_map, container, false)
+
+//        isAdmin = true
+        var adminTitle = view.findViewById<TextView>(R.id.adminTitle)
+        if (isAdmin) {
+            adminTitle.visibility = View.VISIBLE
+            markerColor = IconGenerator.STYLE_RED
+        }
+
 
 //        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapView = view.findViewById(R.id.map_view)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
+        locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
         locationViewModel = LocationViewModel()
         loadingDialogFragment = LoadingDialogFragment()
-        updatePreference = activity?.getSharedPreferences("update", MODE_PRIVATE)!!
-        editor = updatePreference.edit()
 
-        if ((activity as AppCompatActivity).getSupportActionBar() != null) {
-            (activity as AppCompatActivity).getSupportActionBar()?.hide();
+        if ((activity as AppCompatActivity).supportActionBar != null) {
+            (activity as AppCompatActivity).supportActionBar?.hide();
         }
 
         val filterButton = view.findViewById<Button>(R.id.filterButton)
@@ -132,6 +142,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
             }
             if (previousLocationsSize != it.size) {
                 Toast.makeText(activity, "New Location added", Toast.LENGTH_SHORT).show()
+                previousLocationsSize = it.size
             }
             Log.d("TAp", previousLocationsSize.toString())
         }
@@ -141,23 +152,17 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     override fun onResume() {
         super.onResume()
         mapView.onResume()
+
         if (notRunFirstTime) {
-            val sharedPref = activity?.getSharedPreferences("update", MODE_PRIVATE)
-            updateMap = sharedPref?.getString("updateReview", "NULL").toString()
-            //Log.d("TAp", updateMap)
-            if (updateMap != "NULL") {
-                if (updateMap == "Yes") {
-                    editor.putString("updateReview", "No")
-                    editor.apply()
-                    if (mMap != null && myClusterManager != null) {
-                        mMap.clear()
-                        myClusterManager.clearItems()
-                        loadWashrooms()
-                        setClusterManager()
-                    }
+            if (updateMap) {
+                updateMap = false
+                if (mMap != null && myClusterManager != null) {
+                    mMap.clear()
+                    myClusterManager.clearItems()
+                    loadWashrooms()
+                    setClusterManager()
                 }
             }
-
         } else {
             notRunFirstTime = true
         }
@@ -171,6 +176,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         if (currentUser == null) {
             loadLaunchScreen()
         }
+
     }
 
     private fun loadLaunchScreen() {
@@ -195,22 +201,21 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     }
 
     override fun onLocationChanged(location: Location) {
-        println("debug: onlocationchanged()")
         if (myLocationMarker != null) {
             myLocationMarker!!.remove()
         }
         val lat = location.latitude
         val lng = location.longitude
         val latLng = LatLng(lat, lng)
-        if (mapCentered == false) {
+        if (!mapCentered) {
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
             mMap.animateCamera(cameraUpdate)
             mapCentered = true
         }
 
         markerOptions.position(latLng).title("ME").icon(
-            BitmapDescriptorFactory.defaultMarker(
-                BitmapDescriptorFactory.HUE_BLUE))
+            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
+        )
         myLocationMarker = mMap.addMarker(markerOptions)!!
     }
 
@@ -222,7 +227,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         polylineOptions.color(Color.BLACK)
         polylines = ArrayList()
         markerOptions = MarkerOptions()
-        locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
         setClusterManager()
     }
 
@@ -273,11 +278,12 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         val bubble = IconGenerator(context)
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
-        bubble.setStyle(IconGenerator.STYLE_PURPLE)
+        bubble.setStyle(markerColor)
         if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
+            if (isAdmin) allLocations = filterAdminMarkers(allLocations, reviewViewModel)
             if (allLocations != null &&
                 (paperCheck ||
                         soapCheck ||
@@ -347,7 +353,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
                     var updateAccess = "true"
                     var updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
                     updateAllReviews = updateAllReviews.sortedByDescending { it.dateAdded }
-                    if (updateAllReviews.size != 0) {
+                    if (updateAllReviews.isNotEmpty()) {
                         for (review in updateAllReviews) {
                             updateRating += review.cleanliness
                         }
@@ -371,7 +377,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
                         }
                     }
                     val snippet = update.name + ", " + update.roomNumber + ";" + updateRating.toInt()
-                    val title = updateSoap + "," + updatePaper + "," + updateAccess
+                    val title = "$updateSoap,$updatePaper,$updateAccess"
                     val item = MyItem(
                         updateLatLng,
                         title,
@@ -411,8 +417,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         MainActivity.accessCheck = accessCheck
         MainActivity.maleCheck = maleCheck
         MainActivity.femaleCheck = femaleCheck
-        MainActivity.cleanlinessStart = startValue
-        MainActivity.cleanlinessEnd = endValue
+        cleanlinessStart = startValue
+        cleanlinessEnd = endValue
     }
 
     override fun onLocationChanged(locations: MutableList<Location>) {
@@ -428,6 +434,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     override fun onProviderDisabled(provider: String) {
         println("DEBUG: Provider Disabled" )
     }
+
+
 
     private fun setClusterManager() {
         myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
@@ -467,7 +475,39 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
         mMap.setOnInfoWindowClickListener(myClusterManager)
     }
 
+    private suspend fun filterAdminMarkers(allLocations: List<com.example.ratemytoilet.database.Location>, reviewViewModel: ReviewViewModel): List<com.example.ratemytoilet.database.Location> {
+        var filteredLocations = ArrayList<com.example.ratemytoilet.database.Location>()
+        for (location in allLocations) {
+            var shouldAdd = false
+            var rating = 0.0
+            var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+            allReviews = allReviews.sortedByDescending { it.dateAdded }
+            if (allReviews.isNotEmpty()) {
+                for (review in allReviews) {
+                    rating += review.cleanliness
+                }
+                rating /= allReviews.size
 
+                if (allReviews[0].sufficientPaperTowels == 0) {
+                    shouldAdd = true
+                }
+
+
+                if (allReviews[0].sufficientSoap == 0) {
+                    shouldAdd = true
+                }
+
+            }
+
+            if (rating < 3) {
+                shouldAdd = true
+            }
+
+            if (shouldAdd) filteredLocations.add(location)
+        }
+
+        return filteredLocations
+    }
 
     // Detects if the location is turned on in the map fragment. If detected, it will start the location manager again with function initLocationManager().
 

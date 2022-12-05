@@ -2,18 +2,20 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    >
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -28,12 +30,13 @@
                     android:orientation="vertical">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="37dp"
                             android:layout_marginRight="25dp"
@@ -43,8 +46,9 @@
                             android:textSize="16dp" />
 
                         <Button
-
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_marginRight="25dp"
                             android:layout_height="wrap_content"
                             android:onClick="onAddLocationClick"
                             android:text="Add Location" />
@@ -52,23 +56,25 @@
 
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="37dp"
                             android:layout_marginRight="50dp"
                             android:text="Room Number"
-
                             android:textColor="#28104E"
                             android:textSize="16dp" />
 
                         <EditText
                             android:id="@+id/et_roomNumber"
-                            android:layout_width="200dp"
+                            android:layout_width="0dp"
+                            android:layout_weight="1.3"
+                            android:layout_marginRight="25dp"
                             android:layout_height="45dp"
                             android:background="@drawable/rounded_edittext"
                             android:textColor="@color/black"
@@ -77,12 +83,13 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="37dp"
                             android:layout_marginRight="30dp"
@@ -93,9 +100,10 @@
 
                         <EditText
                             android:id="@+id/et_washroomName"
-                            android:layout_width="200dp"
+                            android:layout_width="0dp"
+                            android:layout_weight="1.1"
+                            android:layout_marginRight="25dp"
                             android:layout_height="45dp"
-
                             android:background="@drawable/rounded_edittext"
                             android:textColor="@color/black" />
                     </LinearLayout>
@@ -411,5 +419,6 @@
         android:background="@drawable/checkmark"
 
         android:onClick="onAddNewWashroomClick"
-       />
+        />
+
 </RelativeLayout>

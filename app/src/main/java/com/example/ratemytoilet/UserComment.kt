@@ -8,8 +8,9 @@ class UserComment {
     var soap:Int ?= -1
     var paper:Int ?= -1
     var access:Int ?= -1
+    var leftByAdmin = false
 
-    constructor(userName: String?, date: String?, rate: Float?, comment: String?, soap: Int?, paper: Int?, access: Int?) {
+    constructor(userName: String?, date: String?, rate: Float?, comment: String?, soap: Int?, paper: Int?, access: Int?, leftByAdmin: Boolean) {
         this.userName = userName
         this.date = date
         this.rate = rate
@@ -17,5 +18,6 @@ class UserComment {
         this.soap = soap
         this.paper = paper
         this.access = access
+        this.leftByAdmin = leftByAdmin
     }
 }
