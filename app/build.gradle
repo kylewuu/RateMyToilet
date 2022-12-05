@@ -51,13 +51,15 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
-    // Import the BoM for the Firebase platform
+
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation "androidx.fragment:fragment-ktx:1.5.4"
+
+    // Firebase
     implementation platform('com.google.firebase:firebase-bom:31.0.3')
     implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
     implementation 'com.google.firebase:firebase-database-ktx:19.2.1'
 
-    // Add the dependency for the Realtime Database library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-firestore-ktx'
 
     // Lifecycle components ref: https://www.sfu.ca/~xingdong/Teaching/CMPT362/lecture15/lecture15.html

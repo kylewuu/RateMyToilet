@@ -1,6 +1,7 @@
 package com.example.ratemytoilet
 
 import android.os.Bundle
+import android.provider.ContactsContract.Profile
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -34,21 +35,29 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
 
         val mapFragment = WashroomMapFragment()
         val listFragment = WashroomListFragment()
+        val profileFragment = ProfileFragment()
 
         supportFragmentManager.beginTransaction().add(R.id.container, mapFragment, "Map").commit()
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavView.setOnItemSelectedListener {
-            val fragment = when(it.itemId) {
-                R.id.washroom_map -> {
-                    currentFragment = "Map"
-                    mapFragment
-                }
+            var fragment = when(it.itemId) {
                 R.id.washroom_list -> {
                     currentFragment = "List"
                     listFragment
                 }
-                else -> mapFragment
+                R.id.profile -> {
+                    currentFragment = "Profile"
+                    profileFragment
+                }
+                else -> {
+                    currentFragment = "Map"
+                    mapFragment
+                }
+            }
+            val foundFragment = supportFragmentManager.findFragmentByTag(currentFragment)
+            if (foundFragment != null) {
+                fragment = foundFragment
             }
             supportFragmentManager.beginTransaction().replace(R.id.container, fragment, currentFragment).commit()
 

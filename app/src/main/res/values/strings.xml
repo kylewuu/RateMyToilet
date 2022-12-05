@@ -27,4 +27,9 @@
     <string name="navigation_title_map">Map</string>
     <string name="navigation_title_washroom_list">List</string>
     <string name="title_fragment_list">Washrooms Near You</string>
+    <string name="title_profile_page">Your Profile</string>
+    <string name="stat_total_reviews_format">%d Reviews</string>
+    <string name="navigation_title_profile">My Profile</string>
+    <string name="stat_level_format">Level %d</string>
+    <string name="title_my_reviews">My Reviews</string>
 </resources>
