@@ -140,7 +140,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
                 Toast.makeText(activity, "New Location added", Toast.LENGTH_SHORT).show()
                 previousLocationsSize = it.size
             }
-            Log.d("TAp", previousLocationsSize.toString())
         }
         return view
     }
@@ -183,6 +182,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
     fun initLocationManager() {
         try {
+            mapCentered = false
+            Log.d("TAp", "running")
             locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val criteria = Criteria()
             criteria.accuracy = Criteria.ACCURACY_FINE
@@ -224,7 +225,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         polylineOptions.color(Color.BLACK)
         polylines = ArrayList()
         markerOptions = MarkerOptions()
-
         setClusterManager()
     }
 
