@@ -27,7 +27,6 @@ import com.example.ratemytoilet.MainActivity.Companion.accessCheck
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
 import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
-import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.maleCheck
 import com.example.ratemytoilet.MainActivity.Companion.notRunFirstTime
 import com.example.ratemytoilet.MainActivity.Companion.paperCheck
@@ -165,7 +164,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
             loadLaunchScreen()
         }
 
-       isAdmin = true
+//       isAdmin = true
     }
 
     private fun loadLaunchScreen() {

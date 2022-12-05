@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Cleanliness Check"
+                android:text="Is clean"
                 android:textColor="#28104E"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -63,7 +63,7 @@
                     style="@style/ChipStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Check"
+                    android:text="Yes"
                     android:textColor="@color/chip_text_background"/>
 
                 <com.google.android.material.chip.Chip
@@ -71,7 +71,7 @@
                     style="@style/ChipStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Uncheck"
+                    android:text="No"
                     android:textColor="@color/chip_text_background"/>
             </com.google.android.material.chip.ChipGroup>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -99,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Soap Check"
+                android:text="Soap is filled"
                 android:textColor="#28104E"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -121,7 +121,7 @@
                     style="@style/ChipStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Check"
+                    android:text="Yes"
                     android:textColor="@color/chip_text_background"/>
 
                 <com.google.android.material.chip.Chip
@@ -129,7 +129,7 @@
                     style="@style/ChipStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Uncheck"
+                    android:text="No"
                     android:textColor="@color/chip_text_background"/>
             </com.google.android.material.chip.ChipGroup>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -156,7 +156,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Paper Towel Check"
+                android:text="Paper towels are stocked"
                 android:textColor="#28104E"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -178,7 +178,7 @@
                     style="@style/ChipStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Check"
+                    android:text="Yes"
                     android:textColor="@color/chip_text_background"/>
 
                 <com.google.android.material.chip.Chip
@@ -186,7 +186,7 @@
                     style="@style/ChipStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Uncheck"
+                    android:text="No"
                     android:textColor="@color/chip_text_background"/>
             </com.google.android.material.chip.ChipGroup>
 
@@ -266,21 +266,6 @@
 
         <Button
             android:id="@+id/cancelAdminButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginStart="96dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:backgroundTint="#DAD9DC"
-            android:text="Cancel"
-            android:textColor="#F7F7F8"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/applyAdminButton"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/commentAdminButton"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginStart="96dp"

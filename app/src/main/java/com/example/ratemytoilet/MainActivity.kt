@@ -25,6 +25,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
 
         var updateMap = false
         var isAdmin = false
+        var updateReviews = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
