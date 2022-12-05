@@ -40,7 +40,8 @@
             android:label="@string/title_activity_add_location_map" />
         <activity
             android:name=".AddNewLocationActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:label="@string/title_activity_add_location_map" />
         <activity
             android:name=".launch.ConfirmPhoneActivity"
             android:exported="false"
