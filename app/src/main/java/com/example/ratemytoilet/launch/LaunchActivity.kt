@@ -1,9 +1,9 @@
 package com.example.ratemytoilet.launch
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.example.ratemytoilet.MainActivity
 import com.example.ratemytoilet.databinding.ActivityLaunchBinding
 import com.google.firebase.auth.ktx.auth
@@ -24,7 +24,7 @@ class LaunchActivity : AppCompatActivity() {
         if (currentUser != null) {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-            finish()
+//            finish()
         }
     }
 

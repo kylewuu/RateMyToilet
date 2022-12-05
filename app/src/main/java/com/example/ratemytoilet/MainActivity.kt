@@ -1,7 +1,6 @@
 package com.example.ratemytoilet
 
 import android.os.Bundle
-import android.provider.ContactsContract.Profile
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
