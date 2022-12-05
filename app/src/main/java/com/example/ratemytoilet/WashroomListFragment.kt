@@ -1,10 +1,14 @@
 package com.example.ratemytoilet
 
+<<<<<<< Updated upstream
 import android.content.Context
+=======
+
+import android.content.*
+>>>>>>> Stashed changes
 import android.content.Context.MODE_PRIVATE
-import android.content.Intent
-import android.content.SharedPreferences
 import android.location.Criteria
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -40,7 +44,7 @@ https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-
 https://www.javatpoint.com/android-custom-listview
  */
 
-class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
+class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener, LocationListener{
 
     private lateinit var myListView: ListView
     private lateinit var toolbar: Toolbar
@@ -68,11 +72,17 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
         val view = inflater.inflate(R.layout.fragment_list, container, false)
         toolbar = view.findViewById(R.id.toolbar)
 
+
         updatePreference = requireContext().getSharedPreferences("update", MODE_PRIVATE)
         editor = updatePreference.edit()
 
-        // Get Location
-        getUserLocation()
+
+
+        // Register for Receiver
+        val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        filter.addAction(Intent.ACTION_PROVIDER_CHANGED)
+        context?.registerReceiver(locationSwitchStateReceiver, filter)
+
 
         // List of locations
         myListView = view.findViewById(R.id.lv_locations)
@@ -82,7 +92,14 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
         arrayAdapter = WashroomListAdapter(requireContext(), arrayList)
         myListView.adapter = arrayAdapter
         locationViewModel = LocationViewModel()
+
+        // Attempt to get users location
+        getUserLocation()
+
+        // Load washrooms
         loadWashrooms()
+
+
 
         myListView.isClickable = true
         myListView.onItemClickListener = object : AdapterView.OnItemClickListener {
@@ -219,22 +236,61 @@ class WashroomListFragment : Fragment(), FilterDialogFragment.FilterListener {
     }
 
 
+    // Get the current users location
     private fun getUserLocation() {
         try {
-            locationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val criteria = Criteria()
             criteria.accuracy = Criteria.ACCURACY_FINE
             val provider : String? = locationManager.getBestProvider(criteria, true)
             if(provider != null) {
                 val location = locationManager.getLastKnownLocation(provider)
                 if (location != null){
-                    println(location)
+                    // Location found. Set the user's location in the WashroomListAdapter and notify
                     userLocation = location
-
+                    arrayAdapter.replaceUserLocation(userLocation)
+                    arrayAdapter.notifyDataSetChanged()
+                }
+                else{
+                    // Otherwise, wait for provider to give us a new location
+                    locationManager.requestLocationUpdates(provider, 0, 0f, this)
                 }
             }
+
         }
         catch (e: SecurityException) {
+        }
+
+    }
+
+    override fun onLocationChanged(location: android.location.Location) {
+        // Location found. Set the user's location in the WashroomListAdapter and notify
+        userLocation = location
+        arrayAdapter.replaceUserLocation(userLocation)
+        arrayAdapter.notifyDataSetChanged()
+
+        // Only needs to be updated once. Remove the request
+        locationManager.removeUpdates(this)
+    }
+
+
+    private val locationSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (LocationManager.PROVIDERS_CHANGED_ACTION == intent.action) {
+                val locationManager =
+                    context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                if (isGpsEnabled || isNetworkEnabled) {
+                    // If location is enabled, try to get users location
+                    getUserLocation()
+                }
+                else{
+                    // Location is disabled. Set distances in Washroom list to --- by setting `passedInUserLocation` to null
+                    arrayAdapter.replaceUserLocation(null)
+                    arrayAdapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 

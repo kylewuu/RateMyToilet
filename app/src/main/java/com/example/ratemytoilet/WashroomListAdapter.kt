@@ -1,8 +1,13 @@
 package com.example.ratemytoilet
 
 
+import android.app.PendingIntent.getActivity
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.location.Criteria
+import android.location.LocationListener
 import android.location.LocationManager
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +25,7 @@ import java.text.DecimalFormat
 
 
 // Based off class demo
-class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter() {
+class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter(){
 
 
     // User location vars
@@ -46,7 +51,7 @@ class WashroomListAdapter(private val context: Context, private var locationList
         val view: View = View.inflate(context, R.layout.layout_adapter, null)
 
         // Attempt to get User Location
-        getUserLocation()
+
 
         val washroomName = view.findViewById(R.id.title) as TextView
         val amenities = view.findViewById(R.id.amenities) as TextView
@@ -207,8 +212,8 @@ class WashroomListAdapter(private val context: Context, private var locationList
 
         }
         else{
-            // Couldn't get user's location. Set distance to ???
-            distance.text = "???"
+            // Couldn't get user's location. Set distance to unknown.
+            distance.text = "---"
         }
 
 
@@ -223,25 +228,12 @@ class WashroomListAdapter(private val context: Context, private var locationList
         locationList = newCommentList
     }
 
-    // Get the current users location
-    private fun getUserLocation() {
-        try {
-            locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val criteria = Criteria()
-            criteria.accuracy = Criteria.ACCURACY_FINE
-            val provider : String? = locationManager.getBestProvider(criteria, true)
-            if(provider != null) {
-                val location = locationManager.getLastKnownLocation(provider)
-                if (location != null){
-                    println(location)
-                    userLocation = location
 
-                }
-            }
-        }
-        catch (e: SecurityException) {
-        }
+    fun replaceUserLocation(passedInUserLocation: android.location.Location?) {
+        userLocation = passedInUserLocation
     }
+
+
 
 }
 

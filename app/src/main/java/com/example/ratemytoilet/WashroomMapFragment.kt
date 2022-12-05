@@ -424,11 +424,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener{
     }
 
     override fun onProviderEnabled(provider: String) {
-        println("DEBUG: Provider Enabled" )
     }
 
     override fun onProviderDisabled(provider: String) {
-        println("DEBUG: Provider Disabled" )
     }
 
 
