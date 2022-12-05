@@ -1,7 +1,6 @@
 package com.example.ratemytoilet
 
 import android.Manifest
-import android.content.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -62,6 +61,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private var myLocationMarker : Marker?= null
     private lateinit var mMap: GoogleMap
     private lateinit var mapView: MapView
+    private var markerColor = IconGenerator.STYLE_PURPLE
 
     private lateinit var locationManager: LocationManager
     private lateinit var locationViewModel: LocationViewModel
@@ -104,7 +104,11 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
 //        isAdmin = true
         var adminTitle = view.findViewById<TextView>(R.id.adminTitle)
-        if (isAdmin) adminTitle.visibility = View.VISIBLE
+        if (isAdmin) {
+            adminTitle.visibility = View.VISIBLE
+            markerColor = IconGenerator.STYLE_RED
+        }
+
 
 //        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapView = view.findViewById(R.id.map_view)
@@ -116,8 +120,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         locationViewModel = LocationViewModel()
         loadingDialogFragment = LoadingDialogFragment()
 
-        if ((activity as AppCompatActivity).getSupportActionBar() != null) {
-            (activity as AppCompatActivity).getSupportActionBar()?.hide();
+        if ((activity as AppCompatActivity).supportActionBar != null) {
+            (activity as AppCompatActivity).supportActionBar?.hide();
         }
 
         val filterButton = view.findViewById<Button>(R.id.filterButton)
@@ -197,22 +201,21 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
-        println("debug: onlocationchanged()")
         if (myLocationMarker != null) {
             myLocationMarker!!.remove()
         }
         val lat = location.latitude
         val lng = location.longitude
         val latLng = LatLng(lat, lng)
-        if (mapCentered == false) {
+        if (!mapCentered) {
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
             mMap.animateCamera(cameraUpdate)
             mapCentered = true
         }
 
         markerOptions.position(latLng).title("ME").icon(
-            BitmapDescriptorFactory.defaultMarker(
-                BitmapDescriptorFactory.HUE_BLUE))
+            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
+        )
         myLocationMarker = mMap.addMarker(markerOptions)!!
     }
 
@@ -275,11 +278,12 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         val bubble = IconGenerator(context)
         val arr = ArrayList<MyItem>()
         var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
-        bubble.setStyle(IconGenerator.STYLE_PURPLE)
+        bubble.setStyle(markerColor)
         if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             var allLocations = locationViewModel.getAllLocations()
             val reviewViewModel = ReviewViewModel()
+            if (isAdmin) allLocations = filterAdminMarkers(allLocations, reviewViewModel)
             if (allLocations != null &&
                 (paperCheck ||
                         soapCheck ||
@@ -349,7 +353,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
                     var updateAccess = "true"
                     var updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
                     updateAllReviews = updateAllReviews.sortedByDescending { it.dateAdded }
-                    if (updateAllReviews.size != 0) {
+                    if (updateAllReviews.isNotEmpty()) {
                         for (review in updateAllReviews) {
                             updateRating += review.cleanliness
                         }
@@ -373,7 +377,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
                         }
                     }
                     val snippet = update.name + ", " + update.roomNumber + ";" + updateRating.toInt()
-                    val title = updateSoap + "," + updatePaper + "," + updateAccess
+                    val title = "$updateSoap,$updatePaper,$updateAccess"
                     val item = MyItem(
                         updateLatLng,
                         title,
@@ -471,7 +475,39 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         mMap.setOnInfoWindowClickListener(myClusterManager)
     }
 
+    private suspend fun filterAdminMarkers(allLocations: List<com.example.ratemytoilet.database.Location>, reviewViewModel: ReviewViewModel): List<com.example.ratemytoilet.database.Location> {
+        var filteredLocations = ArrayList<com.example.ratemytoilet.database.Location>()
+        for (location in allLocations) {
+            var shouldAdd = false
+            var rating = 0.0
+            var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+            allReviews = allReviews.sortedByDescending { it.dateAdded }
+            if (allReviews.isNotEmpty()) {
+                for (review in allReviews) {
+                    rating += review.cleanliness
+                }
+                rating /= allReviews.size
 
+                if (allReviews[0].sufficientPaperTowels == 0) {
+                    shouldAdd = true
+                }
+
+
+                if (allReviews[0].sufficientSoap == 0) {
+                    shouldAdd = true
+                }
+
+            }
+
+            if (rating < 3) {
+                shouldAdd = true
+            }
+
+            if (shouldAdd) filteredLocations.add(location)
+        }
+
+        return filteredLocations
+    }
 
     // Detects if the location is turned on in the map fragment. If detected, it will start the location manager again with function initLocationManager().
 
