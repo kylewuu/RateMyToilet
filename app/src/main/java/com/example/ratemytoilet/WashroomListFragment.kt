@@ -149,7 +149,7 @@ class WashroomListFragment : Fragment(), LocationListener {
     private fun loadWashrooms() {
         lifecycleScope.launch(Dispatchers.IO) {
 
-            if (updateList) {
+            if (updateList || locationViewModel.tempListLocations.value == null) {
                 locationViewModel.processListLocations()
             }
 
