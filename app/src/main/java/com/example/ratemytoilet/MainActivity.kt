@@ -1,8 +1,14 @@
 package com.example.ratemytoilet
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 /**
  * refs:
@@ -12,6 +18,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
     var currentFragment = "Map"
     var FRAGMENT_KEY = "fragment_key"
+
+    private var authListener = AuthStateListener {
+        if (it.currentUser == null) {
+            loadLaunchScreen()
+        }
+    }
 
     companion object {
         var notRunFirstTime = false
@@ -64,6 +76,24 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
 
             true
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        FirebaseAuth.getInstance().addAuthStateListener(authListener)
+
+    }
+
+    private fun loadLaunchScreen() {
+        val intent = Intent(this, LaunchActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        FirebaseAuth.getInstance().removeAuthStateListener(authListener)
     }
 
     override fun onFilterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
