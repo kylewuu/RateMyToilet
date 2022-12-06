@@ -5,6 +5,7 @@ import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.MainActivity.Companion.updateReviews
 import com.example.ratemytoilet.database.Review
@@ -39,6 +40,7 @@ class NormalUserAddReviewActivity : AppCompatActivity() {
             } else {
                 setData()
                 updateMap = true
+                updateList = true
                 updateReviews = true
                 finish()
             }

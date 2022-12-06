@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.MainActivity.Companion.updateReviews
 import com.example.ratemytoilet.database.Review
@@ -99,6 +100,7 @@ class AdminReviewFragment : DialogFragment() {
                 reviewViewModel.addReviewForLocation(review)
                 updateReviews = true
                 updateMap = true
+                updateList = true
                 dismiss()
                 listener?.loadReviews()
             } else {
