@@ -23,7 +23,9 @@ import com.example.ratemytoilet.R
 import com.google.android.material.chip.Chip
 import com.google.android.material.slider.RangeSlider
 
-
+/**
+ * Fragment for the filter dialog in the map and list washroom views.
+ */
 class FilterDialogFragment : DialogFragment() {
     var listener : FilterListener?= null
 

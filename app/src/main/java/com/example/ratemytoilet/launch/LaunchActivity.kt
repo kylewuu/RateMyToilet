@@ -9,6 +9,10 @@ import com.example.ratemytoilet.databinding.ActivityLaunchBinding
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+/**
+ * Activity to launch the sign in page.
+ *
+ */
 class LaunchActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLaunchBinding
 
@@ -24,7 +28,6 @@ class LaunchActivity : AppCompatActivity() {
         if (currentUser != null) {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-//            finish()
         }
     }
 

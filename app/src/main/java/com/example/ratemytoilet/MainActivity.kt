@@ -10,6 +10,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
 /**
+ * Main activity for setting up the tab fragments and launching sign in page.
+ *
  * refs:
  * https://www.howtocreate.co.uk/xor.html
  * https://stackoverflow.com/questions/21352571/android-how-do-i-check-if-dialogfragment-is-showing
@@ -130,5 +132,4 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         }
         supportFragmentManager.beginTransaction().replace(R.id.container, fragment, currentFragment).commit()
     }
-
 }

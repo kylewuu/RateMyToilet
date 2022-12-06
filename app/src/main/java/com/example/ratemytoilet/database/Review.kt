@@ -2,6 +2,9 @@ package com.example.ratemytoilet.database
 
 import com.google.firebase.firestore.DocumentSnapshot
 
+/**
+ * Review object for washroom reviews for the review collection on Firebase.
+ */
 data class Review (
     var id: String = "",
     var locationId: String = "",
