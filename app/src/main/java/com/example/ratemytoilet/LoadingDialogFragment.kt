@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 
@@ -15,20 +17,18 @@ import androidx.fragment.app.DialogFragment
  */
 class LoadingDialogFragment : DialogFragment() {
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val layoutInflater = requireActivity().layoutInflater
-        val dialogLayout = layoutInflater.inflate(R.layout.fragment_loading, null)
-        val builder = AlertDialog.Builder(requireActivity(), R.style.DialogAnimation).setView(dialogLayout)
-        return builder.create()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_loading, container);
     }
 
     override fun onStart() {
         super.onStart()
         val dialog = dialog
-        if(dialog!= null) {
-            val width = resources.getDimension(R.dimen.card_width)
-            val height = ViewGroup.LayoutParams.WRAP_CONTENT
-            dialog.window!!.setLayout(width.toInt(), height)
+        if (dialog != null) {
             dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.window!!.setGravity(Gravity.CENTER)
             dialog.setCanceledOnTouchOutside(false)
