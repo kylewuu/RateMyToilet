@@ -44,3 +44,7 @@ Number 778 444 5555
 Verification code (same every time): 123456
 
 Using an actual phone number also works and you will receive a login code. If you want to try it out just note that your number will be stored in our Firebase.
+
+## Notes
+- Please note that fetching items from Firebase can take awhile, especially on a slow connection. The loading speed may have an impact on all 3 pages (Map, List, My Profile). 
+- Applying the filter for the map or list will require the app to fetch data from the cloud. Thus, please wait 5-10 seconds to see your updates.
