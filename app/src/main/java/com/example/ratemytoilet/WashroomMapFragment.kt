@@ -271,7 +271,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
             if (updateMap || locationViewModel.tempMarkers == null) {
-                locationViewModel.processLocations(bubble)
+                locationViewModel.processMapLocations(bubble)
             }
             var arr = locationViewModel.tempMarkers.value
             if (arr != null) {

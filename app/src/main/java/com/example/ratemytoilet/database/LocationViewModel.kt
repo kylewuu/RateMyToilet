@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
  *
  */
 class LocationViewModel : ViewModel() {
+    var tempListLocations: MutableLiveData<ArrayList<Location>> = MutableLiveData()
     var tempMarkers: MutableLiveData<ArrayList<MyItem>> = MutableLiveData()
     var locations: LiveData<List<Location>> = LocationRepository.getAllLocationsFlow().asLiveData()
 
@@ -30,7 +31,7 @@ class LocationViewModel : ViewModel() {
         return LocationRepository.getAllLocations()
     }
 
-    suspend fun processLocations(bubble: IconGenerator) {
+    suspend fun processMapLocations(bubble: IconGenerator) {
         var newLocations = ArrayList<Location>()
         var arr = ArrayList<MyItem>()
         var allLocations = getAllLocations()
@@ -149,6 +150,76 @@ class LocationViewModel : ViewModel() {
 
         withContext(Main) {
             tempMarkers.postValue(arr)
+        }
+    }
+
+    public suspend fun processListLocations() {
+        var newLocations = ArrayList<Location>()
+        val reviewViewModel = ReviewViewModel()
+        var allLocations = getAllLocations()
+        if (MainActivity.isAdmin) allLocations = filterAdminMarkers(allLocations, reviewViewModel)
+        if (allLocations != null &&
+            (MainActivity.paperCheck ||
+                    MainActivity.soapCheck ||
+                    MainActivity.accessCheck ||
+                    MainActivity.maleCheck ||
+                    MainActivity.femaleCheck ||
+                    MainActivity.cleanlinessStart != 1f ||
+                    MainActivity.cleanlinessEnd != 5f)
+        ) {
+            for (location in allLocations) {
+                var shouldAdd = true
+                var rating = 0.0
+
+                var allReviews = reviewViewModel.getReviewsForLocation(location.id)
+                allReviews = allReviews.sortedByDescending { it.dateAdded }
+                if (allReviews.isNotEmpty()) {
+                    for (review in allReviews) {
+                        rating += review.cleanliness
+                    }
+                    rating /= allReviews.size
+
+                    if (MainActivity.paperCheck) {
+                        if (allReviews[0].sufficientPaperTowels != 1) {
+                            shouldAdd = false
+                        }
+                    }
+                    if (MainActivity.soapCheck) {
+                        if (allReviews[0].sufficientSoap != 1) {
+                            shouldAdd = false
+                        }
+                    }
+                    if (MainActivity.accessCheck) {
+                        if (allReviews[0].accessibility != 1) {
+                            shouldAdd = false
+                        }
+                    }
+                }
+                if ((MainActivity.femaleCheck && !MainActivity.maleCheck) || (!MainActivity.femaleCheck && MainActivity.maleCheck)) {
+                    if (MainActivity.maleCheck) {
+                        if (location.gender != 0 && location.gender != 2) {
+                            shouldAdd = false
+                        }
+                    }
+                    if (MainActivity.femaleCheck) {
+                        if (location.gender != 1 && location.gender != 2) {
+                            shouldAdd = false
+                        }
+                    }
+                }
+
+                if (rating !in MainActivity.cleanlinessStart..MainActivity.cleanlinessEnd) {
+                    shouldAdd = false
+                }
+
+                if (shouldAdd) newLocations.add(location)
+            }
+        } else {
+            newLocations = allLocations as java.util.ArrayList<Location>
+        }
+
+        withContext(Main) {
+            tempListLocations.value = newLocations
         }
     }
 

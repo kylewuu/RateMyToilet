@@ -24,6 +24,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         var previousLocationsSize = -1
 
         var updateMap = true
+        var updateList = true
         var isAdmin = false
         var updateReviews = false
     }
