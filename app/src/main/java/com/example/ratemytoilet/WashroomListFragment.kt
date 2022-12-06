@@ -292,12 +292,6 @@ class WashroomListFragment : Fragment(), LocationListener {
         loadWashrooms()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // Unregister receiver
-        activity?.unregisterReceiver(locationSwitchStateReceiver)
-    }
-
     // Get the current users location
     private fun getUserLocation() {
         try {
