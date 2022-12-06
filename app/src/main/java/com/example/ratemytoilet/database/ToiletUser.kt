@@ -1,4 +1,4 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.database
 
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.DocumentSnapshot

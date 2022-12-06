@@ -26,11 +26,11 @@
             android:value="AIzaSyCV4BT1MF8LWiFIShSVRIyCdCPmjxGY354" />
 
         <activity
-            android:name=".AddLocationMapActivity"
+            android:name=".AddLocationToNewWashroomActivity"
             android:exported="false"
             android:label="@string/title_activity_add_location_map" />
         <activity
-            android:name=".AddNewLocationActivity"
+            android:name=".AddNewWashroomActivity"
             android:exported="false"
             android:label="@string/title_activity_add_location_map" />
         <activity
@@ -71,12 +71,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisplayActivity"
+        <activity android:name=".WashroomDetailsActivity"
             android:label="Washroom Reviews"
             android:parentActivityName=".MainActivity"/>
-        <activity android:name=".NormalUserAddReviewActivity"
+        <activity android:name=".NewReviewActivity"
             android:label="Review Washroom"
-            android:parentActivityName=".DisplayActivity"/>
+            android:parentActivityName=".WashroomDetailsActivity"/>
 
 
     </application>

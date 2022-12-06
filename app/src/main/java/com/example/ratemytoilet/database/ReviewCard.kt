@@ -1,10 +1,10 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.database
 
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 
-class MyItem : ClusterItem {
+class ReviewCard : ClusterItem {
     private val mPosition: LatLng
     private val mTitle: String
     private val mSnippet: String

@@ -21,7 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class AddNewLocationActivity : AppCompatActivity() {
+class AddNewWashroomActivity : AppCompatActivity() {
 
     // Views
     private lateinit var ratingBar: RatingBar
@@ -82,7 +82,7 @@ class AddNewLocationActivity : AppCompatActivity() {
 
     // Start the AddLocationMapActivity. User chooses new washroom's location
     fun onAddLocationClick(view: View){
-        val viewIntent = Intent(this, AddLocationMapActivity::class.java)
+        val viewIntent = Intent(this, AddLocationToNewWashroomActivity::class.java)
         startActivityForResult(viewIntent, 0)
     }
 
