@@ -48,3 +48,21 @@ Using an actual phone number also works and you will receive a login code. If yo
 ## Notes
 - Please note that fetching items from Firebase can take awhile, especially on a slow connection. The loading speed may have an impact on all 3 pages (Map, List, My Profile). 
 - Applying the filter for the map or list will require the app to fetch data from the cloud. Thus, please wait 5-10 seconds to see your updates.
+- Sign in screens has orientation locked to vertical for aesthetics, but the rest of the app can be freely rotated.
+
+## References
+Please note that other references are also made at the top of the files they were referenced in.
+- https://stackoverflow.com/questions/57306302/how-to-detect-if-user-turned-off-location-in-settings
+- https://stackoverflow.com/questions/17945498/how-set-listview-not-clickable
+- https://stackoverflow.com/questions/70209573/sorting-arraylist-and-returning-an-arraylist-not-a-list-kotlin
+- https://stackoverflow.com/questions/21422294/how-to-add-button-in-header
+- https://www.android--code.com/2020/03/android-kotlin-listview-add-item.html
+- https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-of-a-imageview-android
+- https://www.javatpoint.com/android-custom-listview
+- https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
+- https://stackoverflow.com/questions/9884202/custom-circle-button
+- https://stackoverflow.com/questions/65879622/using-kotlin-coroutines-to-update-my-textview-crashes-it
+- https://stackoverflow.com/questions/3646415/how-to-create-edittext-with-rounded-corners
+- https://stackoverflow.com/questions/8743120/how-to-grey-out-a-button
+- https://www.geeksforgeeks.org/ratingbar-in-kotlin/
+- https://www.geeksforgeeks.org/cardview-in-android-with-example/#:~:text=CardView%20is%20a%20new%20widget,look%20to%20the%20UI%20design
