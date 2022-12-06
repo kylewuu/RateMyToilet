@@ -11,6 +11,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
  */
 class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
     var currentFragment = "Map"
+    var FRAGMENT_KEY = "fragment_key"
 
     companion object {
         var notRunFirstTime = false
@@ -74,6 +75,31 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
             fragment.filterConditionPassed(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
         }
 
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        savedInstanceState.putString(FRAGMENT_KEY, currentFragment)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        currentFragment = savedInstanceState.getString(FRAGMENT_KEY).toString()
+        updateMap = true
+        updateList = true
+
+        var fragment = when(currentFragment) {
+            "Profile" -> {
+                ProfileFragment()
+            }
+            "List" -> {
+                WashroomListFragment()
+            }
+            else -> {
+                WashroomMapFragment()
+            }
+        }
+        supportFragmentManager.beginTransaction().replace(R.id.container, fragment, currentFragment).commit()
     }
 
 }

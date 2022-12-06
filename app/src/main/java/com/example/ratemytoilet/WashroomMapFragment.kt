@@ -21,7 +21,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -146,7 +145,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         if (notRunFirstTime) {
             if (updateMap) {
                 Log.d("TAp", "true")
-                if (mMap != null && myClusterManager != null) {
+                if (this::mMap.isInitialized && mMap != null && myClusterManager != null) {
                     mMap.clear()
                     myClusterManager.clearItems()
                     loadWashrooms()
@@ -225,6 +224,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onPause() {
         super.onPause()
         mapView.onPause()
+        if (this::loadingDialogFragment.isInitialized && loadingDialogFragment != null) loadingDialogFragment.dismiss()
     }
 
     override fun onStop() {
@@ -236,7 +236,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         super.onDestroy()
         mapView.onDestroy()
 
-        if (locationManager != null)
+        if (this::locationManager.isInitialized && locationManager != null)
             locationManager.removeUpdates(this)
 
         // Unregister receiver
@@ -257,8 +257,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         withContext(Dispatchers.Main){
             var loadFragment = childFragmentManager.findFragmentByTag("Load")
             if (loadFragment != null) {
-                val fragment = loadFragment as DialogFragment
-                fragment.dismiss()
+                loadingDialogFragment.dismiss()
             }
             myClusterManager.addItems(locationList)
             myClusterManager.cluster()
@@ -270,12 +269,15 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         bubble.setStyle(markerColor)
         if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
-            if (updateMap || locationViewModel.tempMarkers == null) {
+
+            if (updateMap || locationViewModel.tempMarkers.value == null) {
                 locationViewModel.processMapLocations(bubble)
             }
             var arr = locationViewModel.tempMarkers.value
             if (arr != null) {
                 setClusterOnMainThread(arr)
+            } else {
+                loadingDialogFragment.dismiss()
             }
             updateMap = false
         }

@@ -149,11 +149,11 @@ class LocationViewModel : ViewModel() {
         }
 
         withContext(Main) {
-            tempMarkers.postValue(arr)
+            tempMarkers.value = arr
         }
     }
 
-    public suspend fun processListLocations() {
+    suspend fun processListLocations() {
         var newLocations = ArrayList<Location>()
         val reviewViewModel = ReviewViewModel()
         var allLocations = getAllLocations()
