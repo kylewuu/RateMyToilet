@@ -13,9 +13,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 /**
+ * View model for the locations objects. Connected to the Location repository for access
+ * to Location collection on Firebase.
+ *
  * refs:
  * https://stackoverflow.com/questions/68840086/proper-way-to-collect-values-from-flow-in-android-and-coroutines
- *
  */
 class LocationViewModel : ViewModel() {
     var tempListLocations: MutableLiveData<ArrayList<Location>> = MutableLiveData()
@@ -255,5 +257,4 @@ class LocationViewModel : ViewModel() {
 
         return filteredLocations
     }
-
 }

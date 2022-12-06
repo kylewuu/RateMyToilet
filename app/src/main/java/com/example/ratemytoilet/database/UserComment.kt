@@ -1,5 +1,8 @@
 package com.example.ratemytoilet.database
 
+/**
+ * Data object for the user reviews in the washroom details.
+ */
 class UserComment {
     var userName:String ?= null
     var date:String ?= null

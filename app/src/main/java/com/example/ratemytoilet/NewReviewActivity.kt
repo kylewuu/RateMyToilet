@@ -15,6 +15,9 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
+/**
+ * Activity for writing a new review
+ */
 class NewReviewActivity : AppCompatActivity() {
     private var rating = 0.0f
     private var paperResult = 1
@@ -45,11 +48,9 @@ class NewReviewActivity : AppCompatActivity() {
                 finish()
             }
         }
-
         cancel.setOnClickListener {
             finish()
         }
-
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -57,7 +58,7 @@ class NewReviewActivity : AppCompatActivity() {
         return true
     }
 
-    fun getData() {
+    private fun getData() {
         val ratingBar = findViewById<RatingBar>(R.id.normalUserRating)
         rating = ratingBar.rating
 

@@ -11,6 +11,8 @@ import androidx.fragment.app.DialogFragment
 import com.example.ratemytoilet.R
 
 /**
+ * Loading dialog for when washroom map reloads.
+ *
  * refs:
  * https://stackoverflow.com/questions/8404140/how-to-dismiss-a-dialogfragment-when-pressing-outside-the-dialog
  */
