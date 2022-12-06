@@ -27,6 +27,9 @@ class WashroomDetailsReviewAdapter(var context: Context, var arrayList: ArrayLis
         return position.toLong()
     }
 
+    /**
+     * Gets the view for the adapter, will set the texts with the passed in values
+     */
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         if (arrayList == null || arrayList.size == 0) {
             return TextView(context)
@@ -53,6 +56,9 @@ class WashroomDetailsReviewAdapter(var context: Context, var arrayList: ArrayLis
         arrayList = newList
     }
 
+    /**
+     * Decides what colour the attributes should have in the review card details
+     */
     private fun setTextState(textView: TextView, state: Int) {
         if (state == 1) {
             textView.setText("Yes")

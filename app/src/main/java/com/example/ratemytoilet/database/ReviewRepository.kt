@@ -22,14 +22,16 @@ class ReviewRepository {
         private var reviewCollection = firestore.collection("review")
         private var userCollection = firestore.collection("users")
 
+        /**
+         * Gets all reviews for a given location from firestore
+         */
         suspend fun getReviewsForLocation(locationId: String): List<Review> {
             return reviewCollection.whereEqualTo("locationId", locationId).get().await().documents.map { it.toReview() }
         }
 
-        suspend fun getReviewsForUserId(userId: String): List<Review> {
-            return firestore.collection("users/${userId}/reviews").get().await().documents.map { it.toReview() }
-        }
-
+        /**
+         * Adds review for a location to firestore
+         */
         fun addReviewForLocation(review: Review) {
             val mappedReview = review.toReviewMap()
             reviewCollection.add(mappedReview)

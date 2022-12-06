@@ -47,6 +47,9 @@ class AddNewWashroomActivity : AppCompatActivity() {
     // Array of genders
     val genderArray = arrayOf("Male", "Female", "Universal")
 
+    /**
+     * On create for adding a new washroom. Sets the adapters and the spinners.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_new_location)
@@ -54,13 +57,13 @@ class AddNewWashroomActivity : AppCompatActivity() {
         if (isAdmin) title = "ADMIN - " + getString(R.string.title_activity_add_location_map)
 
         // Set views
-        paperTowelButtonYes = findViewById<Button>(R.id.bt_paperTowelsYes)
-        paperTowelButtonNo = findViewById<Button>(R.id.bt_paperTowelsNo)
-        soapButtonYes = findViewById<Button>(R.id.bt_soapYes)
-        soapButtonNo = findViewById<Button>(R.id.bt_soapNo)
-        accessButtonYes = findViewById<Button>(R.id.bt_accessYes)
-        accessButtonNo = findViewById<Button>(R.id.bt_accessNo)
-        commentBox = findViewById<EditText>(R.id.et_comment)
+        paperTowelButtonYes = findViewById(R.id.bt_paperTowelsYes)
+        paperTowelButtonNo = findViewById(R.id.bt_paperTowelsNo)
+        soapButtonYes = findViewById(R.id.bt_soapYes)
+        soapButtonNo = findViewById(R.id.bt_soapNo)
+        accessButtonYes = findViewById(R.id.bt_accessYes)
+        accessButtonNo = findViewById(R.id.bt_accessNo)
+        commentBox = findViewById(R.id.et_comment)
 
         // Setup spinner for Gender
         val spinner = findViewById<Spinner>(R.id.sp_gender)
@@ -78,13 +81,17 @@ class AddNewWashroomActivity : AppCompatActivity() {
         updateMap = false
     }
 
-    // Start the AddLocationMapActivity. User chooses new washroom's location
+    /**
+     * Start the AddLocationMapActivity. User chooses new washroom's location
+     */
     fun onAddLocationClick(view: View){
         val viewIntent = Intent(this, AddLocationToNewWashroomActivity::class.java)
         startActivityForResult(viewIntent, 0)
     }
 
-    // Retrieve lat and lng coordinates from the user selected location, from AddLocationMapActivity
+    /**
+     * Retrieve lat and lng coordinates from the user selected location, from AddLocationMapActivity
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 0) {
             if (resultCode == Activity.RESULT_OK) {
@@ -98,7 +105,9 @@ class AddNewWashroomActivity : AppCompatActivity() {
         }
     }
 
-    // On finish button clicked
+    /**
+     * On finish button clicked, add new washroom
+     */
     fun onAddNewWashroomClick(view: View){
         // Get views
         ratingBar = findViewById(R.id.rb_ratingBar)
@@ -164,6 +173,9 @@ class AddNewWashroomActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * When paper towel yes is clicked set response
+     */
     fun onPaperTowelYesClick(view:View){
         paperTowelValue = 1
 
@@ -175,6 +187,9 @@ class AddNewWashroomActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * When paper towel no is clicked set response
+     */
     fun onPaperTowelNoClick(view:View){
         paperTowelValue = 0
 
@@ -185,6 +200,9 @@ class AddNewWashroomActivity : AppCompatActivity() {
         paperTowelButtonNo.setTextColor(Color.WHITE)
     }
 
+    /**
+     * When soap yes is clicked set response
+     */
     fun onSoapYesClick(view:View){
         soapValue = 1
 
@@ -195,6 +213,9 @@ class AddNewWashroomActivity : AppCompatActivity() {
         soapButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
     }
 
+    /**
+     * When soap no is clicked set response
+     */
     fun onSoapNoClick(view:View){
         soapValue = 0
 
@@ -205,6 +226,9 @@ class AddNewWashroomActivity : AppCompatActivity() {
         soapButtonNo.setTextColor(Color.WHITE)
     }
 
+    /**
+     * When accessibility yes is clicked set response
+     */
     fun onAccessYesClick(view:View){
         accessValue = 1
 
@@ -215,6 +239,9 @@ class AddNewWashroomActivity : AppCompatActivity() {
         accessButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
     }
 
+    /**
+     * When accessibility no is clicked set response
+     */
     fun onAccessNoClick(view:View){
         accessValue = 0
 

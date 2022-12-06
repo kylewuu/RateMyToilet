@@ -46,6 +46,9 @@ class ConfirmPhoneActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * Creates the activity, initializes the variables
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityConfirmPhoneBinding.inflate(layoutInflater)
@@ -69,11 +72,17 @@ class ConfirmPhoneActivity : AppCompatActivity() {
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
+    /**
+     * Signs in with the inputted verification code
+     */
     fun onVerifyCodeClick(view: View) {
         val credential = PhoneAuthProvider.getCredential(verificationId, binding.verificationEditText.text.toString())
         signInWithCredential(credential)
     }
 
+    /**
+     * Signs in with the given credentials
+     */
     private fun signInWithCredential(credential: PhoneAuthCredential) {
         auth.signInWithCredential(credential)
             .addOnSuccessListener(this) {
@@ -92,6 +101,9 @@ class ConfirmPhoneActivity : AppCompatActivity() {
             }
     }
 
+    /**
+     * Decides whether to sign in or register if the user already exists for the phone number
+     */
     private fun loginOrRegister(completion: () -> Unit) {
         val currentUserID = auth.currentUser!!.uid
         db.document("users/${currentUserID}").get().addOnCompleteListener {

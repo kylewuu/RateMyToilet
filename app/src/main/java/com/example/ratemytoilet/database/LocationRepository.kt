@@ -24,10 +24,16 @@ class LocationRepository {
         private var firestore = Firebase.firestore
         private var collection = firestore.collection("location")
 
+        /**
+         * Gets all the locations from firestore
+         */
         suspend fun getAllLocations(): List<Location>  {
             return collection.get().await().documents.map { it.toLocation() }
         }
 
+        /**
+         * Gets all the locations using flow
+         */
         fun getAllLocationsFlow(): Flow<List<Location>> {
             return callbackFlow {
                 var listener = collection.addSnapshotListener { querySnapshot: QuerySnapshot?, firebaseFirestoreException: FirebaseFirestoreException? ->
@@ -42,6 +48,9 @@ class LocationRepository {
             }
         }
 
+        /**
+         * Adds a location using flow for document id returned.
+         */
         suspend fun addLocation(newLocation: Location): Flow<String> {
             return callbackFlow {
                 var listener = collection.add(newLocation.toLocationMap())

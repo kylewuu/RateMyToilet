@@ -39,6 +39,9 @@ class NewReviewAdminFragment : DialogFragment() {
         var ACCESSIBILITY_KEY = "accessibility_key"
     }
 
+    /**
+     * Creates the dialog for admins adding a new review. Sets the on click listeners for all buttons
+     */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val layoutInflater = requireActivity().layoutInflater
         val dialogLayout = layoutInflater.inflate(R.layout.fragment_admin_check, null)
@@ -117,6 +120,9 @@ class NewReviewAdminFragment : DialogFragment() {
         return builder.create()
     }
 
+    /**
+     * Stars the dialog with the sizes
+     */
     override fun onStart() {
         super.onStart()
         val dialog = dialog
@@ -138,6 +144,9 @@ class NewReviewAdminFragment : DialogFragment() {
         }
     }
 
+    /**
+     * Interface for loading reviews after admin saves their review
+     */
     interface AdminReviewListener {
         fun loadReviews()
     }
