@@ -17,6 +17,7 @@ import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
 import com.example.ratemytoilet.MainActivity.Companion.maleCheck
 import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
+import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.google.android.material.chip.Chip
 import com.google.android.material.slider.RangeSlider
@@ -47,6 +48,7 @@ class FilterDialogFragment : DialogFragment() {
 
         saveButton.setOnClickListener {
             updateMap = true
+            updateList = true
             listener?.onFilterConditionPassed(paperCheckButton.isChecked, soapCheckButton.isChecked, accessCheckButton.isChecked, maleCheckButton.isChecked, femaleCheckButton.isChecked, cleanliness.values[0], cleanliness.values[1])
             dismiss()
         }

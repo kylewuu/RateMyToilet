@@ -19,18 +19,13 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.ratemytoilet.MainActivity.Companion.accessCheck
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
-import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
 import com.example.ratemytoilet.MainActivity.Companion.isAdmin
-import com.example.ratemytoilet.MainActivity.Companion.maleCheck
-import com.example.ratemytoilet.MainActivity.Companion.paperCheck
-import com.example.ratemytoilet.MainActivity.Companion.soapCheck
+import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
-import com.example.ratemytoilet.database.ReviewViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
@@ -132,7 +127,7 @@ class WashroomListFragment : Fragment(), LocationListener {
             onAddNewLocationClick()
         }
 
-        if (MainActivity.isAdmin) toolbar.title = "ADMIN - Washrooms near you"
+        if (isAdmin) toolbar.title = "ADMIN - Washrooms near you"
 
         return view
     }
@@ -153,73 +148,12 @@ class WashroomListFragment : Fragment(), LocationListener {
 
     private fun loadWashrooms() {
         lifecycleScope.launch(Dispatchers.IO) {
-            var newLocations = ArrayList<Location>()
-            var allLocations = locationViewModel.getAllLocations()
-            var distanceArray = ArrayList<Float?>()
-            val reviewViewModel = ReviewViewModel()
-            if (isAdmin) allLocations = filterAdminMarkers(allLocations, reviewViewModel)
-            if (allLocations != null &&
-                    (paperCheck ||
-                    soapCheck ||
-                    accessCheck ||
-                    maleCheck ||
-                    femaleCheck ||
-                    cleanlinessStart != 1f ||
-                    cleanlinessEnd != 5f)
-            ) {
 
-
-                for (location in allLocations) {
-                    var shouldAdd = true
-                    var rating = 0.0
-
-                    var allReviews = reviewViewModel.getReviewsForLocation(location.id)
-                    allReviews = allReviews.sortedByDescending { it.dateAdded }
-                    if (allReviews.isNotEmpty()) {
-                        for (review in allReviews) {
-                            rating += review.cleanliness
-                        }
-                        rating /= allReviews.size
-
-                        if (paperCheck) {
-                            if (allReviews[0].sufficientPaperTowels != 1) {
-                                shouldAdd = false
-                            }
-                        }
-                        if (soapCheck) {
-                            if (allReviews[0].sufficientSoap != 1) {
-                                shouldAdd = false
-                            }
-                        }
-                        if (accessCheck) {
-                            if (allReviews[0].accessibility != 1) {
-                                shouldAdd = false
-                            }
-                        }
-                    }
-                    if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
-                        if (maleCheck) {
-                            if (location.gender != 0 && location.gender != 2) {
-                                shouldAdd = false
-                            }
-                        }
-                        if (femaleCheck) {
-                            if (location.gender != 1 && location.gender != 2) {
-                                shouldAdd = false
-                            }
-                        }
-                    }
-
-                    if (rating !in cleanlinessStart..cleanlinessEnd) {
-                        shouldAdd = false
-                    }
-
-                    if (shouldAdd) newLocations.add(location)
-                }
-            } else {
-                newLocations = allLocations as ArrayList<Location>
+            if (updateList || locationViewModel.tempListLocations.value == null) {
+                locationViewModel.processListLocations()
             }
 
+            var newLocations = locationViewModel.tempListLocations.value ?: ArrayList()
 
             if(userLocation != null) {
                 newLocations =
@@ -231,44 +165,10 @@ class WashroomListFragment : Fragment(), LocationListener {
                 arrayAdapter.replace(newLocations)
                 arrayAdapter.notifyDataSetChanged()
             }
+
+            updateList = false
         }
     }
-
-
-    private suspend fun filterAdminMarkers(allLocations: List<com.example.ratemytoilet.database.Location>, reviewViewModel: ReviewViewModel): List<com.example.ratemytoilet.database.Location> {
-        var filteredLocations = ArrayList<com.example.ratemytoilet.database.Location>()
-        for (location in allLocations) {
-            var shouldAdd = false
-            var rating = 0.0
-            var allReviews = reviewViewModel.getReviewsForLocation(location.id)
-            allReviews = allReviews.sortedByDescending { it.dateAdded }
-            if (allReviews.isNotEmpty()) {
-                for (review in allReviews) {
-                    rating += review.cleanliness
-                }
-                rating /= allReviews.size
-
-                if (allReviews[0].sufficientPaperTowels == 0) {
-                    shouldAdd = true
-                }
-
-
-                if (allReviews[0].sufficientSoap == 0) {
-                    shouldAdd = true
-                }
-
-            }
-
-            if (rating < 3) {
-                shouldAdd = true
-            }
-
-            if (shouldAdd) filteredLocations.add(location)
-        }
-
-        return filteredLocations
-    }
-
 
     fun filterConditionPassed(
         paperCheck: Boolean,
@@ -288,6 +188,7 @@ class WashroomListFragment : Fragment(), LocationListener {
         cleanlinessEnd = endValue
 
         updateMap = true
+        updateList = true
 
         loadWashrooms()
     }

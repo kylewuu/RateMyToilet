@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.MainActivity.Companion.isAdmin
+import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
@@ -168,6 +169,7 @@ class AddNewLocationActivity : AppCompatActivity() {
 
             }
             updateMap = true
+            updateList = true
             finish()
         }
     }
