@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Date added:"
+                    android:text="Date Added:"
                     android:textStyle="bold" />
 
                 <TextView
@@ -73,7 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Overall cleanness:"
+                    android:text="Overall Cleanliness:"
                     android:textStyle="bold" />
 
                 <RatingBar
@@ -121,7 +121,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="Paper towels:"
+                    android:text="Paper Towels:"
                     android:textStyle="bold" />
 
                 <TextView
@@ -172,9 +172,9 @@
                 android:layout_height="400dp"
                 android:layout_marginTop="5dp"
                 android:divider="@null"
-                tools:layout_editor_absoluteY="372dp"
                 android:listSelector="@android:color/transparent"
-                android:nestedScrollingEnabled="true"/>
+                android:nestedScrollingEnabled="true"
+                tools:layout_editor_absoluteY="372dp" />
 
 
         </LinearLayout>
