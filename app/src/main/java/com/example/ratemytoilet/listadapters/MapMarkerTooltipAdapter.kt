@@ -9,8 +9,10 @@ import com.example.ratemytoilet.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 
+/**
+ * Adapter for the tooltips on each map marker.
+ */
 class MapMarkerTooltipAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
-    var mContext = context
     var view : View = LayoutInflater.from(context).inflate(R.layout.custom_inforwindow, null)
 
     private fun setWindowText(marker: Marker, view: View){
@@ -62,7 +64,6 @@ class MapMarkerTooltipAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
             rate.setText(rateResult)
         }
     }
-
 
     override fun getInfoContents(marker: Marker): View? {
         setWindowText(marker, view)

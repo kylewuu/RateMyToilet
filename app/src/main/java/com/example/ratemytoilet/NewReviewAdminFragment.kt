@@ -21,7 +21,10 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
-
+/**
+ * Activity for adding a new review for admins only.
+ *
+ */
 class NewReviewAdminFragment : DialogFragment() {
     var listener: AdminReviewListener? = null
     private var paperResult = 1
@@ -48,7 +51,6 @@ class NewReviewAdminFragment : DialogFragment() {
         washroomId = bundle?.getString(LOCATION_ID_KEY) ?: ""
 
         saveButton.setOnClickListener {
-
             val cleanGroup = dialogLayout.findViewById<ChipGroup>(R.id.cleanGroupAdmin)
             val cleanChipT = cleanGroup.getChildAt(0) as Chip
             val cleanChipF = cleanGroup.getChildAt(1) as Chip

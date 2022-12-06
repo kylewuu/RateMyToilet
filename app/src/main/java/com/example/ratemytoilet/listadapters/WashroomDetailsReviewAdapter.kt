@@ -11,6 +11,9 @@ import android.widget.TextView
 import com.example.ratemytoilet.R
 import com.example.ratemytoilet.database.UserComment
 
+/**
+ * Adapter for each review in washroom details.
+ */
 class WashroomDetailsReviewAdapter(var context: Context, var arrayList: ArrayList<UserComment>) : BaseAdapter(){
     override fun getCount(): Int {
         return arrayList.size
@@ -44,7 +47,6 @@ class WashroomDetailsReviewAdapter(var context: Context, var arrayList: ArrayLis
         userInformation.rate?.let { rating.setRating(it) }
 
         return view
-
     }
 
     fun update(newList: ArrayList<UserComment>) {

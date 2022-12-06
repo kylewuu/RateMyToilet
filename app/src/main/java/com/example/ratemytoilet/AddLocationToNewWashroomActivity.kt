@@ -24,8 +24,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
+/**
+ * Activity for inputting location for the new washroom.
+ *
+ */
 class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, GoogleMap.OnMapClickListener {
-
     // Map vars
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityAddLocationMapBinding
@@ -41,7 +44,6 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
     // Views
     private lateinit var finishButton: Button
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -54,7 +56,6 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
 
         finishButton = findViewById<Button>(R.id.bt_onFinishAddLocationClick)
         finishButton.setEnabled(false)
@@ -76,7 +77,6 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 0)
         else {
             getUserLocation()
-            //getToiletLocation()
         }
     }
 
@@ -92,8 +92,7 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
                     onLocationChanged(location)
 
             }
-        } catch (e: SecurityException) {
-        }
+        } catch (e: SecurityException) {}
     }
 
     override fun onLocationChanged(location: Location) {
@@ -106,7 +105,6 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
     }
 
     override fun onMapClick(latLng: LatLng) {
-
         // Remove previous marker if it exists
         if(previousMarker != null){
             previousMarker?.remove()
@@ -122,7 +120,6 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
     }
 
     fun onFinishAddLocationClick(view: View){
-
         // Create bundle
         val bundle = Bundle()
 
@@ -136,7 +133,4 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
-
-
-
 }

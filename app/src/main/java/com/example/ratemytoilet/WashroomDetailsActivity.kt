@@ -23,6 +23,9 @@ import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
+/**
+ * Activity to show the washroom details when a washroom is selected.
+ */
 class WashroomDetailsActivity : AppCompatActivity(), NewReviewAdminFragment.AdminReviewListener {
     private lateinit var userCommentList: ArrayList<UserComment>
     private lateinit var washroomId : String
@@ -115,7 +118,6 @@ class WashroomDetailsActivity : AppCompatActivity(), NewReviewAdminFragment.Admi
                     }
                 }
 
-
                 if (allReviews[0].sufficientSoap == 0) {
                     lifecycleScope.launch(Main) {
                         soapText.setText("No")
@@ -172,7 +174,6 @@ class WashroomDetailsActivity : AppCompatActivity(), NewReviewAdminFragment.Admi
                 adminDialogFragment.show(supportFragmentManager, "Admin")
             }
         }
-
     }
 
     override fun loadReviews() {

@@ -8,6 +8,9 @@ import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 
+/**
+ * Renderer for the markers clusters on the map
+ */
 class MarkerClusterRenderer (context:Context, map: GoogleMap, clusterManager: ClusterManager<ReviewCard>?) : DefaultClusterRenderer<ReviewCard> (context, map, clusterManager) {
     override fun onBeforeClusterItemRendered(item: ReviewCard, markerOptions: MarkerOptions) {
         if (item != null && markerOptions != null) {

@@ -30,9 +30,9 @@ import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.notRunFirstTime
 import com.example.ratemytoilet.MainActivity.Companion.previousLocationsSize
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
-import com.example.ratemytoilet.database.ToiletUser.Companion.toToiletUser
 import com.example.ratemytoilet.database.LocationViewModel
 import com.example.ratemytoilet.database.ReviewCard
+import com.example.ratemytoilet.database.ToiletUser.Companion.toToiletUser
 import com.example.ratemytoilet.dialogs.FilterDialogFragment
 import com.example.ratemytoilet.dialogs.LoadingDialogFragment
 import com.example.ratemytoilet.listadapters.MapMarkerTooltipAdapter
@@ -54,7 +54,10 @@ import java.text.SimpleDateFormat
 
 private const val TAG = "WashroomMapFragment"
 
-
+/**
+ * Fragment to show all washrooms on a map.
+ *
+ */
 class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private var myLocationMarker : Marker?= null
     private lateinit var mMap: GoogleMap
@@ -74,9 +77,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private lateinit var  polylines: ArrayList<Polyline>
     private lateinit var myClusterManager: ClusterManager<ReviewCard>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
-
     private lateinit var locationPermissionResultReceiver: ActivityResultLauncher<String>
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,8 +110,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         mapView.getMapAsync(this)
 
         locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-
-
         loadingDialogFragment = LoadingDialogFragment()
 
         if ((activity as AppCompatActivity).supportActionBar != null) {
@@ -159,11 +158,10 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         }
     }
 
-   override fun onStart() {
+    override fun onStart() {
        super.onStart()
        mapView.onStart()
-
-   }
+    }
 
     fun initLocationManager() {
         try {
@@ -179,8 +177,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
                     onLocationChanged(location)
                 locationManager.requestLocationUpdates(provider, 0, 0f, this)
             }
-        } catch (e: SecurityException) {
-        }
+        } catch (e: SecurityException) {}
     }
 
     override fun onLocationChanged(location: Location) {
@@ -282,7 +279,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         setClusterManager()
     }
 
-    fun onAddNewLocationClick() {
+    private fun onAddNewLocationClick() {
         val viewIntent = Intent(activity, AddNewWashroomActivity::class.java)
         startActivity(viewIntent)
     }
@@ -310,8 +307,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onProviderDisabled(provider: String) {
         println("DEBUG: Provider Disabled" )
     }
-
-
 
     private fun setClusterManager() {
         myClusterManager = ClusterManager<ReviewCard>(activity?.applicationContext , mMap)
@@ -351,9 +346,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         mMap.setOnInfoWindowClickListener(myClusterManager)
     }
 
-
     // Detects if the location is turned on in the map fragment. If detected, it will start the location manager again with function initLocationManager().
-
     // Helps to solve the issue where the location is turned off in another fragment (ex. Washroom List Fragment), and the map view is re-opened with location still turned off.
     // This will detect if the location is turned back on in the map view and start up location manager to detect new locations. Otherwise, location will not be updated.
     private val locationSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -373,7 +366,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     }
 
     private fun setUpAdmin(view: View) {
-        //        isAdmin = true
         var db = FirebaseFirestore.getInstance()
         var auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
@@ -396,7 +388,4 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
             }
         }
     }
-
-
-
 }

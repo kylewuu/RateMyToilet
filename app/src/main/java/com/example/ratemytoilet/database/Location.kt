@@ -3,6 +3,9 @@ package com.example.ratemytoilet.database
 import com.google.firebase.firestore.DocumentSnapshot
 
 /**
+ * Location object for the Location collection on firebase.
+ *
+ * refs:
  * https://medium.com/firebase-developers/android-mvvm-firestore-37c3a8d65404
  */
 data class Location (
