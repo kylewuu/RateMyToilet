@@ -224,7 +224,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     override fun onPause() {
         super.onPause()
         mapView.onPause()
-        if (this::loadingDialogFragment.isInitialized && loadingDialogFragment != null) loadingDialogFragment.dismiss()
     }
 
     override fun onStop() {
