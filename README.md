@@ -9,12 +9,13 @@
 Team 11 has created a location-based mobile application for crowdsourced reviews on university washrooms. RateMyToilet is cloud-based and utilizes Firebase for data storage and user authentication.
 
 ## Features
-Functionality the team is currently working on include:
-- Precise location tracking via LocationManager
-- User account registration with Firebase 
-- Landmark (washroom) filtering via a pop-up dialog fragment with criteria options
-- Compiled user reviews via a list view
-- Cloud-based storage of user accounts, reviews, and landmark locations 
+Functionalities of the App include:
+- User account authentication with Firebase 
+- Ability to view washrooms around the user's current location
+- Ability to add new washrooms to the map
+- Ability to view reviews created by users and add new reviews to pre-existing washrooms
+- Washroom filtering with criteria options in both the map and list views
+- Login with an admin account with the ability to view and update washrooms in need of assistance.
 
 ## Installation Notes
 Due to the Firebase SDK setup and configurations for Firebase Auth, installing the app from the Android Studio project directly onto a phone requires adding in the the SHA certificates for that specific Android Studio. Therefore, installing the application from Android Studio will not allow the user to successfully sign in to the app. 
@@ -51,13 +52,29 @@ Using an actual phone number also works and you will receive a login code. If yo
 - Sign in screens has orientation locked to vertical for aesthetics, but the rest of the app can be freely rotated.
 
 
-## Pitches
+## Pitches And Presentation Videos
 - [Original Pitch](https://www.youtube.com/watch?v=8LEHrpURMUA)
 - [Show and Tell 1](https://www.youtube.com/watch?v=ig3SUulYDys)
 - [Show and Tell 2](https://www.youtube.com/watch?v=bEes_D9cRB4)
+- [Figma UI Prototype](https://www.figma.com/file/LH57Gz221c4b5S6shuGYpm/Final-Project?node-id=0%3A1&t=vYoF0P7ErklMTadW-0)
+- [Final Presentation]()
 
 ## Team Effort Breakdown
-- 
+- Warren - Washroom Map, Washroom Details & Reviews
+- Wilson - Washroom List & Adding a New Location to the Map
+- Kyle - Firebase Database for Locations & Reviews, Admin Interfaces & Figma UI Prototype
+- Nirvon - Firestore Authentication, Profile Page & Tab Layout
+- Kyle & Wilson - Diagrams, Slides & Presentations
+
+## Diagrams
+MVVM Diagram 
+
+<img src = "https://github.com/kylewuu/RateMyToilet/blob/Wilson-Wu1-patch-5/diagrams/MVVMDiagram.png" width=50% height=50%>
+
+Thread Diagram 
+
+<img src = "https://github.com/kylewuu/RateMyToilet/blob/Wilson-Wu1-patch-5/diagrams/threadDiagram.png" width=50% height=50%>
+
 
 ## References
 Please note that other references are also made at the top of the files they were referenced in.
@@ -75,3 +92,6 @@ Please note that other references are also made at the top of the files they wer
 - https://stackoverflow.com/questions/8743120/how-to-grey-out-a-button
 - https://www.geeksforgeeks.org/ratingbar-in-kotlin/
 - https://www.geeksforgeeks.org/cardview-in-android-with-example/#:~:text=CardView%20is%20a%20new%20widget,look%20to%20the%20UI%20design
+- https://stackoverflow.com/questions/23925907/slidedown-and-slideup-layout-with-animation
+- https://stackoverflow.com/questions/19210187/how-to-create-an-interface-to-get-info-from-a-fragment-to-an-android-activity
+- https://medium.com/@tonyshkurenko/work-with-clustermanager-bdf3d70fb0fd
