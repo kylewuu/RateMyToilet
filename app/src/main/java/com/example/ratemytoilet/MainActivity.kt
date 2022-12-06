@@ -2,9 +2,6 @@ package com.example.ratemytoilet
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**
@@ -26,7 +23,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         var cleanlinessEnd = 5f
         var previousLocationsSize = -1
 
-        var updateMap = false
+        var updateMap = true
         var isAdmin = false
         var updateReviews = false
     }
@@ -35,14 +32,36 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val mapFragment = WashroomMapFragment()
+        val listFragment = WashroomListFragment()
+        val profileFragment = ProfileFragment()
+
+        supportFragmentManager.beginTransaction().add(R.id.container, mapFragment, "Map").commit()
 
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNavView.setOnItemSelectedListener {
+            var fragment = when(it.itemId) {
+                R.id.washroomListFragment -> {
+                    currentFragment = "List"
+                    listFragment
+                }
+                R.id.profileFragment -> {
+                    currentFragment = "Profile"
+                    profileFragment
+                }
+                else -> {
+                    currentFragment = "Map"
+                    mapFragment
+                }
+            }
+            val foundFragment = supportFragmentManager.findFragmentByTag(currentFragment)
+            if (foundFragment != null) {
+                fragment = foundFragment
+            }
+            supportFragmentManager.beginTransaction().replace(R.id.container, fragment, currentFragment).commit()
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        bottomNavView.setupWithNavController(navController)
+            true
+        }
     }
 
     override fun onFilterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
