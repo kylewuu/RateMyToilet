@@ -9,12 +9,13 @@
 Team 11 has created a location-based mobile application for crowdsourced reviews on university washrooms. RateMyToilet is cloud-based and utilizes Firebase for data storage and user authentication.
 
 ## Features
-Functionality the team is currently working on include:
-- Precise location tracking via LocationManager
-- User account registration with Firebase 
-- Landmark (washroom) filtering via a pop-up dialog fragment with criteria options
-- Compiled user reviews via a list view
-- Cloud-based storage of user accounts, reviews, and landmark locations 
+Functionalities of the App include:
+- User account authentication with Firebase 
+- Ability to view washrooms around the user's current location
+- Ability to add new washrooms to the map
+- Ability to view reviews created by users and add new reviews to pre-existing washrooms
+- Washroom filtering with criteria options in both the map and list views
+- Login with an admin account with the ability to view and update washrooms in need of assistance.
 
 ## Installation Notes
 Due to the Firebase SDK setup and configurations for Firebase Auth, installing the app from the Android Studio project directly onto a phone requires adding in the the SHA certificates for that specific Android Studio. Therefore, installing the application from Android Studio will not allow the user to successfully sign in to the app. 
