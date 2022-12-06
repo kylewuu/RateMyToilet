@@ -21,8 +21,8 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/profile_image_view"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
             android:elevation="4dp"
             android:src="@mipmap/ic_avatar"
             android:layout_marginVertical="32dp"
@@ -52,16 +52,21 @@
                 android:textStyle="bold" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="32dp"
                 android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/total_reviews_text_view"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/stat_total_reviews_format"
                     android:textAlignment="center"
@@ -71,8 +76,8 @@
 
                 <TextView
                     android:id="@+id/level_text_view"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
                     android:text="@string/stat_level_format"
                     android:textAlignment="center"
@@ -80,7 +85,21 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
+                </LinearLayout>
+
+
+                <Button
+                    android:id="@+id/sign_out_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/log_out"
+                    android:backgroundTint="@color/white"
+                    android:textColor="@color/purple_500"
+                    android:layout_marginHorizontal="12dp"/>
+
+
             </LinearLayout>
+
 
         </LinearLayout>
 

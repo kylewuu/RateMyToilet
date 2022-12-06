@@ -64,6 +64,10 @@ class ProfileFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentProfileBinding.inflate(inflater, container, false)
 
+        binding.signOutButton.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+        }
+
         if (currentUser != null) {
 //            adapter = UserCommentListAdapter(requireContext(), profileViewModel.reviews)
 //            binding.userReviewsListView.adapter = adapter
@@ -122,27 +126,15 @@ class ProfileFragment : Fragment() {
         return binding.root
     }
 
-//    private fun updateAdapter() {
-//        Log.i(TAG, "Updating adapter")
-//        lifecycleScope.launch(Dispatchers.IO) {
-//            profileViewModel.getReviewsForUserId(currentUser!!.uid)
-//            withContext(Dispatchers.Main) {
-//                adapter.update(profileViewModel.reviews)
-//                adapter.notifyDataSetChanged()
-//                Log.i(TAG, "adapter has item count: ${adapter.count}")
-//            }
-//        }
-//    }
 
     override fun onResume() {
         super.onResume()
-//        updateAdapter()
         updateTotalReviews()
 
     }
 
     private fun updateTotalReviews() {
-        // Temporary until we get the values
+        // Temporarily set these until we get the values loaded
         binding.totalReviewsTextView.text = reviewsStrFormat.format(0)
         binding.levelTextView.text = levelStrFormat.format(0)
 
