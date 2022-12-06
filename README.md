@@ -50,6 +50,15 @@ Using an actual phone number also works and you will receive a login code. If yo
 - Applying the filter for the map or list will require the app to fetch data from the cloud. Thus, please wait 5-10 seconds to see your updates.
 - Sign in screens has orientation locked to vertical for aesthetics, but the rest of the app can be freely rotated.
 
+
+## Pitches
+- [Original Pitch](https://www.youtube.com/watch?v=8LEHrpURMUA)
+- [Show and Tell 1](https://www.youtube.com/watch?v=ig3SUulYDys)
+- [Show and Tell 2](https://www.youtube.com/watch?v=bEes_D9cRB4)
+
+## Team Effort Breakdown
+- 
+
 ## References
 Please note that other references are also made at the top of the files they were referenced in.
 - https://stackoverflow.com/questions/57306302/how-to-detect-if-user-turned-off-location-in-settings
