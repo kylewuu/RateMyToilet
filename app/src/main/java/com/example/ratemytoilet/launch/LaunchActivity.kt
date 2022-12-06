@@ -22,6 +22,9 @@ class LaunchActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
+    /**
+     * Starts main activity when launch activity starts
+     */
     override fun onStart() {
         super.onStart()
         val currentUser = Firebase.auth.currentUser
@@ -35,6 +38,9 @@ class LaunchActivity : AppCompatActivity() {
         moveTaskToBack(true)
     }
 
+    /**
+     * Starts sign in when pressed from title page
+     */
     fun onSignInClicked(view: View) {
         val intent = Intent(this, PhoneActivity::class.java)
         startActivity(intent)

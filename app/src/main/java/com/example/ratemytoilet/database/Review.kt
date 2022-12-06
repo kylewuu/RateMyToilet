@@ -33,6 +33,9 @@ data class Review (
         }
     }
 
+    /**
+     * Converts object to hash map for sending to firestore
+     */
     fun toReviewMap(): HashMap<String, Any> {
         return hashMapOf(
             "locationId" to this.locationId,

@@ -32,6 +32,9 @@ data class Location (
         }
     }
 
+    /**
+     * Creates hashmap of location to send to firestore
+     */
     fun toLocationMap(): HashMap<String, Any> {
         return hashMapOf(
             "roomNumber" to this.roomNumber,

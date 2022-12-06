@@ -43,6 +43,9 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         var updateReviews = false
     }
 
+    /**
+     * Sets the bottom fragment tab view
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -79,24 +82,34 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         }
     }
 
+    /**
+     * Starts firebase auth
+     */
     override fun onStart() {
         super.onStart()
         FirebaseAuth.getInstance().addAuthStateListener(authListener)
-
     }
 
+    /**
+     * Launches sign in screen
+     */
     private fun loadLaunchScreen() {
         val intent = Intent(this, LaunchActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+    /**
+     * Stops firebase auth
+     */
     override fun onStop() {
         super.onStop()
-
         FirebaseAuth.getInstance().removeAuthStateListener(authListener)
     }
 
+    /**
+     * When filter is pressed decides which fragment it was pressed from
+     */
     override fun onFilterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
         if (currentFragment == "Map") {
             val fragment = supportFragmentManager.findFragmentByTag(currentFragment) as WashroomMapFragment
@@ -105,14 +118,19 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
             val fragment = supportFragmentManager.findFragmentByTag(currentFragment) as WashroomListFragment
             fragment.filterConditionPassed(paperCheck, soapCheck, accessCheck, maleCheck, femaleCheck, startValue, endValue)
         }
-
     }
 
+    /**
+     * Saves the current fragment page tag when orientation is changed
+     */
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
         super.onSaveInstanceState(savedInstanceState)
         savedInstanceState.putString(FRAGMENT_KEY, currentFragment)
     }
 
+    /**
+     * When orientation is changed set the fragment to where the user was just on
+     */
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         currentFragment = savedInstanceState.getString(FRAGMENT_KEY).toString()

@@ -19,7 +19,6 @@ private const val TAG = "PhoneActivity"
 
 /**
  * Activity for user inputting phone number for sign ins.
- *
  */
 class PhoneActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPhoneBinding

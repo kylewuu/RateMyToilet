@@ -41,6 +41,10 @@ class WashroomListAdapter(private val context: Context, private var locationList
         return locationList.size
     }
 
+    /**
+     * Sets the list element for the washroom list. Sets the text, colour, and attributes
+     * for each item.
+     */
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view: View = View.inflate(context, R.layout.layout_adapter, null)
 
@@ -186,10 +190,16 @@ class WashroomListAdapter(private val context: Context, private var locationList
         return view
     }
 
+    /**
+     * Replaces the location list
+     */
     fun replace(newCommentList: List<Location>) {
         locationList = newCommentList
     }
 
+    /**
+     * Replaces the user location list
+     */
     fun replaceUserLocation(passedInUserLocation: android.location.Location?) {
         userLocation = passedInUserLocation
     }
