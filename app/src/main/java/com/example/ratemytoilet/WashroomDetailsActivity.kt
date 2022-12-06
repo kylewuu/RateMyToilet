@@ -13,6 +13,8 @@ import com.example.ratemytoilet.AdminReviewFragment.Companion.LOCATION_ID_KEY
 import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.updateReviews
 import com.example.ratemytoilet.database.ReviewViewModel
+import com.example.ratemytoilet.database.UserComment
+import com.example.ratemytoilet.listadapters.UserCommentListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
