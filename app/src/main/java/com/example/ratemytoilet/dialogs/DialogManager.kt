@@ -1,9 +1,8 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.dialogs
 
 import android.content.Context
 import android.content.DialogInterface
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
 
 class DialogManager {
     companion object {

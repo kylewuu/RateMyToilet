@@ -26,6 +26,8 @@ import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
+import com.example.ratemytoilet.dialogs.FilterDialogFragment
+import com.example.ratemytoilet.listadapters.WashroomListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
@@ -113,7 +115,7 @@ class WashroomListFragment : Fragment(), LocationListener {
                     gender = "Universal"
                 }
 
-                val viewIntent = Intent(requireActivity(), DisplayActivity::class.java)
+                val viewIntent = Intent(requireActivity(), WashroomDetailsActivity::class.java)
                 viewIntent.putExtra("ID", location.id)
                 viewIntent.putExtra("name", location.name)
                 viewIntent.putExtra("date", monthName + ". " + date.toString() + ", " +  year.toString())
@@ -225,7 +227,7 @@ class WashroomListFragment : Fragment(), LocationListener {
 
 
     private fun onAddNewLocationClick() {
-        val viewIntent = Intent(activity, AddNewLocationActivity::class.java)
+        val viewIntent = Intent(activity, AddNewWashroomActivity::class.java)
         startActivity(viewIntent)
     }
 

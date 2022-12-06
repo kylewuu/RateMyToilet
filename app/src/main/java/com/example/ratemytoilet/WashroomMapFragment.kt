@@ -30,9 +30,12 @@ import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.notRunFirstTime
 import com.example.ratemytoilet.MainActivity.Companion.previousLocationsSize
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
-import com.example.ratemytoilet.ToiletUser.Companion.toToiletUser
+import com.example.ratemytoilet.database.ToiletUser.Companion.toToiletUser
 import com.example.ratemytoilet.database.LocationViewModel
-import com.example.ratemytoilet.launch.LaunchActivity
+import com.example.ratemytoilet.database.ReviewCard
+import com.example.ratemytoilet.dialogs.FilterDialogFragment
+import com.example.ratemytoilet.dialogs.LoadingDialogFragment
+import com.example.ratemytoilet.listadapters.MapMarkerTooltipAdapter
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -40,9 +43,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.ui.IconGenerator
 import kotlinx.coroutines.Dispatchers
@@ -71,7 +72,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private lateinit var  markerOptions: MarkerOptions
     private lateinit var  polylineOptions: PolylineOptions
     private lateinit var  polylines: ArrayList<Polyline>
-    private lateinit var myClusterManager: ClusterManager<MyItem>
+    private lateinit var myClusterManager: ClusterManager<ReviewCard>
     private lateinit var loadingDialogFragment: LoadingDialogFragment
 
     private lateinit var locationPermissionResultReceiver: ActivityResultLauncher<String>
@@ -243,7 +244,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         mapView.onLowMemory()
     }
 
-    private suspend fun setClusterOnMainThread(locationList : ArrayList<MyItem>) {
+    private suspend fun setClusterOnMainThread(locationList : ArrayList<ReviewCard>) {
         withContext(Dispatchers.Main){
             var loadFragment = childFragmentManager.findFragmentByTag("Load")
             if (loadFragment != null) {
@@ -282,7 +283,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     }
 
     fun onAddNewLocationClick() {
-        val viewIntent = Intent(activity, AddNewLocationActivity::class.java)
+        val viewIntent = Intent(activity, AddNewWashroomActivity::class.java)
         startActivity(viewIntent)
     }
 
@@ -313,9 +314,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
 
     private fun setClusterManager() {
-        myClusterManager = ClusterManager<MyItem>(activity?.applicationContext , mMap)
+        myClusterManager = ClusterManager<ReviewCard>(activity?.applicationContext , mMap)
         myClusterManager.renderer = context?.let { MarkerClusterRenderer(it, mMap, myClusterManager) }
-        myClusterManager.markerCollection.setInfoWindowAdapter(context?.let { MyInfoWindowAdapter(it) })
+        myClusterManager.markerCollection.setInfoWindowAdapter(context?.let { MapMarkerTooltipAdapter(it) })
         myClusterManager.setOnClusterItemClickListener {
             washroomId = it.getId()
             washroomName = it.snippet?.split(",")?.get(0)
@@ -338,7 +339,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         myClusterManager.setOnClusterItemInfoWindowClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 if (washroomId != null) {
-                    val viewIntent = Intent(activity, DisplayActivity::class.java)
+                    val viewIntent = Intent(activity, WashroomDetailsActivity::class.java)
                     viewIntent.putExtra("ID", washroomId)
                     viewIntent.putExtra("name", washroomName)
                     viewIntent.putExtra("date", date)

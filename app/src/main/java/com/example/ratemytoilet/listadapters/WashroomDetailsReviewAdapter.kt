@@ -11,7 +11,7 @@ import android.widget.TextView
 import com.example.ratemytoilet.R
 import com.example.ratemytoilet.database.UserComment
 
-class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<UserComment>) : BaseAdapter(){
+class WashroomDetailsReviewAdapter(var context: Context, var arrayList: ArrayList<UserComment>) : BaseAdapter(){
     override fun getCount(): Int {
         return arrayList.size
     }

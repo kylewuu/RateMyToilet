@@ -9,7 +9,7 @@ import com.example.ratemytoilet.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 
-class MyInfoWindowAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
+class MapMarkerTooltipAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
     var mContext = context
     var view : View = LayoutInflater.from(context).inflate(R.layout.custom_inforwindow, null)
 

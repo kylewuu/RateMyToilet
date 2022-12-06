@@ -1,11 +1,6 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.database
 
 import androidx.lifecycle.ViewModel
-import com.example.ratemytoilet.database.Review
-import com.example.ratemytoilet.database.ReviewRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 

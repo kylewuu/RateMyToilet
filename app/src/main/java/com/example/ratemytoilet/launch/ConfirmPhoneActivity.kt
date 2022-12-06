@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.example.ratemytoilet.DialogManager
+import com.example.ratemytoilet.dialogs.DialogManager
 import com.example.ratemytoilet.R
-import com.example.ratemytoilet.ToiletUser
+import com.example.ratemytoilet.database.ToiletUser
 import com.example.ratemytoilet.databinding.ActivityConfirmPhoneBinding
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.*

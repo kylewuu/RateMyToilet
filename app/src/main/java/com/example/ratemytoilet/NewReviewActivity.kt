@@ -15,7 +15,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
-class NormalUserAddReviewActivity : AppCompatActivity() {
+class NewReviewActivity : AppCompatActivity() {
     private var rating = 0.0f
     private var paperResult = 1
     private var soapResult = 1

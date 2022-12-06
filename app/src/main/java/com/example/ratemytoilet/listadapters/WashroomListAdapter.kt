@@ -1,4 +1,4 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.listadapters
 
 
 import android.content.Context
@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.ratemytoilet.R
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
