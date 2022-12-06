@@ -28,9 +28,11 @@
     <string name="navigation_title_washroom_list">List</string>
     <string name="title_fragment_list">Washrooms Near You</string>
     <string name="title_profile_page">Your Profile</string>
-    <string name="stat_total_reviews_format">%d Reviews</string>
+    <string name="stat_total_reviews_format">Reviews: %d</string>
     <string name="navigation_title_profile">My Profile</string>
-    <string name="stat_level_format">Level %d</string>
+    <string name="stat_level_format">Level: %d</string>
     <string name="title_my_reviews">My Reviews</string>
     <string name="loading_map">Loading Toilets...</string>
+    <string name="log_out">Log Out</string>
+    <string name="app_intro_message">Welcome to RateMyToilet!</string>
 </resources>
