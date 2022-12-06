@@ -53,5 +53,4 @@ class ReviewCard : ClusterItem {
     fun getGender() : Int? {
         return myGender
     }
-
 }

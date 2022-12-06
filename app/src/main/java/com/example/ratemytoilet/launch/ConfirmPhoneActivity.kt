@@ -112,5 +112,4 @@ class ConfirmPhoneActivity : AppCompatActivity() {
             }
         }
     }
-
 }

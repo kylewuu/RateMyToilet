@@ -74,5 +74,4 @@ class MapMarkerTooltipAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
         setWindowText(marker, view)
         return view
     }
-
 }

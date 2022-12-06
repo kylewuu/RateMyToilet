@@ -93,5 +93,4 @@ class FilterDialogFragment : DialogFragment() {
     interface FilterListener {
         fun onFilterConditionPassed(paperCheck : Boolean, soapCheck : Boolean, accessCheck : Boolean, maleCheck : Boolean, femaleCheck : Boolean, startValue : Float, endValue : Float)
     }
-
 }
