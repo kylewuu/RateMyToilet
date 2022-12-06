@@ -63,7 +63,7 @@ Using an actual phone number also works and you will receive a login code. If yo
 - Wilson - Washroom List & Adding a New Location to the Map
 - Kyle - Firebase Database for Locations & Reviews, Admin Interfaces & Figma UI Prototype
 - Nirvon - Firestore Authentication, Profile Page & Tab Layout
-- Kyle and Wilson - Diagrams, Slides & Presentations
+- Kyle & Wilson - Diagrams, Slides & Presentations
 
 ## Diagrams
 MVVM Diagram 
