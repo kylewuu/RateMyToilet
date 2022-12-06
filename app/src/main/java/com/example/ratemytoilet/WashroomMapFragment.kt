@@ -159,20 +159,10 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     }
 
    override fun onStart() {
-        super.onStart()
+       super.onStart()
        mapView.onStart()
 
-        val currentUser = Firebase.auth.currentUser
-        if (currentUser == null) {
-            loadLaunchScreen()
-        }
-
-    }
-
-    private fun loadLaunchScreen() {
-        val intent = Intent(activity, LaunchActivity::class.java)
-        startActivity(intent)
-    }
+   }
 
     fun initLocationManager() {
         try {
