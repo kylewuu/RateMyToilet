@@ -42,5 +42,4 @@ data class Location (
             "name" to this.name
         )
     }
-
 }

@@ -37,7 +37,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
         return position.toLong()
     }
 
-
     override fun getCount(): Int {
         return locationList.size
     }

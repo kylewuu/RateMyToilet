@@ -103,5 +103,4 @@ class DatabaseUsageExamples {
             reviewViewModel.addReviewForLocation(newReview)
         }
     }
-
 }

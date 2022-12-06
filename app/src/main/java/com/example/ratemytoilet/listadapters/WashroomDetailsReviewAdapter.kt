@@ -65,5 +65,4 @@ class WashroomDetailsReviewAdapter(var context: Context, var arrayList: ArrayLis
             textView.setTextColor(Color.DKGRAY)
         }
     }
-
 }
