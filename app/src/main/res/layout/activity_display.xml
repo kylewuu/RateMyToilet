@@ -81,7 +81,7 @@
                     style="?android:attr/ratingBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="40dp"
+                    android:layout_marginLeft="30dp"
                     android:layout_marginTop="16dp"
                     android:progressTint="#ffd700"
                     android:stepSize="1"/>
@@ -128,7 +128,7 @@
                     android:id="@+id/paperCheckText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="75dp"
+                    android:layout_marginLeft="70dp"
                     android:layout_marginTop="16dp" />
 
             </LinearLayout>
@@ -151,7 +151,7 @@
                     android:id="@+id/soapCheckText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="125dp"
+                    android:layout_marginLeft="124dp"
                     android:layout_marginTop="16dp" />
 
             </LinearLayout>
