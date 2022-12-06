@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    >
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
 
         <LinearLayout
@@ -164,11 +169,12 @@
             <ListView
                 android:id="@+id/commentListView"
                 android:layout_width="match_parent"
-                android:layout_height="375dp"
+                android:layout_height="400dp"
                 android:layout_marginTop="5dp"
                 android:divider="@null"
                 tools:layout_editor_absoluteY="372dp"
-                android:listSelector="@android:color/transparent"/>
+                android:listSelector="@android:color/transparent"
+                android:nestedScrollingEnabled="true"/>
 
 
         </LinearLayout>
@@ -178,7 +184,6 @@
         android:id="@+id/addButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_edit"
         app:backgroundTint="@color/white"
@@ -187,11 +192,9 @@
         android:layout_gravity="right"
         app:fabCustomSize="50dp"
         android:layout_marginRight="15dp"
-        android:layout_marginBottom="5dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"/>
-
-
+        android:translationY="-10dp"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>
-
+</ScrollView>

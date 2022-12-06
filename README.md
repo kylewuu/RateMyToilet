@@ -16,18 +16,31 @@ Functionality the team is currently working on include:
 - Compiled user reviews via a list view
 - Cloud-based storage of user accounts, reviews, and landmark locations 
 
-## New in Show and Tell 2
--  Transitioned to phone authentication instead of email-based account authentication (as some email providers filtered the verification email as spam). This also reduces onboarding friction, as there is now only one button ("SIGN IN") and the application automatically detects if an account exists for the phone or not.
--  Utilize Firestore to store cloud-based data and also retrieve live updates inside the app utilizing Coroutines, LiveDatas, and Flows.
--  Mapping capabilities for rendering washroom landmarks on the map for users to navigate to.
--  Integrate an admin mode that allows the university to view advanced information about washrooms, effectively resulting in a washroom management system (WIP)
+## Installation Notes
+Due to the Firebase SDK setup and configurations for Firebase Auth, installing the app from the Android Studio project directly onto a phone requires adding in the the SHA certificates for that specific Android Studio. Therefore, installing the application from Android Studio will not allow the user to successfully sign in to the app. 
 
+As an alternative, please use the attached APK. Signing in when the app is installed from the attached APK will work as intended, and there should not be any errors.
 
-## Notes
-Several important points to consider:
-- Documentation is currently a WIP (Focus for the first show and tell was on implementing base logic. Once the code is refined, it will then be fully documented)
-- A toolbar layout will soon be added to change between fragment "tabs", thus eliminating the current floating action button workflow.
-- A profile page will be added that allows users to view information about their account (e.g. number of reviews).
-- Filtering utilizing cloud data is currently a WIP
-- UI will be polished to resemble a sleek social app.
-- Potentially more components to be added to user reviews (e.g. soap, towel availability)
+If running RateMyToilet from Android Studio is necessary, please comment out the `startActivity(intent)` line in WashroomMapFragment.kt. It should look like this:
+
+```
+    private fun loadLaunchScreen() {
+        val intent = Intent(activity, LaunchActivity::class.java)
+    //        startActivity(intent)
+    }
+```
+
+This is ***not*** the intended method of running the app because the sign up page will be disabled and the map will appear without any users being logged in. There ***will*** be features that crash the app since there is no user present. Please use the APK if possible and only disable the sign in screen if running in Android Studio is absolutely necessary.
+
+## User Logins
+To avoid having your phone number stored into our Firebase, please use the follow test numbers to login:
+
+Admin: 
+Number: 604 444 5555
+Verification code (same every time): 123456
+
+Normal user:
+Number 778 444 5555
+Verification code (same every time): 123456
+
+Using an actual phone number also works and you will receive a login code. If you want to try it out just note that your number will be stored in our Firebase.

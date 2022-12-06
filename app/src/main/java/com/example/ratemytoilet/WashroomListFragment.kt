@@ -9,6 +9,7 @@ import android.location.Criteria
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import android.widget.AdapterView
 import android.widget.ListView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.ratemytoilet.MainActivity.Companion.accessCheck
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
@@ -45,6 +47,8 @@ https://www.javatpoint.com/android-custom-listview
 https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
  */
 
+private const val TAG = "WashroomListFragment"
+
 class WashroomListFragment : Fragment(), LocationListener {
 
     private lateinit var myListView: ListView
@@ -52,7 +56,7 @@ class WashroomListFragment : Fragment(), LocationListener {
     private lateinit var arrayList: ArrayList<Location>
     private lateinit var arrayAdapter: WashroomListAdapter
     private val monthArray = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
-    private lateinit var locationViewModel: LocationViewModel
+    private val locationViewModel: LocationViewModel by viewModels()
 
     // User location vars
     private lateinit var locationManager: LocationManager
@@ -67,6 +71,7 @@ class WashroomListFragment : Fragment(), LocationListener {
         val view = inflater.inflate(R.layout.fragment_list, container, false)
         toolbar = view.findViewById(R.id.toolbar)
 
+        Log.i(TAG, "onCreateView")
 
         // Register for Receiver
         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
@@ -82,7 +87,6 @@ class WashroomListFragment : Fragment(), LocationListener {
         arrayList = ArrayList<Location>()
         arrayAdapter = WashroomListAdapter(requireContext(), arrayList)
         myListView.adapter = arrayAdapter
-        locationViewModel = LocationViewModel()
 
 
         // Attempt to get users location
@@ -133,6 +137,7 @@ class WashroomListFragment : Fragment(), LocationListener {
         return view
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar.inflateMenu(R.menu.main1)
@@ -144,6 +149,7 @@ class WashroomListFragment : Fragment(), LocationListener {
             true
         }
     }
+
 
     private fun loadWashrooms() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -228,6 +234,7 @@ class WashroomListFragment : Fragment(), LocationListener {
         }
     }
 
+
     private suspend fun filterAdminMarkers(allLocations: List<com.example.ratemytoilet.database.Location>, reviewViewModel: ReviewViewModel): List<com.example.ratemytoilet.database.Location> {
         var filteredLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         for (location in allLocations) {
@@ -262,6 +269,7 @@ class WashroomListFragment : Fragment(), LocationListener {
         return filteredLocations
     }
 
+
     fun filterConditionPassed(
         paperCheck: Boolean,
         soapCheck: Boolean,
@@ -284,11 +292,9 @@ class WashroomListFragment : Fragment(), LocationListener {
         loadWashrooms()
     }
 
-
     // Get the current users location
     private fun getUserLocation() {
         try {
-
             locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val criteria = Criteria()
             criteria.accuracy = Criteria.ACCURACY_FINE
@@ -358,6 +364,7 @@ class WashroomListFragment : Fragment(), LocationListener {
 
     }
 
+
     fun calculateDistanceToUser(lat: Double, lng: Double): Float? {
 
         // Calculate distances
@@ -370,6 +377,13 @@ class WashroomListFragment : Fragment(), LocationListener {
         return distanceFromUserToWashroom
 
 
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister receiver
+        activity?.unregisterReceiver(locationSwitchStateReceiver)
     }
 
 }

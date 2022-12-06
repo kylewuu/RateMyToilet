@@ -29,11 +29,10 @@
         app:cardUseCompatPadding="true">
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="4dp"
-            android:background="#FFFFFF">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView17"
@@ -45,17 +44,15 @@
                 android:textColor="#28104E"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_weight="1"/>
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/cleanGroupAdmin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="45dp"
-                android:layout_marginTop="3dp"
-                app:layout_constraintStart_toEndOf="@+id/textView17"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="right"
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
@@ -74,7 +71,7 @@
                     android:text="No"
                     android:textColor="@color/chip_text_background"/>
             </com.google.android.material.chip.ChipGroup>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -86,11 +83,10 @@
         app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:paddingBottom="4dp">
+            android:orientation="horizontal">
 
 
             <TextView
@@ -103,17 +99,15 @@
                 android:textColor="#28104E"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_weight="1"/>
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/soapGroupAdmin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="90dp"
                 android:layout_marginTop="2dp"
-                app:layout_constraintStart_toEndOf="@+id/textView18"
-                app:layout_constraintTop_toTopOf="parent"
+                android:gravity="right"
+                android:layout_marginEnd="16dp"
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
@@ -132,7 +126,7 @@
                     android:text="No"
                     android:textColor="@color/chip_text_background"/>
             </com.google.android.material.chip.ChipGroup>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -144,11 +138,10 @@
         app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:paddingBottom="4dp">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView19"
@@ -160,18 +153,17 @@
                 android:textColor="#28104E"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_weight="1"/>
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/paperGroupAdmin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
                 android:layout_marginTop="2dp"
-                app:layout_constraintStart_toEndOf="@+id/textView19"
-                app:layout_constraintTop_toTopOf="parent"
-                app:singleSelection="true">
+                app:singleSelection="true"
+                android:gravity="right"
+                android:layout_marginEnd="16dp"
+                >
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/yesForPaperAdmin"
@@ -190,7 +182,7 @@
                     android:textColor="@color/chip_text_background"/>
             </com.google.android.material.chip.ChipGroup>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView

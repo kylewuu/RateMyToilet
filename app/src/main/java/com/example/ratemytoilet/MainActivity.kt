@@ -23,7 +23,7 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         var cleanlinessEnd = 5f
         var previousLocationsSize = -1
 
-        var updateMap = false
+        var updateMap = true
         var isAdmin = false
         var updateReviews = false
     }
@@ -41,11 +41,11 @@ class MainActivity :  AppCompatActivity(), FilterDialogFragment.FilterListener {
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavView.setOnItemSelectedListener {
             var fragment = when(it.itemId) {
-                R.id.washroom_list -> {
+                R.id.washroomListFragment -> {
                     currentFragment = "List"
                     listFragment
                 }
-                R.id.profile -> {
+                R.id.profileFragment -> {
                     currentFragment = "Profile"
                     profileFragment
                 }

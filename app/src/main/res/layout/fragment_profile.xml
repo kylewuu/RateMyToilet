@@ -97,8 +97,8 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         tools:layout_editor_absoluteX="16dp" />
 
-    <ListView
-        android:id="@+id/user_reviews_list_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/user_reviews_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:divider="@null"
