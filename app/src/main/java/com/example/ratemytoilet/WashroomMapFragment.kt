@@ -269,6 +269,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         bubble.setStyle(markerColor)
         if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
+
             if (updateMap || locationViewModel.tempMarkers.value == null) {
                 locationViewModel.processMapLocations(bubble)
             }

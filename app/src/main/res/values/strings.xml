@@ -32,4 +32,5 @@
     <string name="navigation_title_profile">My Profile</string>
     <string name="stat_level_format">Level %d</string>
     <string name="title_my_reviews">My Reviews</string>
+    <string name="loading_map">Loading Toilets...</string>
 </resources>
