@@ -79,6 +79,7 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // We must register the ActivityResult in onCreate, to ensure it gets registered each time
         // this fragment is created.
         locationPermissionResultReceiver = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
