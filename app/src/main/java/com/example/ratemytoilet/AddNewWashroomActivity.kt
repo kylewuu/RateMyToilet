@@ -21,8 +21,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class AddNewLocationActivity : AppCompatActivity() {
-
+/**
+ * Add new washroom activity.
+ */
+class AddNewWashroomActivity : AppCompatActivity() {
     // Views
     private lateinit var ratingBar: RatingBar
     private lateinit var roomNumber: EditText
@@ -44,8 +46,6 @@ class AddNewLocationActivity : AppCompatActivity() {
 
     // Array of genders
     val genderArray = arrayOf("Male", "Female", "Universal")
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,11 +78,9 @@ class AddNewLocationActivity : AppCompatActivity() {
         updateMap = false
     }
 
-
-
     // Start the AddLocationMapActivity. User chooses new washroom's location
     fun onAddLocationClick(view: View){
-        val viewIntent = Intent(this, AddLocationMapActivity::class.java)
+        val viewIntent = Intent(this, AddLocationToNewWashroomActivity::class.java)
         startActivityForResult(viewIntent, 0)
     }
 
@@ -93,7 +91,6 @@ class AddNewLocationActivity : AppCompatActivity() {
                 val message = data!!.getParcelableExtra<LatLng>("LATLNG_KEY")
                 if (message != null) {
                     addLocationLatLng = message
-                    //println("debug" + addLocationLatLng)
                 }
             }
         } else {
@@ -101,23 +98,18 @@ class AddNewLocationActivity : AppCompatActivity() {
         }
     }
 
-
-
     // On finish button clicked
     fun onAddNewWashroomClick(view: View){
-
         // Get views
         ratingBar = findViewById(R.id.rb_ratingBar)
         roomNumber = findViewById(R.id.et_roomNumber)
         washroomName = findViewById(R.id.et_washroomName)
-
 
         // Get values in views
         val roomNum = roomNumber.text.toString()
         val roomName = washroomName.text.toString()
         val rating = ratingBar.rating.toDouble().toInt()
         //println("Rating" + rating)
-
 
         // Room Number, Room Name, and Location cannot be empty
         if(addLocationLatLng == null){
@@ -164,9 +156,7 @@ class AddNewLocationActivity : AppCompatActivity() {
 
                     var reviewViewModel = ReviewViewModel()
                     reviewViewModel.addReviewForLocation(newReview)
-
                 }
-
             }
             updateMap = true
             updateList = true
@@ -179,7 +169,6 @@ class AddNewLocationActivity : AppCompatActivity() {
 
         paperTowelButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         paperTowelButtonYes.setTextColor(Color.WHITE)
-
 
         paperTowelButtonNo.setBackgroundColor(Color.WHITE)
         paperTowelButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
@@ -194,10 +183,7 @@ class AddNewLocationActivity : AppCompatActivity() {
 
         paperTowelButtonNo.setBackgroundColor(Color.parseColor("#9754CB"))
         paperTowelButtonNo.setTextColor(Color.WHITE)
-
     }
-
-
 
     fun onSoapYesClick(view:View){
         soapValue = 1
@@ -205,12 +191,9 @@ class AddNewLocationActivity : AppCompatActivity() {
         soapButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         soapButtonYes.setTextColor(Color.WHITE)
 
-
         soapButtonNo.setBackgroundColor(Color.WHITE)
         soapButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
     }
-
-
 
     fun onSoapNoClick(view:View){
         soapValue = 0
@@ -222,19 +205,15 @@ class AddNewLocationActivity : AppCompatActivity() {
         soapButtonNo.setTextColor(Color.WHITE)
     }
 
-
     fun onAccessYesClick(view:View){
         accessValue = 1
 
         accessButtonYes.setBackgroundColor(Color.parseColor("#9754CB"))
         accessButtonYes.setTextColor(Color.WHITE)
 
-
         accessButtonNo.setBackgroundColor(Color.WHITE)
         accessButtonNo.setTextColor(Color.parseColor("#B6B6B6"))
     }
-
-
 
     fun onAccessNoClick(view:View){
         accessValue = 0
@@ -245,5 +224,4 @@ class AddNewLocationActivity : AppCompatActivity() {
         accessButtonNo.setBackgroundColor(Color.parseColor("#9754CB"))
         accessButtonNo.setTextColor(Color.WHITE)
     }
-
 }

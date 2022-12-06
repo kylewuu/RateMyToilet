@@ -10,11 +10,11 @@ import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ratemytoilet.database.Review
+import com.example.ratemytoilet.database.ToiletUser
+import com.example.ratemytoilet.database.UserComment
 import com.example.ratemytoilet.databinding.FragmentProfileBinding
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -22,22 +22,19 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
+private const val TAG = "ProfileFragment"
 
 /**
+ * Fragment for the user profile page.
+ *
  * A simple [Fragment] subclass.
  * Use the [ProfileFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-
-private const val TAG = "ProfileFragment"
-
 class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
     private lateinit var reviewsStrFormat: String
@@ -45,7 +42,6 @@ class ProfileFragment : Fragment() {
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
     private var currentUser: FirebaseUser? = null
-    private val profileViewModel: ProfileViewModel by viewModels()
     private lateinit var adapter: FirestoreRecyclerAdapter<Review, ReviewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,9 +65,6 @@ class ProfileFragment : Fragment() {
         }
 
         if (currentUser != null) {
-//            adapter = UserCommentListAdapter(requireContext(), profileViewModel.reviews)
-//            binding.userReviewsListView.adapter = adapter
-
             val query = db
                 .collection("users/${currentUser!!.uid}/reviews")
                 .orderBy("dateAdded", Query.Direction.DESCENDING)
@@ -100,7 +93,6 @@ class ProfileFragment : Fragment() {
                         userInformation.access?.let { setTextState(holder.accState, it) }
                         userInformation.rate?.let { holder.rating.setRating(it) }
 
-
                         Log.i(TAG,"Binded viewholder!")
                     }
 
@@ -122,15 +114,12 @@ class ProfileFragment : Fragment() {
             binding.userReviewsRecyclerView.layoutManager = LinearLayoutManager(context)
         }
 
-
         return binding.root
     }
-
 
     override fun onResume() {
         super.onResume()
         updateTotalReviews()
-
     }
 
     private fun updateTotalReviews() {
@@ -163,13 +152,12 @@ class ProfileFragment : Fragment() {
         val accState: TextView
 
         init {
-            dateText = view.findViewById<TextView>(R.id.userDate)
-            comment = view.findViewById<EditText>(R.id.userComment)
-            rating = view.findViewById<RatingBar>(R.id.singleRating)
-            paperState = view.findViewById<TextView>(R.id.paperStateText)
-            soapState = view.findViewById<TextView>(R.id.soapStateText)
-            accState = view.findViewById<TextView>(R.id.accessStateText)
+            dateText = view.findViewById(R.id.userDate)
+            comment = view.findViewById(R.id.userComment)
+            rating = view.findViewById(R.id.singleRating)
+            paperState = view.findViewById(R.id.paperStateText)
+            soapState = view.findViewById(R.id.soapStateText)
+            accState = view.findViewById(R.id.accessStateText)
         }
     }
-
 }

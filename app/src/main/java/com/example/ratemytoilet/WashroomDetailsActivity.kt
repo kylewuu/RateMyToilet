@@ -8,11 +8,13 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.ratemytoilet.AdminReviewFragment.Companion.ACCESSIBILITY_KEY
-import com.example.ratemytoilet.AdminReviewFragment.Companion.LOCATION_ID_KEY
 import com.example.ratemytoilet.MainActivity.Companion.isAdmin
 import com.example.ratemytoilet.MainActivity.Companion.updateReviews
+import com.example.ratemytoilet.NewReviewAdminFragment.Companion.ACCESSIBILITY_KEY
+import com.example.ratemytoilet.NewReviewAdminFragment.Companion.LOCATION_ID_KEY
 import com.example.ratemytoilet.database.ReviewViewModel
+import com.example.ratemytoilet.database.UserComment
+import com.example.ratemytoilet.listadapters.WashroomDetailsReviewAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
@@ -21,7 +23,10 @@ import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-class DisplayActivity : AppCompatActivity(), AdminReviewFragment.AdminReviewListener {
+/**
+ * Activity to show the washroom details when a washroom is selected.
+ */
+class WashroomDetailsActivity : AppCompatActivity(), NewReviewAdminFragment.AdminReviewListener {
     private lateinit var userCommentList: ArrayList<UserComment>
     private lateinit var washroomId : String
     private lateinit var washroom : String
@@ -29,7 +34,7 @@ class DisplayActivity : AppCompatActivity(), AdminReviewFragment.AdminReviewList
     private lateinit var date : String
     private lateinit var access : String
     private lateinit var commentList: ListView
-    private lateinit var listAdapter: UserCommentListAdapter
+    private lateinit var listAdapter: WashroomDetailsReviewAdapter
     private var accessibility = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +43,7 @@ class DisplayActivity : AppCompatActivity(), AdminReviewFragment.AdminReviewList
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         commentList = findViewById(R.id.commentListView)
         userCommentList = ArrayList()
-        listAdapter = UserCommentListAdapter(this, userCommentList)
+        listAdapter = WashroomDetailsReviewAdapter(this, userCommentList)
         commentList.adapter = listAdapter
         washroomId = intent.getStringExtra("ID").toString()
         washroom = intent.getStringExtra("name").toString()
@@ -113,7 +118,6 @@ class DisplayActivity : AppCompatActivity(), AdminReviewFragment.AdminReviewList
                     }
                 }
 
-
                 if (allReviews[0].sufficientSoap == 0) {
                     lifecycleScope.launch(Main) {
                         soapText.setText("No")
@@ -158,19 +162,18 @@ class DisplayActivity : AppCompatActivity(), AdminReviewFragment.AdminReviewList
 
         addButton.setOnClickListener {
             if (!isAdmin) {
-                val intent = Intent(this, NormalUserAddReviewActivity::class.java)
+                val intent = Intent(this, NewReviewActivity::class.java)
                 intent.putExtra("location", washroomId)
                 startActivity(intent)
             } else {
                 val bundle = Bundle()
                 bundle.putString(LOCATION_ID_KEY,washroomId)
                 bundle.putInt(ACCESSIBILITY_KEY, accessibility)
-                val adminDialogFragment = AdminReviewFragment()
+                val adminDialogFragment = NewReviewAdminFragment()
                 adminDialogFragment.arguments = bundle
                 adminDialogFragment.show(supportFragmentManager, "Admin")
             }
         }
-
     }
 
     override fun loadReviews() {

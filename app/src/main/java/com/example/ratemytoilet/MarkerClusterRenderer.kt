@@ -1,18 +1,18 @@
 package com.example.ratemytoilet
 
 import android.content.Context
-import android.view.ViewGroup
-import android.widget.ImageView
+import com.example.ratemytoilet.database.ReviewCard
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
-import com.google.maps.android.ui.IconGenerator
 
-class MarkerClusterRenderer (context:Context, map: GoogleMap, clusterManager: ClusterManager<MyItem>?) : DefaultClusterRenderer<MyItem> (context, map, clusterManager) {
-    override fun onBeforeClusterItemRendered(item: MyItem, markerOptions: MarkerOptions) {
+/**
+ * Renderer for the markers clusters on the map
+ */
+class MarkerClusterRenderer (context:Context, map: GoogleMap, clusterManager: ClusterManager<ReviewCard>?) : DefaultClusterRenderer<ReviewCard> (context, map, clusterManager) {
+    override fun onBeforeClusterItemRendered(item: ReviewCard, markerOptions: MarkerOptions) {
         if (item != null && markerOptions != null) {
             super.onBeforeClusterItemRendered(item, markerOptions)
         }
@@ -21,7 +21,7 @@ class MarkerClusterRenderer (context:Context, map: GoogleMap, clusterManager: Cl
         markerOptions?.snippet(item?.snippet)
     }
 
-    override fun shouldRenderAsCluster(cluster: Cluster<MyItem>): Boolean {
+    override fun shouldRenderAsCluster(cluster: Cluster<ReviewCard>): Boolean {
         return cluster.size > 4
     }
 }

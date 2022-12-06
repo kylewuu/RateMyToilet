@@ -1,7 +1,6 @@
 package com.example.ratemytoilet.database
 
 import com.example.ratemytoilet.database.Review.Companion.toReview
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
@@ -10,12 +9,14 @@ import kotlinx.coroutines.tasks.await
 
 
 /**
+ * Repository for review view model and review object. Retrieves and writes data
+ * for review collect in firestore.
+ *
  * refs:
  * https://stackoverflow.com/questions/49592124/android-firestore-querying-and-returning-a-custom-object
  * https://firebase.google.com/docs/firestore/query-data/queries#kotlin+ktx_1
  */
 class ReviewRepository {
-
     companion object {
         private var firestore = Firebase.firestore
         private var reviewCollection = firestore.collection("review")

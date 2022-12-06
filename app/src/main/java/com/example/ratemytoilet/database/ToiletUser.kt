@@ -1,8 +1,11 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.database
 
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.DocumentSnapshot
 
+/**
+ * Data object for users.
+ */
 data class ToiletUser(var phoneNumber: String? = "", var totalReviews: Int? = 0, @DocumentId var reviews: String? = "", var isAdmin: Boolean? = false) {
     companion object {
         fun DocumentSnapshot.toToiletUser(): ToiletUser {

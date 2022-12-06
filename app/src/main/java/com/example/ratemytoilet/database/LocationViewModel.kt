@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.example.ratemytoilet.MainActivity
-import com.example.ratemytoilet.MyItem
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.ui.IconGenerator
@@ -14,13 +13,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 /**
+ * View model for the locations objects. Connected to the Location repository for access
+ * to Location collection on Firebase.
+ *
  * refs:
  * https://stackoverflow.com/questions/68840086/proper-way-to-collect-values-from-flow-in-android-and-coroutines
- *
  */
 class LocationViewModel : ViewModel() {
     var tempListLocations: MutableLiveData<ArrayList<Location>> = MutableLiveData()
-    var tempMarkers: MutableLiveData<ArrayList<MyItem>> = MutableLiveData()
+    var tempMarkers: MutableLiveData<ArrayList<ReviewCard>> = MutableLiveData()
     var locations: LiveData<List<Location>> = LocationRepository.getAllLocationsFlow().asLiveData()
 
     suspend fun addLocation(location: Location): Flow<String> {
@@ -33,7 +34,7 @@ class LocationViewModel : ViewModel() {
 
     suspend fun processMapLocations(bubble: IconGenerator) {
         var newLocations = ArrayList<Location>()
-        var arr = ArrayList<MyItem>()
+        var arr = ArrayList<ReviewCard>()
         var allLocations = getAllLocations()
         val reviewViewModel = ReviewViewModel()
         if (MainActivity.isAdmin) allLocations = filterAdminMarkers(allLocations, reviewViewModel)
@@ -131,7 +132,7 @@ class LocationViewModel : ViewModel() {
                 }
                 val snippet = update.name + ", " + update.roomNumber + ";" + updateRating.toInt()
                 val title = "$updateSoap,$updatePaper,$updateAccess"
-                val item = MyItem(
+                val item = ReviewCard(
                     updateLatLng,
                     title,
                     snippet,
@@ -256,5 +257,4 @@ class LocationViewModel : ViewModel() {
 
         return filteredLocations
     }
-
 }

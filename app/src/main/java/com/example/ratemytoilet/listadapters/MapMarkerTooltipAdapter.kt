@@ -1,17 +1,18 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.listadapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.ratemytoilet.R
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
 import com.google.android.gms.maps.model.Marker
 
-class MyInfoWindowAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
-    var mContext = context
+/**
+ * Adapter for the tooltips on each map marker.
+ */
+class MapMarkerTooltipAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
     var view : View = LayoutInflater.from(context).inflate(R.layout.custom_inforwindow, null)
 
     private fun setWindowText(marker: Marker, view: View){
@@ -64,7 +65,6 @@ class MyInfoWindowAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
         }
     }
 
-
     override fun getInfoContents(marker: Marker): View? {
         setWindowText(marker, view)
         return view
@@ -74,5 +74,4 @@ class MyInfoWindowAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
         setWindowText(marker, view)
         return view
     }
-
 }

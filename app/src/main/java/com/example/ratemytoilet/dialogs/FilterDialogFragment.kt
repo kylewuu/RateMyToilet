@@ -1,4 +1,4 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -19,10 +19,13 @@ import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
 import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
+import com.example.ratemytoilet.R
 import com.google.android.material.chip.Chip
 import com.google.android.material.slider.RangeSlider
 
-
+/**
+ * Fragment for the filter dialog in the map and list washroom views.
+ */
 class FilterDialogFragment : DialogFragment() {
     var listener : FilterListener?= null
 
@@ -90,5 +93,4 @@ class FilterDialogFragment : DialogFragment() {
     interface FilterListener {
         fun onFilterConditionPassed(paperCheck : Boolean, soapCheck : Boolean, accessCheck : Boolean, maleCheck : Boolean, femaleCheck : Boolean, startValue : Float, endValue : Float)
     }
-
 }

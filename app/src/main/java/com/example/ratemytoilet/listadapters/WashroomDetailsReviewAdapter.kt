@@ -1,4 +1,4 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.listadapters
 
 import android.content.Context
 import android.graphics.Color
@@ -8,8 +8,13 @@ import android.widget.BaseAdapter
 import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.TextView
+import com.example.ratemytoilet.R
+import com.example.ratemytoilet.database.UserComment
 
-class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<UserComment>) : BaseAdapter(){
+/**
+ * Adapter for each review in washroom details.
+ */
+class WashroomDetailsReviewAdapter(var context: Context, var arrayList: ArrayList<UserComment>) : BaseAdapter(){
     override fun getCount(): Int {
         return arrayList.size
     }
@@ -42,7 +47,6 @@ class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<User
         userInformation.rate?.let { rating.setRating(it) }
 
         return view
-
     }
 
     fun update(newList: ArrayList<UserComment>) {
@@ -61,5 +65,4 @@ class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<User
             textView.setTextColor(Color.DKGRAY)
         }
     }
-
 }

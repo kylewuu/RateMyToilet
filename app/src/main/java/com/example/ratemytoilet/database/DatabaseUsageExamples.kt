@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 /**
- * Examples for using firestore functions.
+ * Examples for using firestore functions. Not part of the app.
  */
 class DatabaseUsageExamples {
 
@@ -103,5 +103,4 @@ class DatabaseUsageExamples {
             reviewViewModel.addReviewForLocation(newReview)
         }
     }
-
 }

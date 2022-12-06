@@ -1,6 +1,5 @@
 package com.example.ratemytoilet
 
-
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,6 +25,8 @@ import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.LocationViewModel
+import com.example.ratemytoilet.dialogs.FilterDialogFragment
+import com.example.ratemytoilet.listadapters.WashroomListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
@@ -33,17 +34,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-/*
-References:
-https://stackoverflow.com/questions/21422294/how-to-add-button-in-header
-https://www.android--code.com/2020/03/android-kotlin-listview-add-item.html
-https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-of-a-imageview-android
-https://www.javatpoint.com/android-custom-listview
-https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
- */
 
 private const val TAG = "WashroomListFragment"
 
+/**
+ * Fragment for showing the washrooms in a list.
+ *
+ * refs:
+ * https://stackoverflow.com/questions/21422294/how-to-add-button-in-header
+ * https://www.android--code.com/2020/03/android-kotlin-listview-add-item.html
+ * https://stackoverflow.com/questions/14666106/inserting-a-textview-in-the-middle-of-a-imageview-android
+ * https://www.javatpoint.com/android-custom-listview
+ * https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
+ */
 class WashroomListFragment : Fragment(), LocationListener {
 
     private lateinit var myListView: ListView
@@ -56,7 +59,6 @@ class WashroomListFragment : Fragment(), LocationListener {
     // User location vars
     private lateinit var locationManager: LocationManager
     private var userLocation: android.location.Location? = null
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,30 +75,24 @@ class WashroomListFragment : Fragment(), LocationListener {
         filter.addAction(Intent.ACTION_PROVIDER_CHANGED)
         context?.registerReceiver(locationSwitchStateReceiver, filter)
 
-
         // List of locations
         myListView = view.findViewById(R.id.lv_locations)
-
 
         // Arraylist for displaying entries
         arrayList = ArrayList<Location>()
         arrayAdapter = WashroomListAdapter(requireContext(), arrayList)
         myListView.adapter = arrayAdapter
 
-
         // Attempt to get users location
         getUserLocation()
 
-
         // Load washrooms
         loadWashrooms()
-
 
         myListView.isClickable = true
         myListView.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 val location = arrayAdapter.getItem(p2)
-
                 val calendar = Calendar.getInstance()
                 calendar.timeInMillis = location.date
                 val month = calendar.get(Calendar.MONTH)
@@ -113,7 +109,7 @@ class WashroomListFragment : Fragment(), LocationListener {
                     gender = "Universal"
                 }
 
-                val viewIntent = Intent(requireActivity(), DisplayActivity::class.java)
+                val viewIntent = Intent(requireActivity(), WashroomDetailsActivity::class.java)
                 viewIntent.putExtra("ID", location.id)
                 viewIntent.putExtra("name", location.name)
                 viewIntent.putExtra("date", monthName + ". " + date.toString() + ", " +  year.toString())
@@ -132,7 +128,6 @@ class WashroomListFragment : Fragment(), LocationListener {
         return view
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar.inflateMenu(R.menu.main1)
@@ -144,7 +139,6 @@ class WashroomListFragment : Fragment(), LocationListener {
             true
         }
     }
-
 
     private fun loadWashrooms() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -223,12 +217,10 @@ class WashroomListFragment : Fragment(), LocationListener {
         }
     }
 
-
     private fun onAddNewLocationClick() {
-        val viewIntent = Intent(activity, AddNewLocationActivity::class.java)
+        val viewIntent = Intent(activity, AddNewWashroomActivity::class.java)
         startActivity(viewIntent)
     }
-
 
     override fun onLocationChanged(location: android.location.Location) {
         // Location found. Set the user's location in the WashroomListAdapter and notify
@@ -237,12 +229,10 @@ class WashroomListFragment : Fragment(), LocationListener {
         arrayAdapter.replaceUserLocation(userLocation)
         arrayAdapter.notifyDataSetChanged()
 
-
         // Only needs to be updated once. Remove the request
         locationManager.removeUpdates(this)
 
     }
-
 
     private val locationSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -265,26 +255,19 @@ class WashroomListFragment : Fragment(), LocationListener {
 
     }
 
-
-    fun calculateDistanceToUser(lat: Double, lng: Double): Float? {
-
+    private fun calculateDistanceToUser(lat: Double, lng: Double): Float? {
         // Calculate distances
         var washroomLocation: android.location.Location? = android.location.Location("")
         washroomLocation?.latitude = lat
         washroomLocation?.longitude = lng
         var distanceFromUserToWashroom = userLocation?.distanceTo(washroomLocation)
 
-
         return distanceFromUserToWashroom
-
-
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
         // Unregister receiver
         activity?.unregisterReceiver(locationSwitchStateReceiver)
     }
-
 }

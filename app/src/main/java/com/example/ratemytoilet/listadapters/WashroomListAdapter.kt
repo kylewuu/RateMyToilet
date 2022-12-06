@@ -1,13 +1,13 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.listadapters
 
 
 import android.content.Context
-import android.location.LocationManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.ratemytoilet.R
 import com.example.ratemytoilet.database.Location
 import com.example.ratemytoilet.database.Review
 import com.example.ratemytoilet.database.ReviewViewModel
@@ -18,15 +18,16 @@ import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
 
-// Based off class demo
-
+/**
+ * List adapter for the washroom list fragment. Shows all washrooms in a list.
+ *
+ * refs:
+ * Based off class demo by xd
+ */
 class WashroomListAdapter(private val context: Context, private var locationList: List<Location>) : BaseAdapter() {
 
     // User location vars
-    private lateinit var locationManager: LocationManager
     private var userLocation: android.location.Location? = null
-
-
 
     override fun getItem(position: Int): (Location) {
         return locationList.get(position)
@@ -35,7 +36,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
-
 
     override fun getCount(): Int {
         return locationList.size
@@ -52,7 +52,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
         val washroomInfo = locationList[position]
         washroomName.text = washroomInfo.name
 
-
         var reviewViewModel = ReviewViewModel()
 
         var totalRatingAmount = 0
@@ -63,14 +62,10 @@ class WashroomListAdapter(private val context: Context, private var locationList
 
         // Retrieve reviews for a location
         CoroutineScope(Dispatchers.IO).launch{
-
             var locationId = washroomInfo.id
             val genderInt = washroomInfo.gender
-
             var reviews = reviewViewModel.getReviewsForLocation(locationId)
-
             var arrayOfReviews = mutableListOf<Review>()
-
 
             // Get sum of cleanliness from each review
             for (review in reviews) {
@@ -78,21 +73,13 @@ class WashroomListAdapter(private val context: Context, private var locationList
                 arrayOfReviews.add(review)
             }
 
-
             // Make sure there exists a review, otherwise divide by 0 error while calculating average cleanliness
-
             if(reviews.isNotEmpty()){
-
-
                 // Calculate average rating
                 averageCleanlinessRating = (totalRatingAmount.toDouble() / reviews.size.toDouble())
 
-
                 // Sort reviews by timestamp in descending order
                 arrayOfReviews.sortWith(compareByDescending{it.dateAdded})
-
-
-                //TODO: Can I combine the two loops into one? Would it be faster?
 
                 // Loop through reviews, and find most recent review with sufficientPaperTowels set to either 0 or 1 (No or Yes)
                 var paperTowelIsUnknown = false
@@ -111,12 +98,10 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     }
                 }
 
-
                 // If no review contained sufficientPaperTowels set to either 0 or 1 (No or Yes), then set to Unknown status
                 if(!paperTowelIsUnknown){
                     paperTowelsValue = " / Unknown"
                 }
-
 
                 // Loop through reviews, and find most recent review with sufficientSoap set to either 0 or 1 (No or Yes)
                 var soapIsUnknown = false
@@ -133,20 +118,16 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     }
                 }
 
-
                 // If no review contained sufficientSoap set to either 0 or 1 (No or Yes), then set to Unknown status
                 if(!soapIsUnknown){
                     soapValue = " / Unknown"
                 }
-
-
             }
             else{
                 // If no reviews exist, then set amenity values to Unknown
                 paperTowelsValue = " / Unknown"
                 soapValue = " / Unknown"
             }
-
 
             // Change the views. Cannot edit UI in coroutine
             GlobalScope.launch(Dispatchers.Main) {
@@ -159,7 +140,6 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     ratingsText.text = formattedCleanlinessRating
                 }
 
-
                 // Set gender and create amenities string
                 if(genderInt == 0){
                     amenities.text = "Male" + paperTowelsValue + soapValue
@@ -171,9 +151,7 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     amenities.text = "Universal" + paperTowelsValue  + soapValue
                 }
             }
-
         }
-
 
         // Get user location, and find distance relative to washroom location
         var distance = view.findViewById<TextView>(R.id.distance)
@@ -196,20 +174,17 @@ class WashroomListAdapter(private val context: Context, private var locationList
                     distance.text =  decimalFormatDistance.format(distanceInKm).toString() + " KM"
                 }
             }
-
         }
         else{
             // Couldn't get user's location. Set distance to unknown.
             distance.text = "---"
         }
 
-
         // Set image for rating
         imageView.setImageResource(R.drawable.ellipse3)
 
         return view
     }
-
 
     fun replace(newCommentList: List<Location>) {
         locationList = newCommentList
@@ -218,6 +193,4 @@ class WashroomListAdapter(private val context: Context, private var locationList
     fun replaceUserLocation(passedInUserLocation: android.location.Location?) {
         userLocation = passedInUserLocation
     }
-
 }
-

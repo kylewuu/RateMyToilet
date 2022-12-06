@@ -9,25 +9,26 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
+import com.example.ratemytoilet.databinding.ActivityAddLocationMapBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.example.ratemytoilet.databinding.ActivityAddLocationMapBinding
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 
-class AddLocationMapActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, GoogleMap.OnMapClickListener {
-
+/**
+ * Activity for inputting location for the new washroom.
+ *
+ */
+class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, GoogleMap.OnMapClickListener {
     // Map vars
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityAddLocationMapBinding
@@ -43,7 +44,6 @@ class AddLocationMapActivity : AppCompatActivity(), OnMapReadyCallback, Location
     // Views
     private lateinit var finishButton: Button
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,7 +56,6 @@ class AddLocationMapActivity : AppCompatActivity(), OnMapReadyCallback, Location
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
 
         finishButton = findViewById<Button>(R.id.bt_onFinishAddLocationClick)
         finishButton.setEnabled(false)
@@ -78,7 +77,6 @@ class AddLocationMapActivity : AppCompatActivity(), OnMapReadyCallback, Location
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 0)
         else {
             getUserLocation()
-            //getToiletLocation()
         }
     }
 
@@ -94,8 +92,7 @@ class AddLocationMapActivity : AppCompatActivity(), OnMapReadyCallback, Location
                     onLocationChanged(location)
 
             }
-        } catch (e: SecurityException) {
-        }
+        } catch (e: SecurityException) {}
     }
 
     override fun onLocationChanged(location: Location) {
@@ -108,7 +105,6 @@ class AddLocationMapActivity : AppCompatActivity(), OnMapReadyCallback, Location
     }
 
     override fun onMapClick(latLng: LatLng) {
-
         // Remove previous marker if it exists
         if(previousMarker != null){
             previousMarker?.remove()
@@ -124,7 +120,6 @@ class AddLocationMapActivity : AppCompatActivity(), OnMapReadyCallback, Location
     }
 
     fun onFinishAddLocationClick(view: View){
-
         // Create bundle
         val bundle = Bundle()
 
@@ -138,7 +133,4 @@ class AddLocationMapActivity : AppCompatActivity(), OnMapReadyCallback, Location
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
-
-
-
 }
