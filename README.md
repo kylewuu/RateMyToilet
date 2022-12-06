@@ -51,13 +51,22 @@ Using an actual phone number also works and you will receive a login code. If yo
 - Sign in screens has orientation locked to vertical for aesthetics, but the rest of the app can be freely rotated.
 
 
-## Pitches
+## Pitches And Presentation Videos
 - [Original Pitch](https://www.youtube.com/watch?v=8LEHrpURMUA)
 - [Show and Tell 1](https://www.youtube.com/watch?v=ig3SUulYDys)
 - [Show and Tell 2](https://www.youtube.com/watch?v=bEes_D9cRB4)
+- [Final Presentation]()
 
 ## Team Effort Breakdown
-- 
+- Warren - Washroom Map, Washroom Details & Reviews
+- Wilson - Washroom List & Adding a New Location to the Map
+- Kyle - Firebase Database for Locations & Reviews, & Admin Interfaces
+- Nirvon - Firestore Authentication, Profile Page & Tab Layout
+- Kyle and Wilson - Diagrams, Slides & Presentations
+
+## Diagrams
+
+
 
 ## References
 Please note that other references are also made at the top of the files they were referenced in.
@@ -75,3 +84,6 @@ Please note that other references are also made at the top of the files they wer
 - https://stackoverflow.com/questions/8743120/how-to-grey-out-a-button
 - https://www.geeksforgeeks.org/ratingbar-in-kotlin/
 - https://www.geeksforgeeks.org/cardview-in-android-with-example/#:~:text=CardView%20is%20a%20new%20widget,look%20to%20the%20UI%20design
+- https://stackoverflow.com/questions/23925907/slidedown-and-slideup-layout-with-animation
+- https://stackoverflow.com/questions/19210187/how-to-create-an-interface-to-get-info-from-a-fragment-to-an-android-activity
+- https://medium.com/@tonyshkurenko/work-with-clustermanager-bdf3d70fb0fd
