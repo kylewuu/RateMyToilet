@@ -37,6 +37,9 @@ class WashroomDetailsActivity : AppCompatActivity(), NewReviewAdminFragment.Admi
     private lateinit var listAdapter: WashroomDetailsReviewAdapter
     private var accessibility = 2
 
+    /**
+     * Override onCreate. Initialize views and variables.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display)
@@ -54,11 +57,17 @@ class WashroomDetailsActivity : AppCompatActivity(), NewReviewAdminFragment.Admi
         if (isAdmin) title = "ADMIN - Washroom Reviews"
     }
 
+    /**
+     * Override onSupportNavigateUp. Deal with back button press.
+     */
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
 
+    /**
+     * Override onResume.
+     */
     override fun onResume() {
         if (updateReviews) {
             userCommentList.clear()
@@ -68,6 +77,9 @@ class WashroomDetailsActivity : AppCompatActivity(), NewReviewAdminFragment.Admi
         super.onResume()
     }
 
+    /**
+     * Set the views for the washroom view. Calculate overall cleanliness rating and display reviews.
+     */
     private fun setData() {
         updateReviews = false
 
@@ -176,6 +188,9 @@ class WashroomDetailsActivity : AppCompatActivity(), NewReviewAdminFragment.Admi
         }
     }
 
+    /**
+     * Override loadReviews.
+     */
     override fun loadReviews() {
         onResume()
     }
