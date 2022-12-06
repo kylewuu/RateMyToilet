@@ -42,25 +42,6 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/textView24"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="10dp"
-                android:text="Soap:"
-                android:textColor="#090000"
-                android:textSize="12sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/soapStateText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:textSize="12sp" />
-
-            <TextView
                 android:id="@+id/userDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -73,58 +54,81 @@
                 android:textStyle="bold"/>
 
 
-    </LinearLayout>
+        </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp">
-
-        <TextView
-            android:id="@+id/textView25"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Accessibility:"
-            android:textColor="#090000"
-            android:textSize="12sp"
-            android:textStyle="bold"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:id="@+id/textView24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Soap:"
+                android:textColor="#090000"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/accessStateText"
+            <TextView
+                android:id="@+id/soapStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textSize="12sp" />
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/textView25"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Accessibility:"
+                android:textColor="#090000"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
 
-        <RatingBar
-            android:id="@+id/singleRating"
-            style="?android:attr/ratingBarStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
-            android:progressTint="#ffd700"
-            />
+            <TextView
+                android:id="@+id/accessStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textSize="12sp" />
 
-        <EditText
-            android:id="@+id/userComment"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@null"
-            android:enabled="false"
-            android:focusable="false"
-            android:inputType="textMultiLine"
-            android:layout_width="wrap_content"
-            android:textColor="#0C0000"
-            android:textSize="12sp"
-/>
+        </LinearLayout>
+
+            <RatingBar
+                android:id="@+id/singleRating"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:progressTint="#ffd700" />
+
+            <EditText
+                android:id="@+id/userComment"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@null"
+                android:enabled="false"
+                android:focusable="false"
+                android:inputType="textMultiLine"
+                android:layout_width="wrap_content"
+                android:textColor="#0C0000"
+                android:textSize="12sp"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
