@@ -132,6 +132,16 @@ class WashroomListFragment : Fragment(), LocationListener {
     }
 
     /**
+     * Reload washrooms if washrooms have been updated
+     */
+    override fun onResume() {
+        super.onResume()
+        if (updateList) {
+            loadWashrooms()
+        }
+    }
+
+    /**
      * Override onViewCreated. Setup toolbar.
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
