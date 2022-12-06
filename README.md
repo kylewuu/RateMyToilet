@@ -48,6 +48,7 @@ Using an actual phone number also works and you will receive a login code. If yo
 ## Notes
 - Please note that fetching items from Firebase can take awhile, especially on a slow connection. The loading speed may have an impact on all 3 pages (Map, List, My Profile). 
 - Applying the filter for the map or list will require the app to fetch data from the cloud. Thus, please wait 5-10 seconds to see your updates.
+- Sign in screens has orientation locked to vertical for aesthetics, but the rest of the app can be freely rotated.
 
 ## References
 Please note that other references are also made at the top of the files they were referenced in.
