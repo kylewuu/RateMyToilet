@@ -8,7 +8,7 @@ import android.telephony.PhoneNumberFormattingTextWatcher
 import android.telephony.PhoneNumberUtils
 import android.util.Log
 import android.view.View
-import com.example.ratemytoilet.DialogManager
+import com.example.ratemytoilet.dialogs.DialogManager
 import com.example.ratemytoilet.R
 import com.example.ratemytoilet.databinding.ActivityPhoneBinding
 import com.google.firebase.auth.ktx.auth

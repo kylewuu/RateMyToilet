@@ -1,4 +1,4 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.database
 
 class UserComment {
     var userName:String ?= null

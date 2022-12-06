@@ -22,7 +22,7 @@ import com.google.android.material.chip.ChipGroup
 import java.util.*
 
 
-class AdminReviewFragment : DialogFragment() {
+class NewReviewAdminFragment : DialogFragment() {
     var listener: AdminReviewListener? = null
     private var paperResult = 1
     private var soapResult = 1

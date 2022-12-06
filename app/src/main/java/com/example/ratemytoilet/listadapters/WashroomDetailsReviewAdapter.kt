@@ -1,4 +1,4 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.listadapters
 
 import android.content.Context
 import android.graphics.Color
@@ -8,8 +8,10 @@ import android.widget.BaseAdapter
 import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.TextView
+import com.example.ratemytoilet.R
+import com.example.ratemytoilet.database.UserComment
 
-class UserCommentListAdapter(var context: Context, var arrayList: ArrayList<UserComment>) : BaseAdapter(){
+class WashroomDetailsReviewAdapter(var context: Context, var arrayList: ArrayList<UserComment>) : BaseAdapter(){
     override fun getCount(): Int {
         return arrayList.size
     }

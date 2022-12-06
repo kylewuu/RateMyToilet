@@ -1,4 +1,4 @@
-package com.example.ratemytoilet
+package com.example.ratemytoilet.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -19,6 +19,7 @@ import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.soapCheck
 import com.example.ratemytoilet.MainActivity.Companion.updateList
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
+import com.example.ratemytoilet.R
 import com.google.android.material.chip.Chip
 import com.google.android.material.slider.RangeSlider
 
