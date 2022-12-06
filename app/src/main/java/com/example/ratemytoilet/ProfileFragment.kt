@@ -21,6 +21,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -69,7 +70,7 @@ class ProfileFragment : Fragment() {
 
             val query = db
                 .collection("users/${currentUser!!.uid}/reviews")
-                .orderBy("dateAdded")
+                .orderBy("dateAdded", Query.Direction.DESCENDING)
 
             val options: FirestoreRecyclerOptions<Review> = FirestoreRecyclerOptions.Builder<Review>()
                 .setQuery(query, Review::class.java)
