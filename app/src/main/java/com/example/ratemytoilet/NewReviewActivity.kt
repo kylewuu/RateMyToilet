@@ -27,6 +27,9 @@ class NewReviewActivity : AppCompatActivity() {
     private lateinit var review : Review
     private var washroomId : String ?= null
 
+    /**
+     * Creates a new review activity. Sets the save and cancel button listeners
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_review_normal)
@@ -58,6 +61,9 @@ class NewReviewActivity : AppCompatActivity() {
         return true
     }
 
+    /**
+     * Retrieves all of user inputted data
+     */
     private fun getData() {
         val ratingBar = findViewById<RatingBar>(R.id.normalUserRating)
         rating = ratingBar.rating
@@ -96,6 +102,9 @@ class NewReviewActivity : AppCompatActivity() {
         comment = commentText.text.toString()
     }
 
+    /**
+     * When data is saved, write it to the firestore db
+     */
     private fun setData() {
         review.locationId = washroomId.toString()
         review.leftByAdmin = false

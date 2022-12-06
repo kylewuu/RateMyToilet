@@ -29,6 +29,9 @@ import com.google.android.material.slider.RangeSlider
 class FilterDialogFragment : DialogFragment() {
     var listener : FilterListener?= null
 
+    /**
+     * Creates the dialog
+     */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val layoutInflater = requireActivity().layoutInflater
         val dialogLayout = layoutInflater.inflate(R.layout.fragment_dialog, null)
@@ -63,6 +66,9 @@ class FilterDialogFragment : DialogFragment() {
         return builder.create()
     }
 
+    /**
+     * Attaches the dialog
+     */
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is FilterListener) {
@@ -77,6 +83,9 @@ class FilterDialogFragment : DialogFragment() {
         listener = null
     }
 
+    /**
+     * onStart for the dialog
+     */
     override fun onStart() {
         super.onStart()
         val dialog = dialog
@@ -90,6 +99,9 @@ class FilterDialogFragment : DialogFragment() {
         }
     }
 
+    /**
+     * Listener for when filter is clicked
+     */
     interface FilterListener {
         fun onFilterConditionPassed(paperCheck : Boolean, soapCheck : Boolean, accessCheck : Boolean, maleCheck : Boolean, femaleCheck : Boolean, startValue : Float, endValue : Float)
     }

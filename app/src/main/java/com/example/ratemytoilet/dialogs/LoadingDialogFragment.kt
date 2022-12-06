@@ -26,6 +26,9 @@ class LoadingDialogFragment : DialogFragment() {
         return inflater.inflate(R.layout.fragment_loading, container);
     }
 
+    /**
+     * On start for loading dialog
+     */
     override fun onStart() {
         super.onStart()
         val dialog = dialog

@@ -15,6 +15,9 @@ import com.google.android.gms.maps.model.Marker
 class MapMarkerTooltipAdapter(context : Context) : GoogleMap.InfoWindowAdapter {
     var view : View = LayoutInflater.from(context).inflate(R.layout.custom_inforwindow, null)
 
+    /**
+     * Sets the window text
+     */
     private fun setWindowText(marker: Marker, view: View){
         val soapCheck = view.findViewById<ImageView>(R.id.soapCheck)
         val paperCheck = view.findViewById<ImageView>(R.id.paperCheck)

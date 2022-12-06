@@ -53,6 +53,9 @@ class ProfileFragment : Fragment() {
         currentUser = auth.currentUser
     }
 
+    /**
+     * Creates the view for the profile activity. Sets the adapters and the texts for the user reviews
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -122,6 +125,9 @@ class ProfileFragment : Fragment() {
         updateTotalReviews()
     }
 
+    /**
+     * Updates the total reviews after user makes new reviews
+     */
     private fun updateTotalReviews() {
         // Temporarily set these until we get the values loaded
         binding.totalReviewsTextView.text = reviewsStrFormat.format(0)

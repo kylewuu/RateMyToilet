@@ -60,6 +60,9 @@ class WashroomListFragment : Fragment(), LocationListener {
     private lateinit var locationManager: LocationManager
     private var userLocation: android.location.Location? = null
 
+    /**
+     * Override onCreateView. Setup/Initialize views, buttons, and variables.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -128,10 +131,12 @@ class WashroomListFragment : Fragment(), LocationListener {
         return view
     }
 
+    /**
+     * Override onViewCreated. Setup toolbar.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar.inflateMenu(R.menu.main1)
-
 
         toolbar.setOnMenuItemClickListener {
             val filterDialogFragment = FilterDialogFragment()
@@ -140,6 +145,9 @@ class WashroomListFragment : Fragment(), LocationListener {
         }
     }
 
+    /**
+     * Load washrooms into the arrayAdapter, sorted by distance from washroom to user in ascending order.
+     */
     private fun loadWashrooms() {
         lifecycleScope.launch(Dispatchers.IO) {
 
@@ -164,6 +172,9 @@ class WashroomListFragment : Fragment(), LocationListener {
         }
     }
 
+    /**
+     * Save filter conditions.
+     */
     fun filterConditionPassed(
         paperCheck: Boolean,
         soapCheck: Boolean,
@@ -187,7 +198,9 @@ class WashroomListFragment : Fragment(), LocationListener {
         loadWashrooms()
     }
 
-    // Get the current users location
+    /**
+     * Retrieve the current user's locations. If cannot retrieve, then set request for location updates from locationManager.
+     */
     private fun getUserLocation() {
         try {
             locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -217,13 +230,18 @@ class WashroomListFragment : Fragment(), LocationListener {
         }
     }
 
+    /**
+     * Start AddNewWashroomActivity when new washroom button is pressed.
+     */
     private fun onAddNewLocationClick() {
         val viewIntent = Intent(activity, AddNewWashroomActivity::class.java)
         startActivity(viewIntent)
     }
 
+    /**
+     * Override onLocationChanged. New location found. Set the user's location in the WashroomListAdapter and notify. This function only needs to be called once.
+     */
     override fun onLocationChanged(location: android.location.Location) {
-        // Location found. Set the user's location in the WashroomListAdapter and notify
         userLocation = location
         loadWashrooms()
         arrayAdapter.replaceUserLocation(userLocation)
@@ -234,6 +252,10 @@ class WashroomListFragment : Fragment(), LocationListener {
 
     }
 
+    /**
+     * Detects if the location is turned on in the washroomList fragment. If detected, it will ask to retrieve the user's current location with function getUserLocation().
+     * Helps to solve the issue where the location is turned off in another fragment (ex. Washroom Map Fragment), and the Washroom List Fragment is re-opened with location still turned off.
+     */
     private val locationSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (LocationManager.PROVIDERS_CHANGED_ACTION == intent.action) {
@@ -252,9 +274,11 @@ class WashroomListFragment : Fragment(), LocationListener {
                 }
             }
         }
-
     }
 
+    /**
+     * Calculate the lat and lng distance from the user's current location.
+     */
     private fun calculateDistanceToUser(lat: Double, lng: Double): Float? {
         // Calculate distances
         var washroomLocation: android.location.Location? = android.location.Location("")
@@ -265,6 +289,9 @@ class WashroomListFragment : Fragment(), LocationListener {
         return distanceFromUserToWashroom
     }
 
+    /**
+     * Override onDestroy. Unregister the locationSwitchStateReceiver.
+     */
     override fun onDestroy() {
         super.onDestroy()
         // Unregister receiver

@@ -55,7 +55,7 @@ import java.text.SimpleDateFormat
 private const val TAG = "WashroomMapFragment"
 
 /**
- * Fragment to show all washrooms on a map.
+ * Fragment to show the map and all washrooms on the map
  *
  */
 class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
@@ -79,6 +79,10 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
     private lateinit var loadingDialogFragment: LoadingDialogFragment
     private lateinit var locationPermissionResultReceiver: ActivityResultLauncher<String>
 
+
+    /**
+     * Override onCreate. Call initializer functions
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -101,6 +105,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         getActivity()?.registerReceiver(locationSwitchStateReceiver, filter)
     }
 
+    /**
+     * Override onCreateView. Set up map view, buttons and toolbar. Also observe for new locations added to map.
+     */
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_washroom_map, container, false)
 
@@ -139,6 +146,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         return view
     }
 
+    /**
+     * Override onResume. If not first time loading map, reload map and washrooms.
+     */
     override fun onResume() {
         super.onResume()
         mapView.onResume()
@@ -158,11 +168,17 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         }
     }
 
+    /**
+     * Override onStart
+     */
     override fun onStart() {
        super.onStart()
        mapView.onStart()
     }
 
+    /**
+     * Initialize Location Manager. Attempt to get user last known location and request for user location updates.
+     */
     fun initLocationManager() {
         try {
             mapCentered = false
@@ -180,6 +196,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         } catch (e: SecurityException) {}
     }
 
+    /**
+     * Override onLocationChanged. Get user lat and lng, and set marker to user's current location. Center camera if first time loading map or location setting is turned on.
+     */
     override fun onLocationChanged(location: Location) {
         if (myLocationMarker != null) {
             myLocationMarker!!.remove()
@@ -199,6 +218,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         myLocationMarker = mMap.addMarker(markerOptions)!!
     }
 
+    /**
+     * Override onMapReady. Start clusterManger and google map
+     */
     override fun onMapReady(googleMap: GoogleMap) {
         Log.d(TAG, "Map is ready!")
         mMap = googleMap
@@ -210,16 +232,25 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         setClusterManager()
     }
 
+    /**
+     * Override onPause
+     */
     override fun onPause() {
         super.onPause()
         mapView.onPause()
     }
 
+    /**
+     * Override onStop
+     */
     override fun onStop() {
         super.onStop()
         mapView.onStop()
     }
 
+    /**
+     * Override onDestroy. Unregister the locationSwitchStateReceiver and stop receiving user location updates from locationManager
+     */
     override fun onDestroy() {
         super.onDestroy()
         mapView.onDestroy()
@@ -231,16 +262,25 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         getActivity()?.unregisterReceiver(locationSwitchStateReceiver)
     }
 
+    /**
+     * Override onSaveInstanceState
+     */
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView.onSaveInstanceState(outState)
     }
 
+    /**
+     * Override onLowMemory
+     */
     override fun onLowMemory() {
         super.onLowMemory()
         mapView.onLowMemory()
     }
 
+    /**
+     * Cluster the washrooms on the main thread
+     */
     private suspend fun setClusterOnMainThread(locationList : ArrayList<ReviewCard>) {
         withContext(Dispatchers.Main){
             var loadFragment = childFragmentManager.findFragmentByTag("Load")
@@ -252,6 +292,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         }
     }
 
+    /**
+     * Load the washrooms into the map
+     */
     private fun loadWashrooms() {
         val bubble = IconGenerator(context)
         bubble.setStyle(markerColor)
@@ -271,6 +314,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         }
     }
 
+    /**
+     * Save filter settings
+     */
     fun filterConditionPassed(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
         mMap.clear()
         myClusterManager.clearItems()
@@ -279,11 +325,17 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         setClusterManager()
     }
 
+    /**
+     * Start the AddNewWashroomActivity when the add new location button is pressed by the user
+     */
     private fun onAddNewLocationClick() {
         val viewIntent = Intent(activity, AddNewWashroomActivity::class.java)
         startActivity(viewIntent)
     }
 
+    /**
+     * Save filter conditions for switching between Map fragment and Washroom list fragment
+     */
     private fun saveFilterConditions(paperCheck: Boolean, soapCheck: Boolean, accessCheck: Boolean, maleCheck: Boolean, femaleCheck: Boolean, startValue: Float, endValue: Float) {
         MainActivity.paperCheck = paperCheck
         MainActivity.soapCheck = soapCheck
@@ -294,20 +346,28 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         cleanlinessEnd = endValue
     }
 
+
     override fun onLocationChanged(locations: MutableList<Location>) {
     }
+
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
     }
 
+
     override fun onProviderEnabled(provider: String) {
-        println("DEBUG: Provider Enabled" )
+
     }
+
 
     override fun onProviderDisabled(provider: String) {
-        println("DEBUG: Provider Disabled" )
+
     }
 
+
+    /**
+     * Start the cluster manager in order to show washroom clusters on the map
+     */
     private fun setClusterManager() {
         myClusterManager = ClusterManager<ReviewCard>(activity?.applicationContext , mMap)
         myClusterManager.renderer = context?.let { MarkerClusterRenderer(it, mMap, myClusterManager) }
@@ -346,9 +406,11 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         mMap.setOnInfoWindowClickListener(myClusterManager)
     }
 
-    // Detects if the location is turned on in the map fragment. If detected, it will start the location manager again with function initLocationManager().
-    // Helps to solve the issue where the location is turned off in another fragment (ex. Washroom List Fragment), and the map view is re-opened with location still turned off.
-    // This will detect if the location is turned back on in the map view and start up location manager to detect new locations. Otherwise, location will not be updated.
+    /**
+     * Detects if the location is turned on in the map fragment. If detected, it will start the location manager again with function initLocationManager().
+     * Helps to solve the issue where the location is turned off in another fragment (ex. Washroom List Fragment), and the map view is re-opened with location still turned off.
+     * This will detect if the location is turned back on in the map view and start up location manager to detect new locations. Otherwise, location will not be updated.
+     */
     private val locationSwitchStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (LocationManager.PROVIDERS_CHANGED_ACTION == intent.action) {
@@ -365,6 +427,9 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         }
     }
 
+    /**
+     * Check if the user is an admin. If so, display the appropriate Admin title in map
+     */
     private fun setUpAdmin(view: View) {
         var db = FirebaseFirestore.getInstance()
         var auth = FirebaseAuth.getInstance()

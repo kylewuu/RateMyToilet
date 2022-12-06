@@ -26,7 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 /**
  * Activity for inputting location for the new washroom.
- *
  */
 class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, GoogleMap.OnMapClickListener {
     // Map vars
@@ -44,6 +43,9 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
     // Views
     private lateinit var finishButton: Button
 
+    /**
+     * On create for the activity. Sets the finish button
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,11 +59,14 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        finishButton = findViewById<Button>(R.id.bt_onFinishAddLocationClick)
+        finishButton = findViewById(R.id.bt_onFinishAddLocationClick)
         finishButton.setEnabled(false)
         finishButton.setAlpha(.5f)
     }
 
+    /**
+     * When map is ready check for location permission
+     */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
@@ -71,7 +76,10 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
         checkPermission()
     }
 
-    fun checkPermission() {
+    /**
+     * Checks for location permission
+     */
+    private fun checkPermission() {
         if (Build.VERSION.SDK_INT < 23) return
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 0)
@@ -80,7 +88,10 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
         }
     }
 
-    fun getUserLocation() {
+    /**
+     * Gets the user location
+     */
+    private fun getUserLocation() {
         try {
             locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
             val criteria = Criteria()
@@ -95,15 +106,20 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
         } catch (e: SecurityException) {}
     }
 
+    /**
+     * On location change update camera
+     */
     override fun onLocationChanged(location: Location) {
         val lat = location.latitude
         val lng = location.longitude
         val latLng = LatLng(lat, lng)
-        println("Debug: Init user location ")
         val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
         mMap.animateCamera(cameraUpdate)
     }
 
+    /**
+     * When map is clicked add marker
+     */
     override fun onMapClick(latLng: LatLng) {
         // Remove previous marker if it exists
         if(previousMarker != null){
@@ -119,6 +135,9 @@ class AddLocationToNewWashroomActivity : AppCompatActivity(), OnMapReadyCallback
         finishButton.setAlpha(1f)
     }
 
+    /**
+     * When finish is clicked add the location to the new washroom
+     */
     fun onFinishAddLocationClick(view: View){
         // Create bundle
         val bundle = Bundle()

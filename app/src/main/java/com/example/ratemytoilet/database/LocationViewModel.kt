@@ -24,14 +24,23 @@ class LocationViewModel : ViewModel() {
     var tempMarkers: MutableLiveData<ArrayList<ReviewCard>> = MutableLiveData()
     var locations: LiveData<List<Location>> = LocationRepository.getAllLocationsFlow().asLiveData()
 
+    /**
+     * Adds a location to firestore
+     */
     suspend fun addLocation(location: Location): Flow<String> {
         return LocationRepository.addLocation(location)
     }
 
+    /**
+     * Gets all the locations using the repository calls
+     */
     suspend fun getAllLocations(): List<Location> {
         return LocationRepository.getAllLocations()
     }
 
+    /**
+     * Retrieves, processes, sorts the locations for map
+     */
     suspend fun processMapLocations(bubble: IconGenerator) {
         var newLocations = ArrayList<Location>()
         var arr = ArrayList<ReviewCard>()
@@ -154,6 +163,9 @@ class LocationViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Retrieves, processes, sorts the locations for list
+     */
     suspend fun processListLocations() {
         var newLocations = ArrayList<Location>()
         val reviewViewModel = ReviewViewModel()
@@ -224,6 +236,9 @@ class LocationViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Filters out all markers to only keep markers that admin should see
+     */
     private suspend fun filterAdminMarkers(allLocations: List<Location>, reviewViewModel: ReviewViewModel): List<Location> {
         var filteredLocations = ArrayList<Location>()
         for (location in allLocations) {
