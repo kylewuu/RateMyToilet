@@ -23,21 +23,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.ratemytoilet.MainActivity.Companion.accessCheck
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessEnd
 import com.example.ratemytoilet.MainActivity.Companion.cleanlinessStart
-import com.example.ratemytoilet.MainActivity.Companion.femaleCheck
 import com.example.ratemytoilet.MainActivity.Companion.isAdmin
-import com.example.ratemytoilet.MainActivity.Companion.maleCheck
 import com.example.ratemytoilet.MainActivity.Companion.notRunFirstTime
-import com.example.ratemytoilet.MainActivity.Companion.paperCheck
 import com.example.ratemytoilet.MainActivity.Companion.previousLocationsSize
-import com.example.ratemytoilet.MainActivity.Companion.soapCheck
 import com.example.ratemytoilet.MainActivity.Companion.updateMap
 import com.example.ratemytoilet.ToiletUser.Companion.toToiletUser
 import com.example.ratemytoilet.database.LocationViewModel
-import com.example.ratemytoilet.database.ReviewViewModel
 import com.example.ratemytoilet.launch.LaunchActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -96,6 +91,8 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
             }
         }
 
+        locationViewModel = ViewModelProvider(requireActivity())[LocationViewModel::class.java]
+
         // Register for Receiver
         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
         filter.addAction(Intent.ACTION_PROVIDER_CHANGED)
@@ -106,14 +103,13 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         val view = inflater.inflate(R.layout.fragment_washroom_map, container, false)
 
         setUpAdmin(view)
-//        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapView = view.findViewById(R.id.map_view)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
         locationPermissionResultReceiver.launch(Manifest.permission.ACCESS_FINE_LOCATION)
 
-        locationViewModel = LocationViewModel()
+
         loadingDialogFragment = LoadingDialogFragment()
 
         if ((activity as AppCompatActivity).supportActionBar != null) {
@@ -131,7 +127,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
             onAddNewLocationClick()
         }
 
-        locationViewModel = LocationViewModel()
         locationViewModel.locations.observe(viewLifecycleOwner) {
             if (previousLocationsSize == -1) {
                 previousLocationsSize = it.size
@@ -151,7 +146,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         if (notRunFirstTime) {
             if (updateMap) {
                 Log.d("TAp", "true")
-                updateMap = false
                 if (mMap != null && myClusterManager != null) {
                     mMap.clear()
                     myClusterManager.clearItems()
@@ -273,125 +267,17 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
 
     private fun loadWashrooms() {
         val bubble = IconGenerator(context)
-        val arr = ArrayList<MyItem>()
-        var newLocations = ArrayList<com.example.ratemytoilet.database.Location>()
         bubble.setStyle(markerColor)
         if (loadingDialogFragment.dialog == null || !loadingDialogFragment.dialog?.isShowing!!) loadingDialogFragment.show(childFragmentManager, "Load")
         lifecycleScope.launch(Dispatchers.IO) {
-            var allLocations = locationViewModel.getAllLocations()
-            val reviewViewModel = ReviewViewModel()
-            if (isAdmin) allLocations = filterAdminMarkers(allLocations, reviewViewModel)
-            if (allLocations != null &&
-                (paperCheck ||
-                        soapCheck ||
-                        accessCheck ||
-                        maleCheck ||
-                        femaleCheck ||
-                        cleanlinessStart != 1f ||
-                        cleanlinessEnd != 5f)
-            ) {
-                for (location in allLocations) {
-                    var shouldAdd = true
-                    var rating = 0.0
-                    var allReviews = reviewViewModel.getReviewsForLocation(location.id)
-                    allReviews = allReviews.sortedByDescending { it.dateAdded }
-                    if (allReviews.isNotEmpty()) {
-                        for (review in allReviews) {
-                            rating += review.cleanliness
-                        }
-                        rating /= allReviews.size
-
-                        if (paperCheck) {
-                            if (allReviews[0].sufficientPaperTowels != 1) {
-                                shouldAdd = false
-                            }
-                        }
-                        if (soapCheck) {
-                            if (allReviews[0].sufficientSoap != 1) {
-                                shouldAdd = false
-                            }
-                        }
-                        if (accessCheck) {
-                            if (allReviews[0].accessibility != 1) {
-                                shouldAdd = false
-                            }
-                        }
-                    }
-                    if ((femaleCheck && !maleCheck) || (!femaleCheck && maleCheck)) {
-                        if (maleCheck) {
-                            if (location.gender != 0 && location.gender != 2) {
-                                shouldAdd = false
-                            }
-                        }
-                        if (femaleCheck) {
-                            if (location.gender != 1 && location.gender != 2) {
-                                shouldAdd = false
-                            }
-                        }
-                    }
-
-                    if (rating !in cleanlinessStart..cleanlinessEnd) {
-                        shouldAdd = false
-                    }
-
-                    if (shouldAdd) newLocations.add(location)
-                }
-            } else if (allLocations != null){
-                newLocations = allLocations as java.util.ArrayList<com.example.ratemytoilet.database.Location>
+            if (updateMap || locationViewModel.tempMarkers == null) {
+                locationViewModel.processLocations(bubble)
             }
-
-            if (newLocations.isNotEmpty()) {
-                val updates = newLocations.distinctBy { it.id }
-                for(update in updates) {
-                    val updateLatLng = LatLng(update.lat, update.lng)
-                    var updateRating = 0.0
-                    var updateSoap = "true"
-                    var updatePaper = "true"
-                    var updateAccess = "true"
-                    var updateAllReviews = reviewViewModel.getReviewsForLocation(update.id)
-                    updateAllReviews = updateAllReviews.sortedByDescending { it.dateAdded }
-                    if (updateAllReviews.isNotEmpty()) {
-                        for (review in updateAllReviews) {
-                            updateRating += review.cleanliness
-                        }
-                        updateRating /= updateAllReviews.size
-                        if (updateAllReviews[0].sufficientSoap == 0) {
-                            updateSoap = "false"
-                        } else if (updateAllReviews[0].sufficientSoap == 2) {
-                            updateSoap = "unknown"
-                        }
-
-                        if (updateAllReviews[0].sufficientPaperTowels == 0) {
-                            updatePaper = "false"
-                        } else if (updateAllReviews[0].sufficientPaperTowels == 2) {
-                            updatePaper = "unknown"
-                        }
-
-                        if (updateAllReviews[0].accessibility == 0) {
-                            updateAccess = "false"
-                        } else if (updateAllReviews[0].accessibility == 2) {
-                            updateAccess = "unknown"
-                        }
-                    }
-                    val snippet = update.name + ", " + update.roomNumber + ";" + updateRating.toInt()
-                    val title = "$updateSoap,$updatePaper,$updateAccess"
-                    val item = MyItem(
-                        updateLatLng,
-                        title,
-                        snippet,
-                        BitmapDescriptorFactory.fromBitmap(
-                            bubble.makeIcon(
-                                updateRating.toInt().toString()
-                            )
-                        ),
-                        update.id,
-                        update.date,
-                        update.gender
-                    )
-                    arr.add(item)
-                }
+            var arr = locationViewModel.tempMarkers.value
+            if (arr != null) {
                 setClusterOnMainThread(arr)
             }
+            updateMap = false
         }
     }
 
@@ -472,39 +358,6 @@ class WashroomMapFragment : Fragment(), OnMapReadyCallback, LocationListener {
         mMap.setOnInfoWindowClickListener(myClusterManager)
     }
 
-    private suspend fun filterAdminMarkers(allLocations: List<com.example.ratemytoilet.database.Location>, reviewViewModel: ReviewViewModel): List<com.example.ratemytoilet.database.Location> {
-        var filteredLocations = ArrayList<com.example.ratemytoilet.database.Location>()
-        for (location in allLocations) {
-            var shouldAdd = false
-            var rating = 0.0
-            var allReviews = reviewViewModel.getReviewsForLocation(location.id)
-            allReviews = allReviews.sortedByDescending { it.dateAdded }
-            if (allReviews.isNotEmpty()) {
-                for (review in allReviews) {
-                    rating += review.cleanliness
-                }
-                rating /= allReviews.size
-
-                if (allReviews[0].sufficientPaperTowels == 0) {
-                    shouldAdd = true
-                }
-
-
-                if (allReviews[0].sufficientSoap == 0) {
-                    shouldAdd = true
-                }
-
-            }
-
-            if (rating < 3) {
-                shouldAdd = true
-            }
-
-            if (shouldAdd) filteredLocations.add(location)
-        }
-
-        return filteredLocations
-    }
 
     // Detects if the location is turned on in the map fragment. If detected, it will start the location manager again with function initLocationManager().
 
