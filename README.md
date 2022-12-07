@@ -5,6 +5,9 @@
 - Yang Han
 - Nirvon Shoa
 
+## APK Download
+[Download apk](https://github.com/kylewuu/RateMyToilet/blob/main/FinalAPK.apk)
+
 ## Overview
 Team 11 has created a location-based mobile application for crowdsourced reviews on university washrooms. RateMyToilet is cloud-based and utilizes Firebase for data storage and user authentication.
 
