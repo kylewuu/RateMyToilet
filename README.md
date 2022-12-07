@@ -56,8 +56,10 @@ Using an actual phone number also works and you will receive a login code. If yo
 - [Original Pitch](https://www.youtube.com/watch?v=8LEHrpURMUA)
 - [Show and Tell 1](https://www.youtube.com/watch?v=ig3SUulYDys)
 - [Show and Tell 2](https://www.youtube.com/watch?v=bEes_D9cRB4)
-- [Figma UI Prototype](https://www.figma.com/file/LH57Gz221c4b5S6shuGYpm/Final-Project?node-id=0%3A1&t=vYoF0P7ErklMTadW-0)
 - [Final Presentation](https://www.youtube.com/watch?v=JoFHff5Khso&feature=youtu.be)
+
+#### Prototype
+- [Figma UI Prototype](https://www.figma.com/file/LH57Gz221c4b5S6shuGYpm/Final-Project?node-id=0%3A1&t=vYoF0P7ErklMTadW-0)
 
 ## Team Effort Breakdown
 - Warren - Washroom Map, Washroom Details & Reviews
