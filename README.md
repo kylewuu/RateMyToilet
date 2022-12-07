@@ -97,3 +97,4 @@ Please note that other references are also made at the top of the files they wer
 - https://stackoverflow.com/questions/23925907/slidedown-and-slideup-layout-with-animation
 - https://stackoverflow.com/questions/19210187/how-to-create-an-interface-to-get-info-from-a-fragment-to-an-android-activity
 - https://medium.com/@tonyshkurenko/work-with-clustermanager-bdf3d70fb0fd
+- https://emojipedia.org/microsoft-teams/1.0/toilet/
